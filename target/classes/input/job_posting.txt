@@ -1,0 +1,57 @@
+Stellenausschreibung: Senior Softwareentwickler (m/w/d)
+
+Unternehmen: Digital Innovations GmbH
+Standort: Berlin
+Art: Vollzeit, unbefristet
+
+Über uns:
+Die Digital Innovations GmbH ist ein führendes Technologieunternehmen mit über 200 Mitarbeitern. 
+Wir entwickeln innovative Softwarelösungen für mittelständische Unternehmen und setzen auf 
+moderne Technologien und agile Arbeitsmethoden.
+
+Ihre Aufgaben:
+- Entwicklung und Weiterentwicklung von Enterprise-Java-Anwendungen
+- Konzeption und Implementierung von REST-APIs und Microservices
+- Zusammenarbeit in einem agilen Entwicklerteam
+- Code-Reviews und Qualitätssicherung
+- Optimierung von Datenbankabfragen und Performance
+- Unterstützung bei der Architekturplanung
+- Dokumentation von Softwarekomponenten
+
+Ihre Qualifikationen:
+- Erfolgreich abgeschlossenes Hochschulstudium (Informatik, Wirtschaftsinformatik oder vergleichbar)
+- Mehrjährige Berufserfahrung in der Java-Entwicklung
+- Fundierte Kenntnisse in Spring Boot und Spring Framework
+- Erfahrung mit relationalen Datenbanken (MySQL, PostgreSQL)
+- Kenntnisse in REST-API-Design
+- Erfahrung mit Git, Maven/Gradle
+- Gute Deutsch- und Englischkenntnisse
+- Teamfähigkeit und selbstständige Arbeitsweise
+
+Von Vorteil:
+- Erfahrung mit Microservices-Architekturen
+- Kenntnisse in Cloud-Technologien (AWS, Azure)
+- Erfahrung mit Docker und Kubernetes
+- Zertifizierungen im Bereich Java/Spring
+
+Wir bieten:
+- Ein modernes Arbeitsumfeld mit neuester Technologie
+- Flexible Arbeitszeiten und Homeoffice-Möglichkeiten
+- Entwicklungsmöglichkeiten und Weiterbildung
+- Attraktive Vergütung und Sozialleistungen
+- Betriebliche Altersvorsorge
+- Jobticket und betriebliches Gesundheitsmanagement
+
+Bewerbung:
+Bitte senden Sie Ihre vollständigen Bewerbungsunterlagen (Anschreiben, Lebenslauf, Zeugnisse) 
+an bewerbung@digital-innovations.de oder über unser Online-Bewerbungsportal.
+
+Kontakt:
+Digital Innovations GmbH
+Hauptstraße 100
+10115 Berlin
+Tel: +49 30 98765432
+E-Mail: bewerbung@digital-innovations.de
+
+Wir freuen uns auf Ihre Bewerbung!
+

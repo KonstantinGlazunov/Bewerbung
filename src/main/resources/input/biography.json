@@ -1,0 +1,75 @@
+{
+  "personalInformation": {
+    "firstName": "Max",
+    "lastName": "Mustermann",
+    "birthDate": "1990-05-15",
+    "address": {
+      "street": "Musterstraße 123",
+      "postalCode": "12345",
+      "city": "Berlin",
+      "country": "Deutschland"
+    },
+    "phone": "+49 30 12345678",
+    "email": "max.mustermann@email.de",
+    "nationality": "Deutsch"
+  },
+  "education": [
+    {
+      "degree": "Bachelor of Science",
+      "field": "Informatik",
+      "university": "Technische Universität Berlin",
+      "startDate": "2010-10",
+      "endDate": "2014-09",
+      "description": "Schwerpunkt: Softwareentwicklung und Datenbanken"
+    }
+  ],
+  "workExperience": [
+    {
+      "position": "Softwareentwickler",
+      "company": "Tech Solutions GmbH",
+      "location": "Berlin",
+      "startDate": "2018-03",
+      "endDate": "2024-12",
+      "description": "Entwicklung von Web-Anwendungen mit Java Spring Boot. Verantwortlich für Backend-Entwicklung, API-Design und Datenbankoptimierung. Zusammenarbeit in agilen Teams.",
+      "technologies": ["Java", "Spring Boot", "MySQL", "REST APIs", "Git", "Docker"]
+    },
+    {
+      "position": "Junior Softwareentwickler",
+      "company": "Startup Innovations AG",
+      "location": "Berlin",
+      "startDate": "2015-01",
+      "endDate": "2018-02",
+      "description": "Entwicklung von Java-Anwendungen. Unterstützung bei der Implementierung neuer Features und Bug-Fixes.",
+      "technologies": ["Java", "Spring Framework", "PostgreSQL", "Maven"]
+    }
+  ],
+  "skills": {
+    "programmingLanguages": ["Java", "Python", "JavaScript"],
+    "frameworks": ["Spring Boot", "Spring Framework", "React"],
+    "databases": ["MySQL", "PostgreSQL", "MongoDB"],
+    "tools": ["Git", "Docker", "Jenkins", "Maven", "Gradle"],
+    "languages": [
+      {
+        "language": "Deutsch",
+        "level": "Muttersprache"
+      },
+      {
+        "language": "Englisch",
+        "level": "Fließend (C1)"
+      }
+    ]
+  },
+  "certifications": [
+    {
+      "name": "Oracle Certified Professional, Java SE 11 Developer",
+      "issuer": "Oracle",
+      "date": "2021-06"
+    }
+  ],
+  "additionalInfo": {
+    "interests": ["Open Source Projekte", "Technologie-Blogs", "Joggen"],
+    "availability": "2025-01-01",
+    "desiredPosition": "Senior Softwareentwickler / Software Engineer"
+  }
+}
+
