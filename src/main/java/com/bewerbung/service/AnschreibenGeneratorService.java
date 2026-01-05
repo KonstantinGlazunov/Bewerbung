@@ -3,6 +3,7 @@ package com.bewerbung.service;
 import com.bewerbung.model.JobRequirements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -10,11 +11,8 @@ public class AnschreibenGeneratorService {
 
     private static final Logger logger = LoggerFactory.getLogger(AnschreibenGeneratorService.class);
     
-    private final GeminiAiService geminiAiService;
-
-    public AnschreibenGeneratorService(GeminiAiService geminiAiService) {
-        this.geminiAiService = geminiAiService;
-    }
+    @Autowired
+    private GroqAiService groqAiService;
 
     public String generateAnschreiben(JobRequirements job, String candidateName) {
         logger.info("Generating Bewerbungsanschreiben for candidate: {} and position: {}", 
@@ -23,7 +21,7 @@ public class AnschreibenGeneratorService {
         String prompt = buildPrompt(job, candidateName);
         logger.debug("Generated prompt for Anschreiben");
         
-        String anschreiben = geminiAiService.generateText(prompt);
+        String anschreiben = groqAiService.generateText(prompt);
         
         logger.info("Successfully generated Bewerbungsanschreiben (length: {} characters)", 
                 anschreiben.length());

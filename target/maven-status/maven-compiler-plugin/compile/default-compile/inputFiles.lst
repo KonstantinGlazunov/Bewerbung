@@ -1,7 +1,0 @@
-/media/kosta/DATA/ProgrammingSchool/MyProjects/BewerbungAi/src/main/java/com/bewerbung/controller/BewerbungController.java
-/media/kosta/DATA/ProgrammingSchool/MyProjects/BewerbungAi/src/main/java/com/bewerbung/BewerbungAiApplication.java
-/media/kosta/DATA/ProgrammingSchool/MyProjects/BewerbungAi/src/main/java/com/bewerbung/model/JobRequirements.java
-/media/kosta/DATA/ProgrammingSchool/MyProjects/BewerbungAi/src/main/java/com/bewerbung/runner/VacancyAnalysisRunner.java
-/media/kosta/DATA/ProgrammingSchool/MyProjects/BewerbungAi/src/main/java/com/bewerbung/service/GeminiAiService.java
-/media/kosta/DATA/ProgrammingSchool/MyProjects/BewerbungAi/src/main/java/com/bewerbung/service/VacancyAnalyzerService.java
-/media/kosta/DATA/ProgrammingSchool/MyProjects/BewerbungAi/src/main/java/com/bewerbung/service/AnschreibenGeneratorService.java
