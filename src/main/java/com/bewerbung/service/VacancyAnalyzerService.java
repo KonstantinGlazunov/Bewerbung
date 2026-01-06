@@ -30,6 +30,16 @@ public class VacancyAnalyzerService {
         return requirements;
     }
 
+    public JobRequirements analyzeVacancy(String jobPostingText) {
+        logger.info("Starting vacancy analysis from provided text");
+        
+        JobRequirements requirements = extractRequirements(jobPostingText);
+        
+        logExtractedRequirements(requirements);
+        
+        return requirements;
+    }
+
     private String readJobPostingFile() {
         try {
             ClassPathResource resource = new ClassPathResource(JOB_POSTING_PATH);

@@ -59,6 +59,21 @@ public class BiographyService {
         }
     }
 
+    public Biography parseBiographyFromJson(JsonObject jsonObject) {
+        logger.info("Parsing biography from JSON object");
+        
+        try {
+            Biography biography = parseBiography(jsonObject);
+            
+            logger.info("Successfully parsed biography for: {}", biography.getName());
+            return biography;
+            
+        } catch (Exception e) {
+            logger.error("Error parsing biography JSON", e);
+            throw new RuntimeException("Failed to parse biography: " + e.getMessage(), e);
+        }
+    }
+
     private Biography parseBiography(JsonObject jsonObject) {
         Biography biography = new Biography();
         
