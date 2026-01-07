@@ -8,8 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.multipart.MultipartException;
 
 import java.util.stream.Collectors;
 
@@ -35,6 +37,23 @@ public class GlobalExceptionHandler {
         logger.warn("Invalid request body: {}", ex.getMessage());
         
         ApiError apiError = new ApiError("INVALID_REQUEST", "Invalid request body format");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ApiError> handleMissingParameter(MissingServletRequestParameterException ex) {
+        logger.warn("Missing request parameter: {}", ex.getMessage());
+        
+        String message = "Missing required parameter: " + ex.getParameterName();
+        ApiError apiError = new ApiError("MISSING_PARAMETER", message);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
+    }
+
+    @ExceptionHandler(MultipartException.class)
+    public ResponseEntity<ApiError> handleMultipartException(MultipartException ex) {
+        logger.warn("Multipart error: {}", ex.getMessage());
+        
+        ApiError apiError = new ApiError("FILE_UPLOAD_ERROR", "Error processing file upload: " + ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
     }
 

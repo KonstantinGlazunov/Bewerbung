@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bewerbung AI - Document Generator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        #biographyTextarea {
+            min-height: 300px;
+        }
+
+        #jobPostingTextarea {
+            min-height: 200px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .results {
+            margin-top: 30px;
+        }
+
+        .result-section {
+            margin-bottom: 25px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            border-left: 4px solid #007bff;
+        }
+
+        .result-section h2 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .result-content {
+            background: white;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 500px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .error {
+            background-color: #fff5f5;
+            border-left-color: #dc3545;
+            color: #dc3545;
+        }
+
+        .error .result-content {
+            color: #dc3545;
+        }
+
+        .loading {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bewerbung AI - Document Generator</h1>
+        
+        <form id="generateForm">
+            <div class="form-group">
+                <label for="biographyTextarea">Biography (Text):</label>
+                <textarea id="biographyTextarea" name="biography" required></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="jobPostingTextarea">Job Posting:</label>
+                <textarea id="jobPostingTextarea" name="jobPosting" required></textarea>
+            </div>
+            
+            <button type="submit" id="generateButton">Generate Documents</button>
+        </form>
+
+        <div id="loading" class="loading hidden">Generating documents...</div>
+
+        <div id="errorSection" class="results hidden">
+            <div class="result-section error">
+                <h2>Error</h2>
+                <div class="result-content" id="errorContent"></div>
+            </div>
+        </div>
+
+        <div id="results" class="results hidden">
+            <div class="result-section">
+                <h2>Cover Letter (Anschreiben)</h2>
+                <div class="result-content" id="coverLetterContent"></div>
+            </div>
+            
+            <div class="result-section">
+                <h2>CV (Lebenslauf)</h2>
+                <div class="result-content" id="cvContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const sampleBiography = `Name: Max Mustermann
+Email: max.mustermann@email.de
+Phone: +49 30 12345678
+Address: Musterstraße 123, 12345 Berlin, Deutschland
+Date of Birth: 1990-05-15
+Nationality: Deutsch
+
+=== EDUCATION ===
+Degree: Bachelor of Science - Informatik
+Institution: Technische Universität Berlin
+Location: Berlin
+Start Date: 2010-10
+End Date: 2014-09
+Description: Schwerpunkt: Softwareentwicklung und Datenbanken
+
+=== WORK EXPERIENCE ===
+Position: Softwareentwickler
+Company: Tech Solutions GmbH
+Location: Berlin
+Start Date: 2018-03
+End Date: 2024-12
+Responsibilities: Entwicklung von Web-Anwendungen mit Java Spring Boot. Verantwortlich für Backend-Entwicklung, API-Design und Datenbankoptimierung. Zusammenarbeit in agilen Teams. Technologien: Java, Spring Boot, MySQL, REST APIs, Git, Docker
+
+Position: Junior Softwareentwickler
+Company: Startup Innovations AG
+Location: Berlin
+Start Date: 2015-01
+End Date: 2018-02
+Responsibilities: Entwicklung von Java-Anwendungen. Unterstützung bei der Implementierung neuer Features und Bug-Fixes. Technologien: Java, Spring Framework, PostgreSQL, Maven
+
+=== TECHNICAL SKILLS ===
+Java, Python, JavaScript, Spring Boot, Spring Framework, React, MySQL, PostgreSQL, MongoDB, Git, Docker, Jenkins, Maven, Gradle
+
+=== LANGUAGES ===
+Deutsch: Muttersprache
+Englisch: Fließend (C1)
+
+=== CERTIFICATIONS ===
+Oracle Certified Professional, Java SE 11 Developer (Oracle, 2021-06)`;
+
+        const sampleJobPosting = `Stellenausschreibung: Senior Softwareentwickler (m/w/d)
+
+Unternehmen: Digital Innovations GmbH
+Standort: Berlin
+Art: Vollzeit, unbefristet
+
+Über uns:
+Die Digital Innovations GmbH ist ein führendes Technologieunternehmen mit über 200 Mitarbeitern. 
+Wir entwickeln innovative Softwarelösungen für mittelständische Unternehmen und setzen auf 
+moderne Technologien und agile Arbeitsmethoden.
+
+Ihre Aufgaben:
+- Entwicklung und Weiterentwicklung von Enterprise-Java-Anwendungen
+- Konzeption und Implementierung von REST-APIs und Microservices
+- Zusammenarbeit in einem agilen Entwicklerteam
+- Code-Reviews und Qualitätssicherung
+- Optimierung von Datenbankabfragen und Performance
+- Unterstützung bei der Architekturplanung
+- Dokumentation von Softwarekomponenten
+
+Ihre Qualifikationen:
+- Erfolgreich abgeschlossenes Hochschulstudium (Informatik, Wirtschaftsinformatik oder vergleichbar)
+- Mehrjährige Berufserfahrung in der Java-Entwicklung
+- Fundierte Kenntnisse in Spring Boot und Spring Framework
+- Erfahrung mit relationalen Datenbanken (MySQL, PostgreSQL)
+- Kenntnisse in REST-API-Design
+- Erfahrung mit Git, Maven/Gradle
+- Gute Deutsch- und Englischkenntnisse
+- Teamfähigkeit und selbstständige Arbeitsweise
+
+Von Vorteil:
+- Erfahrung mit Microservices-Architekturen
+- Kenntnisse in Cloud-Technologien (AWS, Azure)
+- Erfahrung mit Docker und Kubernetes
+- Zertifizierungen im Bereich Java/Spring
+
+Wir bieten:
+- Ein modernes Arbeitsumfeld mit neuester Technologie
+- Flexible Arbeitszeiten und Homeoffice-Möglichkeiten
+- Entwicklungsmöglichkeiten und Weiterbildung
+- Attraktive Vergütung und Sozialleistungen
+- Betriebliche Altersvorsorge
+- Jobticket und betriebliches Gesundheitsmanagement
+
+Bewerbung:
+Bitte senden Sie Ihre vollständigen Bewerbungsunterlagen (Anschreiben, Lebenslauf, Zeugnisse) 
+an bewerbung@digital-innovations.de oder über unser Online-Bewerbungsportal.
+
+Kontakt:
+Digital Innovations GmbH
+Hauptstraße 100
+10115 Berlin
+Tel: +49 30 98765432
+E-Mail: bewerbung@digital-innovations.de
+
+Wir freuen uns auf Ihre Bewerbung!`;
+
+        // Initialize form with sample data
+        document.getElementById('biographyTextarea').value = sampleBiography;
+        document.getElementById('jobPostingTextarea').value = sampleJobPosting;
+
+        // Form submission handler
+        document.getElementById('generateForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const biographyTextarea = document.getElementById('biographyTextarea');
+            const jobPostingTextarea = document.getElementById('jobPostingTextarea');
+            const generateButton = document.getElementById('generateButton');
+            const loading = document.getElementById('loading');
+            const results = document.getElementById('results');
+            const errorSection = document.getElementById('errorSection');
+            const errorContent = document.getElementById('errorContent');
+            
+            // Hide previous results
+            results.classList.add('hidden');
+            errorSection.classList.add('hidden');
+            
+            // Show loading state
+            loading.classList.remove('hidden');
+            generateButton.disabled = true;
+            
+            try {
+                // Validate biography text
+                const biographyText = biographyTextarea.value.trim();
+                if (!biographyText || biographyText.length === 0) {
+                    throw new Error('Biography cannot be empty');
+                }
+                
+                // Validate job posting
+                const jobPostingText = jobPostingTextarea.value.trim();
+                if (!jobPostingText || jobPostingText.length === 0) {
+                    throw new Error('Job posting cannot be empty');
+                }
+                
+                // Create a Blob from the biography text and convert it to a File
+                const biographyBlob = new Blob([biographyText], { type: 'text/plain' });
+                const biographyFile = new File([biographyBlob], 'biography.txt', { type: 'text/plain' });
+                
+                // Prepare form data
+                const formData = new FormData();
+                formData.append('biographyFile', biographyFile);
+                formData.append('jobPosting', jobPostingText);
+                
+                // Send POST request
+                const response = await fetch('/api/generate/from-file', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                // Parse response
+                let responseData;
+                try {
+                    responseData = await response.json();
+                } catch (jsonError) {
+                    throw new Error('Invalid response from server');
+                }
+                
+                if (!response.ok) {
+                    // Handle API error response
+                    const errorMessage = responseData.message || responseData.error || 'An error occurred';
+                    throw new Error(`API Error (${response.status}): ${errorMessage}`);
+                }
+                
+                // Display results
+                document.getElementById('coverLetterContent').textContent = responseData.coverLetter || 'No cover letter generated';
+                document.getElementById('cvContent').textContent = responseData.cv || 'No CV generated';
+                results.classList.remove('hidden');
+                
+            } catch (error) {
+                // Display error
+                errorContent.textContent = error.message || 'An unexpected error occurred';
+                errorSection.classList.remove('hidden');
+                console.error('Error:', error);
+            } finally {
+                // Hide loading state
+                loading.classList.add('hidden');
+                generateButton.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
+
