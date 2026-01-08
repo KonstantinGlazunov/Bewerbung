@@ -3,6 +3,7 @@ package com.bewerbung.service;
 import com.bewerbung.model.JobRequirements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
@@ -18,14 +19,19 @@ public class VacancyAnalyzerService {
 
     private static final Logger logger = LoggerFactory.getLogger(VacancyAnalyzerService.class);
     private static final String JOB_POSTING_PATH = "input/job_posting.txt";
+    
+    private final JobPostingAiAnalyzerService jobPostingAiAnalyzerService;
+
+    @Autowired
+    public VacancyAnalyzerService(JobPostingAiAnalyzerService jobPostingAiAnalyzerService) {
+        this.jobPostingAiAnalyzerService = jobPostingAiAnalyzerService;
+    }
 
     public JobRequirements analyzeVacancy() {
         logger.info("Starting vacancy analysis from file: {}", JOB_POSTING_PATH);
         
         String jobPostingText = readJobPostingFile();
-        JobRequirements requirements = extractRequirements(jobPostingText);
-        
-        logExtractedRequirements(requirements);
+        JobRequirements requirements = analyzeVacancy(jobPostingText);
         
         return requirements;
     }
@@ -33,7 +39,18 @@ public class VacancyAnalyzerService {
     public JobRequirements analyzeVacancy(String jobPostingText) {
         logger.info("Starting vacancy analysis from provided text");
         
-        JobRequirements requirements = extractRequirements(jobPostingText);
+        JobRequirements requirements = null;
+        
+        try {
+            // Primary method: Use AI to extract job requirements
+            logger.info("Using AI-powered job posting analysis");
+            requirements = jobPostingAiAnalyzerService.analyzeJobPosting(jobPostingText);
+            
+        } catch (Exception e) {
+            logger.warn("AI-powered analysis failed, falling back to regex-based extraction", e);
+            // Fallback: Use regex-based extraction
+            requirements = extractRequirements(jobPostingText);
+        }
         
         logExtractedRequirements(requirements);
         

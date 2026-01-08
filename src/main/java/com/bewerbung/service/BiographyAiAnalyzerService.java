@@ -19,12 +19,12 @@ public class BiographyAiAnalyzerService {
 
     private static final Logger logger = LoggerFactory.getLogger(BiographyAiAnalyzerService.class);
     
-    private final GroqAiService groqAiService;
+    private final OpenAiService openAiService;
     private final Gson gson;
 
     @Autowired
-    public BiographyAiAnalyzerService(GroqAiService groqAiService) {
-        this.groqAiService = groqAiService;
+    public BiographyAiAnalyzerService(OpenAiService openAiService) {
+        this.openAiService = openAiService;
         this.gson = new Gson();
     }
 
@@ -39,8 +39,8 @@ public class BiographyAiAnalyzerService {
             // Build prompt for AI to extract structured data
             String prompt = buildExtractionPrompt(rawText);
             
-            // Get AI response
-            String aiResponse = groqAiService.generateText(prompt);
+            // Get AI response using LIGHT model for analysis
+            String aiResponse = openAiService.generateTextWithLightModel(prompt);
             
             // Parse AI response to Biography object
             Biography biography = parseAiResponse(aiResponse, rawText);

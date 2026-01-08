@@ -75,9 +75,8 @@ public class GenerateController {
         // Analyze job posting
         JobRequirements jobRequirements = vacancyAnalyzerService.analyzeVacancy(request.getJobPosting());
 
-        // Generate cover letter (Anschreiben)
-        String candidateName = biography.getName();
-        String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, candidateName);
+        // Generate cover letter (Anschreiben) - pass full biography for experience/education reference
+        String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography);
 
         // Generate CV (Lebenslauf)
         String cv = lebenslaufGeneratorService.generateLebenslauf(biography);
@@ -106,9 +105,8 @@ public class GenerateController {
         // Analyze job posting
         JobRequirements jobRequirements = vacancyAnalyzerService.analyzeVacancy(request.getJobPosting());
 
-        // Generate cover letter (Anschreiben)
-        String candidateName = biography.getName();
-        String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, candidateName);
+        // Generate cover letter (Anschreiben) - pass full biography for experience/education reference
+        String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography);
 
         // Build response
         CoverLetterResponseDto response = new CoverLetterResponseDto(coverLetter);
@@ -171,9 +169,8 @@ public class GenerateController {
         // Analyze job posting
         JobRequirements jobRequirements = vacancyAnalyzerService.analyzeVacancy(jobPosting);
 
-        // Generate cover letter (Anschreiben)
-        String candidateName = biography.getName();
-        String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, candidateName);
+        // Generate cover letter (Anschreiben) - pass full biography for experience/education reference
+        String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography);
 
         // Generate CV (Lebenslauf)
         String cv = lebenslaufGeneratorService.generateLebenslauf(biography);

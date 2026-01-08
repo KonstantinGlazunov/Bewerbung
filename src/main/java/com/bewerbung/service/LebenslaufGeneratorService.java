@@ -12,7 +12,7 @@ public class LebenslaufGeneratorService {
     private static final Logger logger = LoggerFactory.getLogger(LebenslaufGeneratorService.class);
     
     @Autowired
-    private GroqAiService groqAiService;
+    private OpenAiService openAiService;
 
     public String generateLebenslauf(Biography bio) {
         logger.info("Generating Lebenslauf for: {}", bio.getName());
@@ -20,7 +20,8 @@ public class LebenslaufGeneratorService {
         String prompt = buildPrompt(bio);
         logger.debug("Generated prompt for Lebenslauf");
         
-        String lebenslauf = groqAiService.generateText(prompt);
+        // Use HEAVY model for final document generation (higher quality)
+        String lebenslauf = openAiService.generateTextWithHeavyModel(prompt);
         
         logger.info("Successfully generated Lebenslauf (length: {} characters)", 
                 lebenslauf.length());

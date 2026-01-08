@@ -179,106 +179,28 @@
     </div>
 
     <script>
-        const sampleBiography = `Name: Max Mustermann
-Email: max.mustermann@email.de
-Phone: +49 30 12345678
-Address: Musterstraße 123, 12345 Berlin, Deutschland
-Date of Birth: 1990-05-15
-Nationality: Deutsch
+        // Load sample data from separate files
+        async function loadSampleData() {
+            try {
+                // Fetch sample biography
+                const biographyResponse = await fetch('/sample_biography.txt');
+                const sampleBiography = await biographyResponse.text();
+                
+                // Fetch sample job posting
+                const jobPostingResponse = await fetch('/sample_job_posting.txt');
+                const sampleJobPosting = await jobPostingResponse.text();
+                
+                // Initialize form with sample data
+                document.getElementById('biographyTextarea').value = sampleBiography.trim();
+                document.getElementById('jobPostingTextarea').value = sampleJobPosting.trim();
+            } catch (error) {
+                console.error('Error loading sample data:', error);
+                // If files fail to load, leave textareas empty
+            }
+        }
 
-=== EDUCATION ===
-Degree: Bachelor of Science - Informatik
-Institution: Technische Universität Berlin
-Location: Berlin
-Start Date: 2010-10
-End Date: 2014-09
-Description: Schwerpunkt: Softwareentwicklung und Datenbanken
-
-=== WORK EXPERIENCE ===
-Position: Softwareentwickler
-Company: Tech Solutions GmbH
-Location: Berlin
-Start Date: 2018-03
-End Date: 2024-12
-Responsibilities: Entwicklung von Web-Anwendungen mit Java Spring Boot. Verantwortlich für Backend-Entwicklung, API-Design und Datenbankoptimierung. Zusammenarbeit in agilen Teams. Technologien: Java, Spring Boot, MySQL, REST APIs, Git, Docker
-
-Position: Junior Softwareentwickler
-Company: Startup Innovations AG
-Location: Berlin
-Start Date: 2015-01
-End Date: 2018-02
-Responsibilities: Entwicklung von Java-Anwendungen. Unterstützung bei der Implementierung neuer Features und Bug-Fixes. Technologien: Java, Spring Framework, PostgreSQL, Maven
-
-=== TECHNICAL SKILLS ===
-Java, Python, JavaScript, Spring Boot, Spring Framework, React, MySQL, PostgreSQL, MongoDB, Git, Docker, Jenkins, Maven, Gradle
-
-=== LANGUAGES ===
-Deutsch: Muttersprache
-Englisch: Fließend (C1)
-
-=== CERTIFICATIONS ===
-Oracle Certified Professional, Java SE 11 Developer (Oracle, 2021-06)`;
-
-        const sampleJobPosting = `Stellenausschreibung: Senior Softwareentwickler (m/w/d)
-
-Unternehmen: Digital Innovations GmbH
-Standort: Berlin
-Art: Vollzeit, unbefristet
-
-Über uns:
-Die Digital Innovations GmbH ist ein führendes Technologieunternehmen mit über 200 Mitarbeitern. 
-Wir entwickeln innovative Softwarelösungen für mittelständische Unternehmen und setzen auf 
-moderne Technologien und agile Arbeitsmethoden.
-
-Ihre Aufgaben:
-- Entwicklung und Weiterentwicklung von Enterprise-Java-Anwendungen
-- Konzeption und Implementierung von REST-APIs und Microservices
-- Zusammenarbeit in einem agilen Entwicklerteam
-- Code-Reviews und Qualitätssicherung
-- Optimierung von Datenbankabfragen und Performance
-- Unterstützung bei der Architekturplanung
-- Dokumentation von Softwarekomponenten
-
-Ihre Qualifikationen:
-- Erfolgreich abgeschlossenes Hochschulstudium (Informatik, Wirtschaftsinformatik oder vergleichbar)
-- Mehrjährige Berufserfahrung in der Java-Entwicklung
-- Fundierte Kenntnisse in Spring Boot und Spring Framework
-- Erfahrung mit relationalen Datenbanken (MySQL, PostgreSQL)
-- Kenntnisse in REST-API-Design
-- Erfahrung mit Git, Maven/Gradle
-- Gute Deutsch- und Englischkenntnisse
-- Teamfähigkeit und selbstständige Arbeitsweise
-
-Von Vorteil:
-- Erfahrung mit Microservices-Architekturen
-- Kenntnisse in Cloud-Technologien (AWS, Azure)
-- Erfahrung mit Docker und Kubernetes
-- Zertifizierungen im Bereich Java/Spring
-
-Wir bieten:
-- Ein modernes Arbeitsumfeld mit neuester Technologie
-- Flexible Arbeitszeiten und Homeoffice-Möglichkeiten
-- Entwicklungsmöglichkeiten und Weiterbildung
-- Attraktive Vergütung und Sozialleistungen
-- Betriebliche Altersvorsorge
-- Jobticket und betriebliches Gesundheitsmanagement
-
-Bewerbung:
-Bitte senden Sie Ihre vollständigen Bewerbungsunterlagen (Anschreiben, Lebenslauf, Zeugnisse) 
-an bewerbung@digital-innovations.de oder über unser Online-Bewerbungsportal.
-
-Kontakt:
-Digital Innovations GmbH
-Hauptstraße 100
-10115 Berlin
-Tel: +49 30 98765432
-E-Mail: bewerbung@digital-innovations.de
-
-Wir freuen uns auf Ihre Bewerbung!`;
-
-        // Initialize form with sample data
-        document.getElementById('biographyTextarea').value = sampleBiography;
-        document.getElementById('jobPostingTextarea').value = sampleJobPosting;
+        // Load sample data when page loads
+        loadSampleData();
 
         // Form submission handler
         document.getElementById('generateForm').addEventListener('submit', async function(e) {

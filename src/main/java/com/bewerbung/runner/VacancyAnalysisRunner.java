@@ -44,8 +44,7 @@ public class VacancyAnalysisRunner implements ApplicationRunner {
             Biography biography = biographyService.loadBiography();
             
             logger.info("Generating Bewerbungsanschreiben...");
-            String candidateName = biography.getName();
-            String anschreiben = anschreibenGeneratorService.generateAnschreiben(jobRequirements, candidateName);
+            String anschreiben = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography);
             
             logger.info("=== Generated Bewerbungsanschreiben ===");
             logger.info("\n{}", anschreiben);
