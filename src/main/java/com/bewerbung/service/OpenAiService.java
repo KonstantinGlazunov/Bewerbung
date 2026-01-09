@@ -31,6 +31,7 @@ public class OpenAiService {
         if (apiKey == null || apiKey.isBlank() || apiKey.isEmpty()) {
             throw new IllegalStateException("GPT_API_KEY is missing or empty");
         }
+        System.out.println("GPT_API_KEY = " + System.getenv("GPT_API_KEY"));
         this.apiUrl = apiUrl;
         this.lightModel = lightModel;
         this.heavyModel = heavyModel;
