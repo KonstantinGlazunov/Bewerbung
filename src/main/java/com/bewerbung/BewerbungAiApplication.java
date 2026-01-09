@@ -7,6 +7,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class BewerbungAiApplication {
 
     public static void main(String[] args) {
+        // Проверка переменной окружения GPT_API_KEY
+        String apiKey = System.getenv("GPT_API_KEY");
+        System.out.println("GPT_API_KEY: " + apiKey);
         SpringApplication.run(BewerbungAiApplication.class, args);
     }
 }
