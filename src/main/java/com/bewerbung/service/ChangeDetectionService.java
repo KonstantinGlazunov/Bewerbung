@@ -1,0 +1,305 @@
+package com.bewerbung.service;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
+
+@Service
+public class ChangeDetectionService {
+
+    private static final Logger logger = LoggerFactory.getLogger(ChangeDetectionService.class);
+    private static final String DATA_DIR = "data";
+    private static final String VACANCY_FILE = "data/vacancy.txt";
+    private static final String CV_FILE = "data/cv.txt";
+    private static final String STATE_FILE = "data/state.json";
+    
+    private final Gson gson;
+
+    public ChangeDetectionService() {
+        this.gson = new Gson();
+        logger.info("ChangeDetectionService initialized. Working directory: {}", 
+            System.getProperty("user.dir"));
+        logger.info("Data directory will be: {}", Paths.get(DATA_DIR).toAbsolutePath());
+        ensureDirectoriesExist();
+    }
+
+    private void ensureDirectoriesExist() {
+        try {
+            Files.createDirectories(Paths.get(DATA_DIR));
+            Files.createDirectories(Paths.get("output"));
+            
+            // Initialize state.json if it doesn't exist
+            Path statePath = Paths.get(STATE_FILE);
+            if (!Files.exists(statePath)) {
+                State initialState = new State();
+                saveState(initialState);
+                logger.info("Initialized state.json file");
+            }
+            
+            // Create empty placeholder files if they don't exist
+            Path vacancyPath = Paths.get(VACANCY_FILE);
+            if (!Files.exists(vacancyPath)) {
+                Files.write(vacancyPath, "".getBytes(StandardCharsets.UTF_8));
+                logger.debug("Created placeholder vacancy.txt file");
+            }
+            
+            Path cvPath = Paths.get(CV_FILE);
+            if (!Files.exists(cvPath)) {
+                Files.write(cvPath, "".getBytes(StandardCharsets.UTF_8));
+                logger.debug("Created placeholder cv.txt file");
+            }
+        } catch (IOException e) {
+            logger.error("Failed to create directories and files", e);
+        }
+    }
+
+    public ChangeResult checkAndSave(String vacancyText, String cvText) {
+        try {
+            // Handle null inputs
+            if (vacancyText == null) {
+                vacancyText = "";
+                logger.warn("Vacancy text is null, using empty string");
+            }
+            if (cvText == null) {
+                cvText = "";
+                logger.warn("CV text is null, using empty string");
+            }
+
+            logger.info("Checking changes - Vacancy length: {} chars, CV length: {} chars", 
+                vacancyText.length(), cvText.length());
+
+            // Calculate hashes BEFORE saving (to compare with existing state)
+            String vacancyHash = calculateHash(vacancyText);
+            String cvHash = calculateHash(cvText);
+            
+            logger.info("Calculated hashes - Vacancy: {}..., CV: {}...", 
+                vacancyHash.substring(0, Math.min(8, vacancyHash.length())),
+                cvHash.substring(0, Math.min(8, cvHash.length())));
+
+            // Load existing state
+            State state = loadState();
+            
+            logger.info("Existing state - Vacancy hash: {}..., CV hash: {}...",
+                state.getVacancyHash().isEmpty() ? "(empty)" : state.getVacancyHash().substring(0, Math.min(8, state.getVacancyHash().length())),
+                state.getCvHash().isEmpty() ? "(empty)" : state.getCvHash().substring(0, Math.min(8, state.getCvHash().length())));
+
+            // Check if both hashes match
+            boolean vacancyChanged = !vacancyHash.equals(state.getVacancyHash());
+            boolean cvChanged = !cvHash.equals(state.getCvHash());
+
+            if (!vacancyChanged && !cvChanged) {
+                logger.info("No changes detected. Hashes match existing state. Skipping AI processing.");
+                return new ChangeResult(false, false, false, "No changes detected");
+            }
+
+            // Save texts to files (only if changes detected)
+            logger.info("Changes detected - saving files. Vacancy changed: {}, CV changed: {}", vacancyChanged, cvChanged);
+            saveTextToFile(VACANCY_FILE, vacancyText);
+            saveTextToFile(CV_FILE, cvText);
+
+            // Update state with new hashes
+            state.setVacancyHash(vacancyHash);
+            state.setCvHash(cvHash);
+            state.setVacancyLastProcessed(vacancyChanged ? Instant.now().toString() : state.getVacancyLastProcessed());
+            state.setCvLastProcessed(cvChanged ? Instant.now().toString() : state.getCvLastProcessed());
+            saveState(state);
+            
+            logger.info("State updated with new hashes");
+
+            String changeDescription = buildChangeDescription(vacancyChanged, cvChanged);
+            logger.info("Changes detected: {}", changeDescription);
+
+            return new ChangeResult(true, vacancyChanged, cvChanged, changeDescription);
+
+        } catch (Exception e) {
+            logger.error("Error in change detection", e);
+            // On error, assume changes detected to ensure processing
+            return new ChangeResult(true, true, true, "Error during change detection, processing anyway");
+        }
+    }
+
+    private String buildChangeDescription(boolean vacancyChanged, boolean cvChanged) {
+        if (vacancyChanged && cvChanged) {
+            return "Vacancy and CV changed";
+        } else if (vacancyChanged) {
+            return "Vacancy changed";
+        } else {
+            return "CV changed";
+        }
+    }
+
+    private void saveTextToFile(String filePath, String content) throws IOException {
+        if (content == null) {
+            content = "";
+            logger.warn("Content is null, saving empty string to: {}", filePath);
+        }
+        
+        Path path = Paths.get(filePath).toAbsolutePath();
+        Files.write(path, content.getBytes(StandardCharsets.UTF_8));
+        logger.info("Saved {} bytes to: {}", content.length(), path);
+        
+        // Verify file was written
+        if (Files.exists(path)) {
+            long fileSize = Files.size(path);
+            logger.info("Verified file exists: {} ({} bytes)", path, fileSize);
+        } else {
+            logger.error("File was not created: {}", path);
+        }
+    }
+
+    private String calculateHash(String text) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hashBytes = digest.digest(text.getBytes(StandardCharsets.UTF_8));
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hashBytes) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) {
+                    hexString.append('0');
+                }
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            logger.error("SHA-256 algorithm not available", e);
+            throw new RuntimeException("Hash calculation failed", e);
+        }
+    }
+
+    private State loadState() {
+        try {
+            Path statePath = Paths.get(STATE_FILE).toAbsolutePath();
+            logger.debug("Loading state from: {}", statePath);
+            
+            if (!Files.exists(statePath)) {
+                logger.info("State file does not exist, using empty state");
+                return new State();
+            }
+            
+            String json = Files.readString(statePath, StandardCharsets.UTF_8);
+            logger.debug("Loaded state JSON: {} bytes", json.length());
+            
+            JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
+            
+            State state = new State();
+            if (jsonObject.has("vacancyHash")) {
+                state.setVacancyHash(jsonObject.get("vacancyHash").getAsString());
+            }
+            if (jsonObject.has("cvHash")) {
+                state.setCvHash(jsonObject.get("cvHash").getAsString());
+            }
+            if (jsonObject.has("vacancyLastProcessed")) {
+                state.setVacancyLastProcessed(jsonObject.get("vacancyLastProcessed").getAsString());
+            }
+            if (jsonObject.has("cvLastProcessed")) {
+                state.setCvLastProcessed(jsonObject.get("cvLastProcessed").getAsString());
+            }
+            
+            logger.debug("Loaded state - Vacancy hash length: {}, CV hash length: {}", 
+                state.getVacancyHash().length(), state.getCvHash().length());
+            
+            return state;
+        } catch (Exception e) {
+            logger.warn("Failed to load state, using empty state", e);
+            return new State();
+        }
+    }
+
+    private void saveState(State state) {
+        try {
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("vacancyHash", state.getVacancyHash());
+            jsonObject.addProperty("cvHash", state.getCvHash());
+            jsonObject.addProperty("vacancyLastProcessed", state.getVacancyLastProcessed());
+            jsonObject.addProperty("cvLastProcessed", state.getCvLastProcessed());
+            
+            String json = gson.toJson(jsonObject);
+            Path statePath = Paths.get(STATE_FILE).toAbsolutePath();
+            Files.write(statePath, json.getBytes(StandardCharsets.UTF_8));
+            logger.info("State saved to: {} ({} bytes)", statePath, json.length());
+        } catch (Exception e) {
+            logger.error("Failed to save state", e);
+        }
+    }
+
+    public static class ChangeResult {
+        private final boolean hasChanges;
+        private final boolean vacancyChanged;
+        private final boolean cvChanged;
+        private final String description;
+
+        public ChangeResult(boolean hasChanges, boolean vacancyChanged, boolean cvChanged, String description) {
+            this.hasChanges = hasChanges;
+            this.vacancyChanged = vacancyChanged;
+            this.cvChanged = cvChanged;
+            this.description = description;
+        }
+
+        public boolean hasChanges() {
+            return hasChanges;
+        }
+
+        public boolean isVacancyChanged() {
+            return vacancyChanged;
+        }
+
+        public boolean isCvChanged() {
+            return cvChanged;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+    }
+
+    private static class State {
+        private String vacancyHash = "";
+        private String cvHash = "";
+        private String vacancyLastProcessed = "";
+        private String cvLastProcessed = "";
+
+        public String getVacancyHash() {
+            return vacancyHash;
+        }
+
+        public void setVacancyHash(String vacancyHash) {
+            this.vacancyHash = vacancyHash;
+        }
+
+        public String getCvHash() {
+            return cvHash;
+        }
+
+        public void setCvHash(String cvHash) {
+            this.cvHash = cvHash;
+        }
+
+        public String getVacancyLastProcessed() {
+            return vacancyLastProcessed;
+        }
+
+        public void setVacancyLastProcessed(String vacancyLastProcessed) {
+            this.vacancyLastProcessed = vacancyLastProcessed;
+        }
+
+        public String getCvLastProcessed() {
+            return cvLastProcessed;
+        }
+
+        public void setCvLastProcessed(String cvLastProcessed) {
+            this.cvLastProcessed = cvLastProcessed;
+        }
+    }
+}
+

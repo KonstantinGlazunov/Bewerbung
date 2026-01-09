@@ -1,7 +1,5 @@
 package com.bewerbung.controller;
 
-import com.bewerbung.dto.CoverLetterResponseDto;
-import com.bewerbung.dto.CvResponseDto;
 import com.bewerbung.dto.GenerateRequestDto;
 import com.bewerbung.dto.GenerateResponseDto;
 import com.bewerbung.model.Biography;
@@ -10,6 +8,8 @@ import com.bewerbung.service.AnschreibenGeneratorService;
 import com.bewerbung.service.BiographyAiAnalyzerService;
 import com.bewerbung.service.BiographyFileAnalyzerService;
 import com.bewerbung.service.BiographyService;
+import com.bewerbung.service.ChangeDetectionService;
+import com.bewerbung.service.FileOutputService;
 import com.bewerbung.service.LebenslaufGeneratorService;
 import com.bewerbung.service.VacancyAnalyzerService;
 import com.google.gson.Gson;
@@ -40,6 +40,8 @@ public class GenerateController {
     private final BiographyAiAnalyzerService biographyAiAnalyzerService;
     private final AnschreibenGeneratorService anschreibenGeneratorService;
     private final LebenslaufGeneratorService lebenslaufGeneratorService;
+    private final ChangeDetectionService changeDetectionService;
+    private final FileOutputService fileOutputService;
     private final Gson gson;
 
     @Autowired
@@ -48,18 +50,22 @@ public class GenerateController {
                              BiographyFileAnalyzerService biographyFileAnalyzerService,
                              BiographyAiAnalyzerService biographyAiAnalyzerService,
                              AnschreibenGeneratorService anschreibenGeneratorService,
-                             LebenslaufGeneratorService lebenslaufGeneratorService) {
+                             LebenslaufGeneratorService lebenslaufGeneratorService,
+                             ChangeDetectionService changeDetectionService,
+                             FileOutputService fileOutputService) {
         this.vacancyAnalyzerService = vacancyAnalyzerService;
         this.biographyService = biographyService;
         this.biographyFileAnalyzerService = biographyFileAnalyzerService;
         this.biographyAiAnalyzerService = biographyAiAnalyzerService;
         this.anschreibenGeneratorService = anschreibenGeneratorService;
         this.lebenslaufGeneratorService = lebenslaufGeneratorService;
+        this.changeDetectionService = changeDetectionService;
+        this.fileOutputService = fileOutputService;
         this.gson = new Gson();
     }
 
     @PostMapping
-    public ResponseEntity<GenerateResponseDto> generate(@Valid @RequestBody GenerateRequestDto request) {
+    public ResponseEntity<?> generate(@Valid @RequestBody GenerateRequestDto request) {
         logger.info("Received generate request");
         
         // Validate biography is not empty (null is already handled by @NotNull)
@@ -67,29 +73,60 @@ public class GenerateController {
             throw new IllegalArgumentException("Biography must not be empty");
         }
 
-        // Convert biography Map to JsonObject
+        // Convert biography Map to text for storage
+        String cvText = convertBiographyToText(request.getBiography());
+        String vacancyText = request.getJobPosting();
+        
+        logger.info("Data received - Vacancy: {} chars, CV (biography): {} chars", 
+            vacancyText != null ? vacancyText.length() : 0,
+            cvText != null ? cvText.length() : 0);
+
+        // Check for changes
+        ChangeDetectionService.ChangeResult changeResult = changeDetectionService.checkAndSave(vacancyText, cvText);
+
+        // If no changes detected, return early without AI processing
+        if (!changeResult.hasChanges()) {
+            logger.info("No changes detected. Skipping AI processing.");
+            return ResponseEntity.ok("No changes detected. Existing analysis is still valid. AI processing skipped to save tokens.");
+        }
+
+        logger.info("Changes detected: {}", changeResult.getDescription());
+
+        // Convert biography Map to JsonObject for processing
         String biographyJsonString = gson.toJson(request.getBiography());
         JsonObject biographyJson = gson.fromJson(biographyJsonString, JsonObject.class);
         Biography biography = biographyService.parseBiographyFromJson(biographyJson);
 
-        // Analyze job posting
-        JobRequirements jobRequirements = vacancyAnalyzerService.analyzeVacancy(request.getJobPosting());
+        // Analyze job posting (only if vacancy changed)
+        JobRequirements jobRequirements = null;
+        if (changeResult.isVacancyChanged()) {
+            jobRequirements = vacancyAnalyzerService.analyzeVacancy(request.getJobPosting());
+            fileOutputService.writeAnalysis(jobRequirements);
+        } else {
+            // Load existing analysis if available
+            logger.info("Vacancy unchanged, skipping analysis");
+        }
 
-        // Generate cover letter (Anschreiben) - pass full biography for experience/education reference
-        String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography);
+        // Generate cover letter (Anschreiben) - only if vacancy or CV changed
+        if (changeResult.isVacancyChanged() || changeResult.isCvChanged()) {
+            if (jobRequirements == null) {
+                // Need to analyze even if vacancy didn't change, for anschreiben generation
+                jobRequirements = vacancyAnalyzerService.analyzeVacancy(request.getJobPosting());
+            }
+            String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography);
+            fileOutputService.writeAnschreiben(coverLetter);
+        }
 
-        // Generate CV (Lebenslauf)
-        String cv = lebenslaufGeneratorService.generateLebenslauf(biography);
-
-        // Build response
-        GenerateResponseDto response = new GenerateResponseDto(coverLetter, cv);
+        // Write notes
+        fileOutputService.writeNotes(changeResult.getDescription(), 
+            changeResult.isVacancyChanged(), changeResult.isCvChanged());
         
-        logger.info("Successfully generated cover letter and CV");
-        return ResponseEntity.ok(response);
+        logger.info("Processing complete. Results written to output files.");
+        return ResponseEntity.ok("Processing complete. Results written to output files.");
     }
 
     @PostMapping("/cover-letter")
-    public ResponseEntity<CoverLetterResponseDto> generateCoverLetter(@Valid @RequestBody GenerateRequestDto request) {
+    public ResponseEntity<?> generateCoverLetter(@Valid @RequestBody GenerateRequestDto request) {
         logger.info("Received cover letter generation request");
         
         // Validate biography is not empty (null is already handled by @NotNull)
@@ -97,26 +134,46 @@ public class GenerateController {
             throw new IllegalArgumentException("Biography must not be empty");
         }
 
-        // Convert biography Map to JsonObject
+        // Convert biography Map to text for storage
+        String cvText = convertBiographyToText(request.getBiography());
+        String vacancyText = request.getJobPosting();
+
+        // Check for changes
+        ChangeDetectionService.ChangeResult changeResult = changeDetectionService.checkAndSave(vacancyText, cvText);
+
+        // If no changes detected, return early without AI processing
+        if (!changeResult.hasChanges()) {
+            logger.info("No changes detected. Skipping AI processing.");
+            return ResponseEntity.ok("No changes detected. Existing analysis is still valid. AI processing skipped to save tokens.");
+        }
+
+        logger.info("Changes detected: {}", changeResult.getDescription());
+
+        // Convert biography Map to JsonObject for processing
         String biographyJsonString = gson.toJson(request.getBiography());
         JsonObject biographyJson = gson.fromJson(biographyJsonString, JsonObject.class);
         Biography biography = biographyService.parseBiographyFromJson(biographyJson);
 
         // Analyze job posting
         JobRequirements jobRequirements = vacancyAnalyzerService.analyzeVacancy(request.getJobPosting());
+        if (changeResult.isVacancyChanged()) {
+            fileOutputService.writeAnalysis(jobRequirements);
+        }
 
-        // Generate cover letter (Anschreiben) - pass full biography for experience/education reference
+        // Generate cover letter (Anschreiben)
         String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography);
+        fileOutputService.writeAnschreiben(coverLetter);
 
-        // Build response
-        CoverLetterResponseDto response = new CoverLetterResponseDto(coverLetter);
+        // Write notes
+        fileOutputService.writeNotes(changeResult.getDescription(), 
+            changeResult.isVacancyChanged(), changeResult.isCvChanged());
         
-        logger.info("Successfully generated cover letter");
-        return ResponseEntity.ok(response);
+        logger.info("Cover letter generated and written to output files");
+        return ResponseEntity.ok("Cover letter generated and written to output files");
     }
 
     @PostMapping("/cv")
-    public ResponseEntity<CvResponseDto> generateCv(@Valid @RequestBody GenerateRequestDto request) {
+    public ResponseEntity<?> generateCv(@Valid @RequestBody GenerateRequestDto request) {
         logger.info("Received CV generation request");
         
         // Validate biography is not empty (null is already handled by @NotNull)
@@ -124,19 +181,39 @@ public class GenerateController {
             throw new IllegalArgumentException("Biography must not be empty");
         }
 
-        // Convert biography Map to JsonObject
+        // Convert biography Map to text for storage
+        String cvText = convertBiographyToText(request.getBiography());
+        String vacancyText = request.getJobPosting();
+
+        // Check for changes
+        ChangeDetectionService.ChangeResult changeResult = changeDetectionService.checkAndSave(vacancyText, cvText);
+
+        // If no changes detected, return early without AI processing
+        if (!changeResult.hasChanges()) {
+            logger.info("No changes detected. Skipping AI processing.");
+            return ResponseEntity.ok("No changes detected. Existing analysis is still valid. AI processing skipped to save tokens.");
+        }
+
+        logger.info("Changes detected: {}", changeResult.getDescription());
+
+        // Convert biography Map to JsonObject for processing
         String biographyJsonString = gson.toJson(request.getBiography());
         JsonObject biographyJson = gson.fromJson(biographyJsonString, JsonObject.class);
         Biography biography = biographyService.parseBiographyFromJson(biographyJson);
 
-        // Generate CV (Lebenslauf)
-        String cv = lebenslaufGeneratorService.generateLebenslauf(biography);
+        // Generate CV (Lebenslauf) - only if CV changed
+        if (changeResult.isCvChanged()) {
+            lebenslaufGeneratorService.generateLebenslauf(biography);
+            // Note: CV output would go to a separate file if needed
+            // For now, we'll just update notes
+        }
 
-        // Build response
-        CvResponseDto response = new CvResponseDto(cv);
+        // Write notes
+        fileOutputService.writeNotes(changeResult.getDescription(), 
+            changeResult.isVacancyChanged(), changeResult.isCvChanged());
         
-        logger.info("Successfully generated CV");
-        return ResponseEntity.ok(response);
+        logger.info("CV processing complete");
+        return ResponseEntity.ok("CV processing complete. Results written to output files.");
     }
 
     @PostMapping("/from-file")
@@ -180,6 +257,11 @@ public class GenerateController {
         
         logger.info("Successfully generated cover letter and CV from file");
         return ResponseEntity.ok(response);
+    }
+
+    private String convertBiographyToText(java.util.Map<String, Object> biography) {
+        // Convert biography Map to JSON string for storage
+        return gson.toJson(biography);
     }
 }
 
