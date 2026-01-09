@@ -21,12 +21,12 @@ public class OpenAiService {
     private final String heavyModel;
     private final Gson gson;
 
-    public OpenAiService(@Value("${openai.api.key}") String apiKey,
+    public OpenAiService(@Value("#{systemEnvironment['GPT_API_KEY']}") String apiKey,
                          @Value("${openai.api.url}") String apiUrl,
                          @Value("${openai.model.light}") String lightModel,
                          @Value("${openai.model.heavy}") String heavyModel) {
                             
-                                if (apiKey == null || apiKey.isBlank()) {
+                                if (apiKey == null || apiKey.isBlank() || apiKey.isEmpty()) {
                                     throw new IllegalStateException("GPT_API_KEY is missing or empty");
                                 }
         this.apiKey = apiKey;
