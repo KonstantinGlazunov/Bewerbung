@@ -25,6 +25,10 @@ public class OpenAiService {
                          @Value("${openai.api.url}") String apiUrl,
                          @Value("${openai.model.light}") String lightModel,
                          @Value("${openai.model.heavy}") String heavyModel) {
+                            
+                                if (apiKey == null || apiKey.isBlank()) {
+                                    throw new IllegalStateException("GPT_API_KEY is missing or empty");
+                                }
         this.apiKey = apiKey;
         this.apiUrl = apiUrl;
         this.lightModel = lightModel;
