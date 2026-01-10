@@ -33,10 +33,6 @@ Used for:
 1. **Cover Letter Generation** (`AnschreibenGeneratorService`)
    - Creating professional, personalized cover letters
    - Requires natural, flowing German language
-   
-2. **CV/Resume Generation** (`LebenslaufGeneratorService`)
-   - Formatting professional resumes
-   - Requires polished, professional output
 
 **Why Heavy Model?**
 - These are **generation tasks** requiring creativity and quality
@@ -50,9 +46,8 @@ Used for:
 |------|-------|---------|
 | Job Posting Analysis | **LIGHT** | JobPostingAiAnalyzerService |
 | Cover Letter Generation | **HEAVY** | AnschreibenGeneratorService |
-| CV Generation | **HEAVY** | LebenslaufGeneratorService |
 
-**Total: 1 light + 2 heavy = 3 requests**
+**Total: 1 light + 1 heavy = 2 requests**
 
 ### Per `/api/generate/from-file` Request:
 | Task | Model | Service |
@@ -60,9 +55,8 @@ Used for:
 | Biography Analysis | **LIGHT** | BiographyAiAnalyzerService |
 | Job Posting Analysis | **LIGHT** | JobPostingAiAnalyzerService |
 | Cover Letter Generation | **HEAVY** | AnschreibenGeneratorService |
-| CV Generation | **HEAVY** | LebenslaufGeneratorService |
 
-**Total: 2 light + 2 heavy = 4 requests**
+**Total: 2 light + 1 heavy = 3 requests**
 
 ## Configuration
 
@@ -98,7 +92,6 @@ Updated to use light model:
 ### 3. Generation Services
 Updated to use heavy model:
 - `AnschreibenGeneratorService.generateAnschreiben()`
-- `LebenslaufGeneratorService.generateLebenslauf()`
 
 ## Benefits
 

@@ -8,13 +8,12 @@
 
 ### Overview
 
-Bewerbung AI is a Spring Boot application that uses OpenAI's GPT models to automatically generate German job application documents (Bewerbung). The application analyzes job postings and candidate biographies to create personalized cover letters (Anschreiben) and CVs (Lebenslauf) following German DIN 5008 standards.
+Bewerbung AI is a Spring Boot application that uses OpenAI's GPT models to automatically generate German job application documents (Bewerbung). The application analyzes job postings and candidate biographies to create personalized cover letters (Anschreiben) following German DIN 5008 standards.
 
 ### Features
 
 - **Job Posting Analysis**: Automatically extracts requirements and key information from job postings
 - **Cover Letter Generation**: Creates personalized cover letters (Anschreiben) tailored to specific job postings
-- **CV Generation**: Generates professional CVs (Lebenslauf) from candidate biographies
 - **Change Detection**: Optimizes API usage by detecting changes in input data and skipping unnecessary processing
 - **Biography Parsing**: Supports both structured JSON and free-form text biography parsing using AI
 - **REST API**: Provides multiple endpoints for document generation
@@ -69,7 +68,7 @@ The application will start on port 8080 by default (configurable via `PORT` envi
 
 #### Generate Documents
 - **POST** `/api/generate`
-  - Generates both cover letter and CV
+  - Generates cover letter
   - Request body:
 ```json
 {
@@ -86,9 +85,6 @@ The application will start on port 8080 by default (configurable via `PORT` envi
 
 - **POST** `/api/generate/cover-letter`
   - Generates only the cover letter (Anschreiben)
-
-- **POST** `/api/generate/cv`
-  - Generates only the CV (Lebenslauf)
 
 - **POST** `/api/generate/from-file`
   - Generates documents from uploaded biography file
@@ -148,13 +144,12 @@ mvn test
 
 ### Обзор
 
-Bewerbung AI — это Spring Boot приложение, которое использует модели GPT от OpenAI для автоматической генерации немецких документов для трудоустройства (Bewerbung). Приложение анализирует вакансии и биографии кандидатов для создания персонализированных сопроводительных писем (Anschreiben) и резюме (Lebenslauf) в соответствии с немецкими стандартами DIN 5008.
+Bewerbung AI — это Spring Boot приложение, которое использует модели GPT от OpenAI для автоматической генерации немецких документов для трудоустройства (Bewerbung). Приложение анализирует вакансии и биографии кандидатов для создания персонализированных сопроводительных писем (Anschreiben) в соответствии с немецкими стандартами DIN 5008.
 
 ### Возможности
 
 - **Анализ вакансий**: Автоматически извлекает требования и ключевую информацию из объявлений о вакансиях
 - **Генерация сопроводительных писем**: Создает персонализированные сопроводительные письма (Anschreiben), адаптированные под конкретные вакансии
-- **Генерация резюме**: Создает профессиональные резюме (Lebenslauf) из биографий кандидатов
 - **Обнаружение изменений**: Оптимизирует использование API, обнаруживая изменения во входных данных и пропуская ненужную обработку
 - **Парсинг биографии**: Поддерживает как структурированный JSON, так и свободный текстовый формат биографии с использованием AI
 - **REST API**: Предоставляет несколько эндпоинтов для генерации документов
@@ -209,7 +204,7 @@ mvn spring-boot:run
 
 #### Генерация документов
 - **POST** `/api/generate`
-  - Генерирует и сопроводительное письмо, и резюме
+  - Генерирует сопроводительное письмо
   - Тело запроса:
 ```json
 {
@@ -226,9 +221,6 @@ mvn spring-boot:run
 
 - **POST** `/api/generate/cover-letter`
   - Генерирует только сопроводительное письмо (Anschreiben)
-
-- **POST** `/api/generate/cv`
-  - Генерирует только резюме (Lebenslauf)
 
 - **POST** `/api/generate/from-file`
   - Генерирует документы из загруженного файла биографии

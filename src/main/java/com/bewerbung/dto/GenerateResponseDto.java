@@ -2,20 +2,17 @@ package com.bewerbung.dto;
 
 public class GenerateResponseDto {
     private String coverLetter;
-    private String cv;
     private Double matchingScore;
 
     public GenerateResponseDto() {
     }
 
-    public GenerateResponseDto(String coverLetter, String cv) {
+    public GenerateResponseDto(String coverLetter) {
         this.coverLetter = coverLetter;
-        this.cv = cv;
     }
 
-    public GenerateResponseDto(String coverLetter, String cv, Double matchingScore) {
+    public GenerateResponseDto(String coverLetter, Double matchingScore) {
         this.coverLetter = coverLetter;
-        this.cv = cv;
         this.matchingScore = matchingScore;
     }
 
@@ -25,14 +22,6 @@ public class GenerateResponseDto {
 
     public void setCoverLetter(String coverLetter) {
         this.coverLetter = coverLetter;
-    }
-
-    public String getCv() {
-        return cv;
-    }
-
-    public void setCv(String cv) {
-        this.cv = cv;
     }
 
     public Double getMatchingScore() {

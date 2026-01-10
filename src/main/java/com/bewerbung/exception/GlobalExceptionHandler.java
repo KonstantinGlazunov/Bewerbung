@@ -67,9 +67,28 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiError> handleRuntimeException(RuntimeException ex) {
-        logger.error("Unhandled runtime exception", ex);
+        logger.error("Unhandled runtime exception: {}", ex.getMessage(), ex);
         
-        ApiError apiError = new ApiError("INTERNAL_ERROR", "An unexpected error occurred");
+        // Include the actual error message for better debugging
+        String errorMessage = ex.getMessage();
+        if (errorMessage == null || errorMessage.isEmpty()) {
+            errorMessage = "An unexpected error occurred";
+        }
+        
+        ApiError apiError = new ApiError("INTERNAL_ERROR", errorMessage);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiError);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiError> handleException(Exception ex) {
+        logger.error("Unhandled exception: {}", ex.getMessage(), ex);
+        
+        String errorMessage = ex.getMessage();
+        if (errorMessage == null || errorMessage.isEmpty()) {
+            errorMessage = "An unexpected error occurred";
+        }
+        
+        ApiError apiError = new ApiError("INTERNAL_ERROR", errorMessage);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiError);
     }
 }

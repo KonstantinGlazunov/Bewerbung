@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 @Service
 public class OpenAiService {
@@ -26,12 +27,52 @@ public class OpenAiService {
                          @Value("${openai.model.light}") String lightModel,
                          @Value("${openai.model.heavy}") String heavyModel) {
                             
-                                
-        this.apiKey = System.getenv("GPT_API_KEY");
-        if (apiKey == null || apiKey.isBlank() || apiKey.isEmpty()) {
-            throw new IllegalStateException("GPT_API_KEY is missing or empty");
+        // Try to get from environment variable first, then system property (loaded from .env file)
+        String apiKeyValue = System.getenv("GPT_API_KEY");
+        String source = "environment variable";
+        
+        if (apiKeyValue == null || apiKeyValue.isBlank()) {
+            apiKeyValue = System.getProperty("GPT_API_KEY");
+            source = "system property (from variables.env)";
         }
-        System.out.println("GPT_API_KEY = " + System.getenv("GPT_API_KEY"));
+        
+        if (apiKeyValue == null || apiKeyValue.isBlank()) {
+            // Last attempt: try EnvConfig if available
+            try {
+                apiKeyValue = com.bewerbung.config.EnvConfig.get("GPT_API_KEY");
+                if (apiKeyValue != null && !apiKeyValue.isBlank()) {
+                    source = "EnvConfig (from variables.env)";
+                }
+            } catch (Exception e) {
+                logger.debug("Could not get API key from EnvConfig: {}", e.getMessage());
+            }
+        }
+        
+        if (apiKeyValue == null || apiKeyValue.isBlank()) {
+            logger.error("GPT_API_KEY not found in environment variable, system property, or EnvConfig");
+            throw new IllegalStateException("GPT_API_KEY is missing or empty. Please set it in variables.env or as an environment variable.");
+        }
+        
+        // Trim whitespace and newlines that might be in the .env file
+        String originalLength = String.valueOf(apiKeyValue.length());
+        apiKeyValue = apiKeyValue.trim();
+        String trimmedLength = String.valueOf(apiKeyValue.length());
+        
+        if (!originalLength.equals(trimmedLength)) {
+            logger.info("API key was trimmed from {} to {} characters (removed whitespace/newlines)", 
+                    originalLength, trimmedLength);
+        }
+        
+        // Validate API key format (should start with "sk-")
+        if (!apiKeyValue.startsWith("sk-")) {
+            logger.error("API key does not start with 'sk-' - this might indicate an invalid key format. Key starts with: {}", 
+                    apiKeyValue.length() > 10 ? apiKeyValue.substring(0, 10) : apiKeyValue);
+            logger.error("NOTE: OpenAI API keys should start with 'sk-', not 'sk-proj-'. Please verify your API key is correct.");
+        }
+        
+        this.apiKey = apiKeyValue;
+        logger.info("GPT_API_KEY loaded successfully from {} (length: {} characters, starts with: {})", 
+                source, apiKey.length(), apiKey.substring(0, Math.min(10, apiKey.length())));
         this.apiUrl = apiUrl;
         this.lightModel = lightModel;
         this.heavyModel = heavyModel;
@@ -74,6 +115,8 @@ public class OpenAiService {
             String requestBodyJson = gson.toJson(requestBody);
             
             logger.debug("Sending request to OpenAI API: {} with model: {}", apiUrl, model);
+            logger.debug("Using API key with length: {} characters, prefix: {}", 
+                    apiKey.length(), apiKey.substring(0, Math.min(10, apiKey.length())));
             
             String responseJson = webClient.post()
                     .header("Authorization", "Bearer " + apiKey)
@@ -93,6 +136,18 @@ public class OpenAiService {
             logger.info("Successfully generated text with {} (length: {} characters)", model, generatedText.length());
             return generatedText;
             
+        } catch (WebClientResponseException e) {
+            logger.error("OpenAI API error - Status: {}, Response: {}", e.getStatusCode(), e.getResponseBodyAsString());
+            
+            if (e.getStatusCode().value() == 401) {
+                logger.error("401 Unauthorized - API key is invalid or expired. Please check your GPT_API_KEY in variables.env");
+                throw new RuntimeException("OpenAI API authentication failed. Please verify your API key is valid and not expired. Error: " + e.getMessage(), e);
+            } else if (e.getStatusCode().value() == 429) {
+                logger.error("429 Rate limit exceeded");
+                throw new RuntimeException("OpenAI API rate limit exceeded. Please try again later. Error: " + e.getMessage(), e);
+            } else {
+                throw new RuntimeException("OpenAI API error (" + e.getStatusCode() + "): " + e.getMessage(), e);
+            }
         } catch (Exception e) {
             logger.error("Error generating text with OpenAI API using model: {}", model, e);
             throw new RuntimeException("Failed to generate text with OpenAI API: " + e.getMessage(), e);

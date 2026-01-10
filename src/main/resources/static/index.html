@@ -170,11 +170,6 @@
                 <h2>Cover Letter (Anschreiben)</h2>
                 <div class="result-content" id="coverLetterContent"></div>
             </div>
-            
-            <div class="result-section">
-                <h2>CV (Lebenslauf)</h2>
-                <div class="result-content" id="cvContent"></div>
-            </div>
         </div>
     </div>
 
@@ -266,7 +261,6 @@
                 
                 // Display results
                 document.getElementById('coverLetterContent').textContent = responseData.coverLetter || 'No cover letter generated';
-                document.getElementById('cvContent').textContent = responseData.cv || 'No CV generated';
                 results.classList.remove('hidden');
                 
             } catch (error) {

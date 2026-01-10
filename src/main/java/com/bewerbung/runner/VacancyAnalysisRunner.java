@@ -4,7 +4,6 @@ import com.bewerbung.model.Biography;
 import com.bewerbung.model.JobRequirements;
 import com.bewerbung.service.AnschreibenGeneratorService;
 import com.bewerbung.service.BiographyService;
-import com.bewerbung.service.LebenslaufGeneratorService;
 import com.bewerbung.service.VacancyAnalyzerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,16 +21,13 @@ public class VacancyAnalysisRunner implements ApplicationRunner {
     private final VacancyAnalyzerService vacancyAnalyzerService;
     private final AnschreibenGeneratorService anschreibenGeneratorService;
     private final BiographyService biographyService;
-    private final LebenslaufGeneratorService lebenslaufGeneratorService;
 
     public VacancyAnalysisRunner(VacancyAnalyzerService vacancyAnalyzerService,
                                  AnschreibenGeneratorService anschreibenGeneratorService,
-                                 BiographyService biographyService,
-                                 LebenslaufGeneratorService lebenslaufGeneratorService) {
+                                 BiographyService biographyService) {
         this.vacancyAnalyzerService = vacancyAnalyzerService;
         this.anschreibenGeneratorService = anschreibenGeneratorService;
         this.biographyService = biographyService;
-        this.lebenslaufGeneratorService = lebenslaufGeneratorService;
     }
 
     @Override
@@ -52,15 +48,8 @@ public class VacancyAnalysisRunner implements ApplicationRunner {
             logger.info("\n{}", anschreiben);
             logger.info("=======================================");
             
-            logger.info("Generating Lebenslauf...");
-            String lebenslauf = lebenslaufGeneratorService.generateLebenslauf(biography);
-            
-            logger.info("=== Generated Lebenslauf ===");
-            logger.info("\n{}", lebenslauf);
-            logger.info("============================");
-            
         } catch (Exception e) {
-            logger.error("Error during vacancy analysis, Anschreiben generation, or Lebenslauf generation on startup", e);
+            logger.error("Error during vacancy analysis or Anschreiben generation on startup", e);
         }
     }
 }
