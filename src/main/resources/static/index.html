@@ -194,6 +194,19 @@
             stroke: url(#gradient);
         }
 
+        .progress-segment.active.blinking {
+            animation: blink-segment 1.2s ease-in-out infinite;
+        }
+
+        @keyframes blink-segment {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.4;
+            }
+        }
+
         .progress-segment.inactive {
             stroke: #f5f5f5;
         }
@@ -309,12 +322,13 @@
                 this.segments = 24; // Number of segments in the ring
                 this.currentProgress = 0;
                 this.messages = [
-                    { text: "Lese Lebenslauf", progress: 10 },
-                    { text: "Analysiere Lebenslauf", progress: 25 },
-                    { text: "Lese Stellenausschreibung", progress: 40 },
-                    { text: "Analysiere Stellenausschreibung", progress: 55 },
-                    { text: "Erstelle Anschreiben", progress: 75 },
-                    { text: "Finalisiere Dokument", progress: 90 }
+                    { text: "Lese Lebenslauf", progress: 5 },
+                    { text: "Analysiere Lebenslauf", progress: 15 },
+                    { text: "Lese Stellenausschreibung", progress: 25 },
+                    { text: "Analysiere Stellenausschreibung", progress: 40 },
+                    { text: "Erstelle Anschreiben", progress: 50 },
+                    { text: "Generiere Inhalt...", progress: 70 },
+                    { text: "Finalisiere Dokument", progress: 95 }
                 ];
                 this.currentMessageIndex = 0;
                 this.init();
@@ -361,6 +375,7 @@
             update(progress) {
                 this.currentProgress = Math.min(100, Math.max(0, progress));
                 const activeSegments = Math.floor((this.currentProgress / 100) * this.segments);
+                const isComplete = this.currentProgress >= 100;
                 
                 // Update segments
                 const segments = document.querySelectorAll('.progress-segment');
@@ -368,8 +383,15 @@
                     if (index < activeSegments) {
                         segment.classList.remove('inactive');
                         segment.classList.add('active');
+                        // Add blinking animation if not complete
+                        if (!isComplete) {
+                            segment.classList.add('blinking');
+                        } else {
+                            segment.classList.remove('blinking');
+                        }
                     } else {
                         segment.classList.remove('active');
+                        segment.classList.remove('blinking');
                         segment.classList.add('inactive');
                     }
                 });
@@ -400,6 +422,11 @@
 
             complete() {
                 this.update(100);
+                // Remove blinking from all segments when complete
+                const segments = document.querySelectorAll('.progress-segment');
+                segments.forEach(segment => {
+                    segment.classList.remove('blinking');
+                });
                 const label = document.getElementById('progressLabel');
                 label.textContent = "Abgeschlossen";
                 label.classList.add('active');
@@ -455,15 +482,8 @@
             // Start progress bar
             progressBar.start();
             
-            // Simulate progress updates
-            const progressInterval = setInterval(() => {
-                const current = progressBar.currentProgress;
-                if (current < 90) {
-                    // Gradually increase progress
-                    const increment = Math.random() * 3 + 1;
-                    progressBar.update(current + increment);
-                }
-            }, 300);
+            let progressInterval = null;
+            let generationProgressInterval = null;
             
             try {
                 // Validate biography text
@@ -479,32 +499,44 @@
                 }
                 
                 // Update progress: Reading biography
-                progressBar.update(10);
-                await new Promise(resolve => setTimeout(resolve, 200));
+                progressBar.update(5);
+                await new Promise(resolve => setTimeout(resolve, 300));
                 
                 // Update progress: Analyzing biography
-                progressBar.update(25);
-                await new Promise(resolve => setTimeout(resolve, 200));
+                progressBar.update(15);
+                await new Promise(resolve => setTimeout(resolve, 400));
                 
                 // Create a Blob from the biography text and convert it to a File
                 const biographyBlob = new Blob([biographyText], { type: 'text/plain' });
                 const biographyFile = new File([biographyBlob], 'biography.txt', { type: 'text/plain' });
                 
                 // Update progress: Reading job posting
-                progressBar.update(40);
-                await new Promise(resolve => setTimeout(resolve, 200));
+                progressBar.update(25);
+                await new Promise(resolve => setTimeout(resolve, 300));
                 
                 // Update progress: Analyzing job posting
-                progressBar.update(55);
-                await new Promise(resolve => setTimeout(resolve, 200));
+                progressBar.update(40);
+                await new Promise(resolve => setTimeout(resolve, 400));
                 
                 // Prepare form data
                 const formData = new FormData();
                 formData.append('biographyFile', biographyFile);
                 formData.append('jobPosting', jobPostingText);
                 
-                // Update progress: Generating anschreiben
-                progressBar.update(75);
+                // Update progress: Starting generation
+                progressBar.update(50);
+                
+                // Start simulating progress during generation (50% to 95%)
+                let generationProgress = 50;
+                generationProgressInterval = setInterval(() => {
+                    if (generationProgress < 95) {
+                        // Slow down as we approach 95%
+                        const remaining = 95 - generationProgress;
+                        const increment = remaining > 10 ? 0.8 : (remaining > 5 ? 0.4 : 0.2);
+                        generationProgress = Math.min(95, generationProgress + increment);
+                        progressBar.update(generationProgress);
+                    }
+                }, 400); // Update every 400ms
                 
                 // Send POST request
                 const response = await fetch('/api/generate/from-file', {
@@ -512,8 +544,14 @@
                     body: formData
                 });
                 
+                // Stop generation progress simulation
+                if (generationProgressInterval) {
+                    clearInterval(generationProgressInterval);
+                    generationProgressInterval = null;
+                }
+                
                 // Update progress: Finalizing
-                progressBar.update(90);
+                progressBar.update(95);
                 
                 // Parse response
                 let responseData;
@@ -530,7 +568,12 @@
                 }
                 
                 // Complete progress
-                clearInterval(progressInterval);
+                if (generationProgressInterval) {
+                    clearInterval(generationProgressInterval);
+                }
+                if (progressInterval) {
+                    clearInterval(progressInterval);
+                }
                 progressBar.complete();
                 await new Promise(resolve => setTimeout(resolve, 500));
                 
@@ -540,7 +583,12 @@
                 
             } catch (error) {
                 // Stop progress simulation on error
-                clearInterval(progressInterval);
+                if (generationProgressInterval) {
+                    clearInterval(generationProgressInterval);
+                }
+                if (progressInterval) {
+                    clearInterval(progressInterval);
+                }
                 
                 // Display error
                 errorContent.textContent = error.message || 'An unexpected error occurred';
