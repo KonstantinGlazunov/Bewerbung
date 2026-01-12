@@ -1,54 +1,57 @@
-Stellenangebot
-Mitarbeitenden (m/w/d) im Hol- und Bringedienst
-Die BDH-Klinik Braunfels liegt verkehrsgünstig mitten in Braunfels, ca. 15 Minuten von Weilburg und Wetzlar, ca. 25 Minuten von Gießen und Weilmünster sowie ca. 30 Minuten von Limburg entfernt. Sie ist eine gemeinnützige Einrichtung und begleitet seit über sieben Jahrzehnten neurologisch erkrankte Menschen. 200 Betten stehen von der Akutphase bis in alle Phasen der Rehabilitation zur Verfügung.
+Finanz Informatik GmbH & Co. KG logo
+Java Softwareentwickler (m/w/d)
+Finanz Informatik GmbH & Co. KG
+Hannover, Münster, Frankfurt am Main
+Feste Anstellung
+Homeoffice möglich, Vollzeit
+Erschienen: vor 3 Tagen
+52.000€ - 79.000€/Jahr (geschätzt für Vollzeit)
+Sei einer der ersten Bewerber
+Finanz Informatik GmbH & Co. KG logo
+Java Softwareentwickler (m/w/d)
+Finanz Informatik GmbH & Co. KG
+Passt dieser Job zu mir?
+Prüfe vor deiner Bewerbung, ob du die Voraussetzungen erfüllst.
 
-Zur Verstärkung unseres Teams suchen wir zum nächstmöglichen Termin einen Mitarbeitenden (m/w/d) für unseren Hol- und Bringedienst in Teilzeit mit 26,25 Wochenstunden - zunächst befristet für ein Jahr
+Passt weniger
+Passt hervorragend
+slide number 1
+Als einer der größten Banken-IT-Dienstleister und Digitalisierungspartner Europas sind wir der Treiber der Digitalisierung innerhalb der Sparkassen-Finanzgruppe. Mit über 5.000 Mitarbeitenden an 3 Standorten machen wir digitales Banking von heute leistungsfähig und entwickeln smarte Finanz-Services von morgen. Dabei bieten wir ein breites Aufgabenspektrum, in dem die individuellen Stärken hervorragend eingebracht werden können. Ob App-Entwicklung, Netzwerktechnologien und Serverbetrieb oder Beratung, Schulung und Support – bei uns findet jede:r seine bzw. ihre Berufung! Als Spezialist:in oder auch als Generalist:in. Alles mit besten Karrierechancen, viel Raum für persönliche Entfaltung und zahlreichen Benefits.
 
-Ihre Aufgaben bei uns
-Der interne Patiententransport wird durch Sie sichergestellt; Ihre Dienstzeiten sind primär montags bis freitags zwischen 9.30 Uhr bis 15.30 Uhr
-Sie sind verantwortlich für den Transport der Essenswagen zwischen den Stationen und der Küche
-Sie helfen beim Verteilen von Apothekenlieferungen und übernehmen auch das Verteilen unserer hausinternen Post
-Auch der hausinterne Transport von Laborproben wird von Ihnen sichergestellt
-Das wünschen wir uns von Ihnen
-Aufgeschlossenheit, Selbständigkeit und Teamfähigkeit prägen Sie sowie ein hohes Maß an körperliche Belastbarkeit, Zuverlässigkeit und Pünktlichkeit
-Der Umgang der Patienten bereitet Ihnen viel Freude, bestenfalls haben Sie bereits Erfahrung im Kontakt mit Patienten
-Ein freundliches Auftreten und sichere Deutschkenntnisse runden Ihr Profil ab
-Wir bieten Ihnen
-Vergütung erfolgt nach aktueller Entgelttabelle des TVÖD VKA
-Übertarifliche Jubiläumsgelder nach Betriebszugehörigkeit
-Zusätzliche arbeitgeberfinanzierte Altersversorgung innerhalb einer Pensionskasse
-Vielfältige Teilzeitmodelle zur Vereinbarkeit von Beruf und Privatleben
-Modernes Arbeitsumfeld zusammen mit einem sehr angenehmen und kollegialen Arbeitsklima
-Elektronische Dienstplangestaltung und Zeiterfassung sowie modernes Zutrittskontrollsystem
-Berufskleidung mit Farbkonzept in den patientennahen Berufsgruppen
-Bewerbende, ob Berufsanfänger*in (m/w/d) oder nach längerer Berufspause, bieten wir einen qualifizierten (Wieder-) Einstieg ins Berufsleben
-Gesundheitsangebote im Rahmen unseres BGM (Betriebliches Gesundheitsmanagement) wie z. B. Hautscreening, Gesundheitstage sowie kostenlose Nutzung unseres Fitnessraums
-Mitarbeiterangebote u. a. Jobrad, EGYM Wellpass, Corporate Benefits sowie verschiedene Rabattaktionen
-Mitarbeiterevents
-Vergünstigtes frisch zubereitetes Essen aus unserer Großküche
-Schnuppertage, die Ihnen die Möglichkeit geben, einen Einblick in die Abteilung und Arbeitsabläufe zu bekommen
-Jetzt bewerben
-Standort
-Klinkinik Braunfels
-Hubertusstraße 3–7
-35619 Braunfels
+Für die Organisationseinheit Rahmenkredite, Avale & Konsortial, suchen wir zum nächstmöglichen Termin für den Standort Hannover, Münster oder Frankfurt am Main einen
 
-Beschäftigungsart und Beginn
-zum nächstmöglichen Zeitpunkt
-Teilzeit
-26,25 Stunden pro Woche
-Für Rückfragen
- Team Personalservice
-Team Personalservice
-Hubertusstrasse 3 - 7
-Braunfels
-+496442936-106 oder -108
-bwrbngbdh-klnk-brnflsd
-Zu Kontakten hinzufügen
-Angebot Teilen
-weitere Angebote
-BDH Bundesverband Rehabilitation
-Lievelingsweg 125
-53119 Bonn
-Telefon 0228/96984-0
-Webseite
+Java Softwareentwickler (m/w/d).
+
+Hinweis: Das Team ist ausschließlich am Standort Hannover angesiedelt.
+
+#mitgestalten – was dich erwartet:
+Innovative Software-Entwicklung: Architekturelle Konzeption und eigenverantwortliche Neu- und Weiterentwicklung von Geschäftsprozessen, Services und Workflows in Java und JavaScript.
+Vielfältige Projekte: Verantwortungsübernahme und Mitarbeit in komplexen Projekten von der Analyse über Design bis hin zu Implementierung, Test, Dokumentation und Einführung.
+Koordination: Technischer Ansprechpartner (m/w/d) für Produktverantwortliche und Führungskräfte, sowie Steuerung der technischen Themen im Entwicklerteam. 
+Technische Implementierung: Enge Zusammenarbeit mit bankfachlichen Produktverantwortlichen und Implementierung von technischen Änderungswünschen.
+Qualitätssicherung & Performance-Optimierung: Konzeption und Durchführung von Maßnahmen zur Qualitätssicherung und Performance-Optimierung.
+Lösungsfinder: Übernahme des Last-Level-Supports für unsere entwickelten Komponenten und Management von Programmeinsätzen.
+#mitbringen – was wir erwarten:
+Background: Abgeschlossenes Studium der Informatik, Wirtschaftsinformatik oder vergleichbare Ausbildung (z.B. Fachinformatiker).
+Erfahrung: Mind. 6 Jahre fachbezogene Berufserfahrung und fundierte Kenntnisse in der Softwareentwicklung mit Java und JavaScript.
+Technologien: Kenntnisse in Tools wie IntelliJ, Subversion, Git, Maven, Harvest, Guice oder JUnit.
+Frontend-Entwicklung: Erfahrung mit React und Material UI ist wünschenswert.
+Arbeitsweise: Strukturierte, zielorientierte und eigenverantwortliche Herangehensweise an Aufgaben.
+Neugierde: Ausgeprägte Neugier und Ausdauer für neue Themen.
+Teamgeist: Freude an der Zusammenarbeit im Team, Zuverlässigkeit und Einsatzbereitschaft sowie Bereitschaft zu gelegentlichen Reisen.
+Ihre Benefits bei der Finanz Informatik:
+Sie fragen sich, warum Sie bei der Finanz Informatik arbeiten sollten? Wir hätten da ein paar gute Gründe für Sie. Neben flexiblen Arbeitszeiten, vergünstigten Jobtickets oder der Möglichkeit, mobil zu arbeiten, bieten wir Ihnen noch viel mehr:
+
+Altersvorsorge
+Barrierefrei
+Betriebssport
+Familienservice
+Firmenevents
+Flexible Arbeitszeiten
+Mobiles Arbeiten
+Jobticket
+Kantine
+Tarifvertrag
+Weiterbildung
+Fitnessförderung
+Bei uns erwartet Sie eine attraktive Vergütung basierend auf Ihrer Qualifikation sowie Ihrer relevanten, praktischen Erfahrung.

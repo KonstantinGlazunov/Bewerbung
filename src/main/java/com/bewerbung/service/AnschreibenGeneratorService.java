@@ -86,28 +86,49 @@ public class AnschreibenGeneratorService {
         prompt.append("- Implizite Erwartungen (Ton, Arbeitsstil, Seniorität, Branchennormen)\n\n");
         
         prompt.append("Extrahiere aus der Biografie:\n");
-        prompt.append("- Berufserfahrung\n");
-        prompt.append("- Technische und übertragbare Fähigkeiten\n");
-        prompt.append("- Erfolge und messbare Ergebnisse\n");
+        prompt.append("- Berufserfahrung (vorläufige Analyse der Relevanz zur Position und Branche)\n");
+        prompt.append("- Ausbildung (vorläufige Bewertung der Passung zu den Anforderungen)\n");
+        prompt.append("- Technische und übertragbare Fähigkeiten (nur relevante)\n");
+        prompt.append("- Erfolge und messbare Ergebnisse (aus relevanten Bereichen)\n");
         prompt.append("- Motivationsfaktoren und Werte\n");
         prompt.append("- Sprachniveau, Kommunikationsstil, kultureller Kontext\n\n");
         
         prompt.append("WICHTIG: Verwende die oben bereitgestellten Daten aus der Biografie und Stellenausschreibung. ");
-        prompt.append("Analysiere diese Daten und erstelle dann das Anschreiben.\n\n");
+        prompt.append("Analysiere diese Daten auf Relevanz zur Position und Branche, dann erstelle das Anschreiben mit NUR relevanten Informationen.\n\n");
         
         // === STEP 2: SEMANTIC MATCHING ===
-        prompt.append("🔎 SCHRITT 2 — SEMANTISCHE ZUORDNUNG\n\n");
+        prompt.append("🔎 SCHRITT 2 — SEMANTISCHE ZUORDNUNG UND RELEVANZFILTERUNG\n\n");
         
-        prompt.append("Für jede Schlüsselanforderung aus der Stellenausschreibung:\n");
-        prompt.append("- Identifiziere die relevanteste passende Evidenz aus der Biografie.\n");
+        prompt.append("KRITISCH: Verwende NUR relevanten Erfahrungen und Ausbildungen, die zur Position und Branche passen.\n\n");
+        
+        prompt.append("RELEVANZPRÜFUNG:\n");
+        prompt.append("Analysiere jeden Eintrag aus Berufserfahrung und Ausbildung:\n");
+        prompt.append("- Ist dieser Erfahrung/Ausbildung relevant für die beworbene Position?\n");
+        prompt.append("- Passt sie zur Branche und den Anforderungen der Stelle?\n");
+        prompt.append("- Könnte HR denken, dass der Kandidat überqualifiziert ist?\n\n");
+        
+        prompt.append("FILTERREGELN - AUSSCHLIESSEN bei Nichtrelevanz:\n");
+        prompt.append("- Erfahrungen aus völlig anderen Branchen/Fachgebieten (z.B. Programmierer-Erfahrung für Lieferant-Position)\n");
+        prompt.append("- Höherwertige Qualifikationen, die deutlich über den Anforderungen liegen\n");
+        prompt.append("- Spezialisierungen, die nicht zur Position passen und Signal senden, dass der Kandidat die Stelle nicht ernst nimmt\n\n");
+        
+        prompt.append("EINBEZIEHEN:\n");
+        prompt.append("- Direkt relevante Berufserfahrung zur Position oder Branche\n");
+        prompt.append("- Übertragbare Fähigkeiten, die zur Stelle passen\n");
+        prompt.append("- Ausbildung, die den Anforderungen entspricht oder leicht darüber liegt\n");
+        prompt.append("- Branchenrelevante Erfahrungen, auch wenn Position leicht anders war\n\n");
+        
+        prompt.append("Für jede RELEVANTE Schlüsselanforderung aus der Stellenausschreibung:\n");
+        prompt.append("- Identifiziere die relevanteste passende Evidenz aus den GEFILTERTEN Biografiedaten.\n");
         prompt.append("- Priorisiere:\n");
-        prompt.append("  • Direkte Erfahrung über indirekte\n");
+        prompt.append("  • Direkte relevante Erfahrung über indirekte\n");
         prompt.append("  • Messbare Ergebnisse über generische Aussagen\n");
         prompt.append("  • Branchenrelevante Terminologie über allgemeine Sprache\n\n");
         
         prompt.append("Wenn eine Anforderung nicht direkt erfüllt wird:\n");
-        prompt.append("- Formuliere angrenzende Kompetenzen oder übertragbare Fähigkeiten um.\n");
-        prompt.append("- Vermeide Erfindungen.\n\n");
+        prompt.append("- Formuliere angrenzende Kompetenzen oder übertragbare Fähigkeiten um (nur wenn relevant).\n");
+        prompt.append("- Vermeide Erfindungen.\n");
+        prompt.append("- Wenn keine relevanten Erfahrungen vorhanden sind, konzentriere dich auf Motivation und potenzielle Passung.\n\n");
         
         // === STEP 3: RHETORICAL STRUCTURE ===
         prompt.append("🧩 SCHRITT 3 — RHETORISCHE STRUKTUR\n\n");
@@ -151,8 +172,9 @@ public class AnschreibenGeneratorService {
         // === OUTPUT FORMAT ===
         prompt.append("📤 AUSGABEFORMAT\n\n");
         
-        prompt.append("WICHTIG: Verwende die oben bereitgestellten Daten aus der Biografie und Stellenausschreibung. ");
-        prompt.append("Die Daten sind vollständig und müssen verwendet werden.\n\n");
+        prompt.append("WICHTIG: Verwende NUR die relevanten Daten aus der Biografie, die zur Position und Branche passen. ");
+        prompt.append("Nicht relevante Erfahrungen oder überqualifizierende Qualifikationen müssen ausgeschlossen werden, ");
+        prompt.append("um zu vermeiden, dass HR denkt, der Kandidat sei überqualifiziert oder nehme die Stelle nicht ernst.\n\n");
         
         prompt.append("Gib NUR das finale Bewerbungsanschreiben auf Deutsch zurück, mit:\n");
         prompt.append("- Keiner Meta-Kommentierung\n");
