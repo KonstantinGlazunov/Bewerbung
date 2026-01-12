@@ -23,6 +23,7 @@ public class ChangeDetectionService {
     private static final String VACANCY_FILE = "data/vacancy.txt";
     private static final String CV_FILE = "data/cv.txt";
     private static final String STATE_FILE = "data/state.json";
+    private static final String ANSCHREIBEN_DATA_FILE = "data/anschreiben.txt";
     
     private final Gson gson;
 
@@ -97,16 +98,43 @@ public class ChangeDetectionService {
             // Check if both hashes match
             boolean vacancyChanged = !vacancyHash.equals(state.getVacancyHash());
             boolean cvChanged = !cvHash.equals(state.getCvHash());
+            
+            // Check if this is the first run (empty state) or if we have data to save
+            boolean isFirstRun = state.getVacancyHash().isEmpty() && state.getCvHash().isEmpty();
+            boolean hasDataToSave = (vacancyText != null && !vacancyText.trim().isEmpty()) || 
+                                   (cvText != null && !cvText.trim().isEmpty());
 
-            if (!vacancyChanged && !cvChanged) {
+            // Always save files if we have data (first run or changes detected)
+            if (isFirstRun || vacancyChanged || cvChanged || hasDataToSave) {
+                if (isFirstRun) {
+                    logger.info("First run detected - saving files. Vacancy length: {}, CV length: {}", 
+                        vacancyText != null ? vacancyText.length() : 0, 
+                        cvText != null ? cvText.length() : 0);
+                } else if (vacancyChanged || cvChanged) {
+                    logger.info("Changes detected - saving files. Vacancy changed: {}, CV changed: {}", vacancyChanged, cvChanged);
+                } else {
+                    logger.info("Saving files with available data");
+                }
+                
+                // Save files if we have data
+                if (vacancyText != null && !vacancyText.trim().isEmpty()) {
+                    saveTextToFile(VACANCY_FILE, vacancyText);
+                } else {
+                    logger.warn("Vacancy text is empty, skipping save");
+                }
+                
+                if (cvText != null && !cvText.trim().isEmpty()) {
+                    saveTextToFile(CV_FILE, cvText);
+                } else {
+                    logger.warn("CV text is empty, skipping save");
+                }
+            }
+
+            // Only skip AI processing if no changes AND not first run
+            if (!vacancyChanged && !cvChanged && !isFirstRun) {
                 logger.info("No changes detected. Hashes match existing state. Skipping AI processing.");
                 return new ChangeResult(false, false, false, "No changes detected");
             }
-
-            // Save texts to files (only if changes detected)
-            logger.info("Changes detected - saving files. Vacancy changed: {}, CV changed: {}", vacancyChanged, cvChanged);
-            saveTextToFile(VACANCY_FILE, vacancyText);
-            saveTextToFile(CV_FILE, cvText);
 
             // Update state with new hashes
             state.setVacancyHash(vacancyHash);
@@ -141,20 +169,34 @@ public class ChangeDetectionService {
 
     private void saveTextToFile(String filePath, String content) throws IOException {
         if (content == null) {
-            content = "";
-            logger.warn("Content is null, saving empty string to: {}", filePath);
+            logger.warn("Content is null for file: {}, skipping save", filePath);
+            return;
+        }
+        
+        if (content.trim().isEmpty()) {
+            logger.warn("Content is empty for file: {}, skipping save", filePath);
+            return;
         }
         
         Path path = Paths.get(filePath).toAbsolutePath();
+        logger.info("Saving {} bytes to: {}", content.length(), path);
+        
         Files.write(path, content.getBytes(StandardCharsets.UTF_8));
-        logger.info("Saved {} bytes to: {}", content.length(), path);
+        logger.info("Successfully saved {} bytes to: {}", content.length(), path);
         
         // Verify file was written
         if (Files.exists(path)) {
             long fileSize = Files.size(path);
             logger.info("Verified file exists: {} ({} bytes)", path, fileSize);
+            
+            // Log first 100 chars for debugging
+            if (fileSize > 0) {
+                String preview = content.length() > 100 ? content.substring(0, 100) + "..." : content;
+                logger.debug("File content preview: {}", preview.replace("\n", "\\n"));
+            }
         } else {
             logger.error("File was not created: {}", path);
+            throw new IOException("File was not created: " + path);
         }
     }
 
@@ -205,6 +247,9 @@ public class ChangeDetectionService {
             if (jsonObject.has("cvLastProcessed")) {
                 state.setCvLastProcessed(jsonObject.get("cvLastProcessed").getAsString());
             }
+            if (jsonObject.has("anschreibenFile")) {
+                state.setAnschreibenFile(jsonObject.get("anschreibenFile").getAsString());
+            }
             
             logger.debug("Loaded state - Vacancy hash length: {}, CV hash length: {}", 
                 state.getVacancyHash().length(), state.getCvHash().length());
@@ -223,6 +268,7 @@ public class ChangeDetectionService {
             jsonObject.addProperty("cvHash", state.getCvHash());
             jsonObject.addProperty("vacancyLastProcessed", state.getVacancyLastProcessed());
             jsonObject.addProperty("cvLastProcessed", state.getCvLastProcessed());
+            jsonObject.addProperty("anschreibenFile", state.getAnschreibenFile());
             
             String json = gson.toJson(jsonObject);
             Path statePath = Paths.get(STATE_FILE).toAbsolutePath();
@@ -268,6 +314,7 @@ public class ChangeDetectionService {
         private String cvHash = "";
         private String vacancyLastProcessed = "";
         private String cvLastProcessed = "";
+        private String anschreibenFile = "";
 
         public String getVacancyHash() {
             return vacancyHash;
@@ -300,6 +347,25 @@ public class ChangeDetectionService {
         public void setCvLastProcessed(String cvLastProcessed) {
             this.cvLastProcessed = cvLastProcessed;
         }
+
+        public String getAnschreibenFile() {
+            return anschreibenFile;
+        }
+
+        public void setAnschreibenFile(String anschreibenFile) {
+            this.anschreibenFile = anschreibenFile;
+        }
+    }
+    
+    public String getSavedAnschreibenPath() {
+        State state = loadState();
+        return state.getAnschreibenFile();
+    }
+    
+    public void saveAnschreibenPath(String filePath) {
+        State state = loadState();
+        state.setAnschreibenFile(filePath);
+        saveState(state);
     }
 }
 

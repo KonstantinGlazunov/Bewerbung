@@ -1,0 +1,39 @@
+Name: Max Mustermann
+Email: max.mustermann@email.de
+Phone: +49 30 12345678
+Address: Musterstraße 123, 12345 Berlin, Deutschland
+Date of Birth: 1990-05-15
+Nationality: Deutsch
+
+=== EDUCATION ===
+Degree: Bachelor of Science - Informatik
+Institution: Technische Universität Berlin
+Location: Berlin
+Start Date: 2010-10
+End Date: 2014-09
+Description: Schwerpunkt: Softwareentwicklung und Datenbanken
+
+=== WORK EXPERIENCE ===
+Position: Softwareentwickler
+Company: Tech Solutions GmbH
+Location: Berlin
+Start Date: 2018-03
+End Date: 2024-12
+Responsibilities: Entwicklung von Web-Anwendungen mit Java Spring Boot. Verantwortlich für Backend-Entwicklung, API-Design und Datenbankoptimierung. Zusammenarbeit in agilen Teams. Technologien: Java, Spring Boot, MySQL, REST APIs, Git, Docker
+
+Position: Junior Softwareentwickler
+Company: Startup Innovations AG
+Location: Berlin
+Start Date: 2015-01
+End Date: 2018-02
+Responsibilities: Entwicklung von Java-Anwendungen. Unterstützung bei der Implementierung neuer Features und Bug-Fixes. Technologien: Java, Spring Framework, PostgreSQL, Maven
+
+=== TECHNICAL SKILLS ===
+Java, Python, JavaScript, Spring Boot, Spring Framework, React, MySQL, PostgreSQL, MongoDB, Git, Docker, Jenkins, Maven, Gradle
+
+=== LANGUAGES ===
+Deutsch: Muttersprache
+Englisch: Fließend (C1)
+
+=== CERTIFICATIONS ===
+Oracle Certified Professional, Java SE 11 Developer (Oracle, 2021-06)

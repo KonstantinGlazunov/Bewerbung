@@ -2,6 +2,7 @@ package com.bewerbung.controller;
 
 import com.bewerbung.dto.GenerateRequestDto;
 import com.bewerbung.dto.GenerateResponseDto;
+import com.bewerbung.dto.PdfRequestDto;
 import com.bewerbung.model.Biography;
 import com.bewerbung.model.JobRequirements;
 import com.bewerbung.service.AnschreibenGeneratorService;
@@ -10,6 +11,7 @@ import com.bewerbung.service.BiographyFileAnalyzerService;
 import com.bewerbung.service.BiographyService;
 import com.bewerbung.service.ChangeDetectionService;
 import com.bewerbung.service.FileOutputService;
+import com.bewerbung.service.PdfGenerationService;
 import com.bewerbung.service.VacancyAnalyzerService;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -24,8 +26,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 
 @RestController
 @RequestMapping("/api/generate")
@@ -40,6 +45,7 @@ public class GenerateController {
     private final AnschreibenGeneratorService anschreibenGeneratorService;
     private final ChangeDetectionService changeDetectionService;
     private final FileOutputService fileOutputService;
+    private final PdfGenerationService pdfGenerationService;
     private final Gson gson;
 
     @Autowired
@@ -49,7 +55,8 @@ public class GenerateController {
                              BiographyAiAnalyzerService biographyAiAnalyzerService,
                              AnschreibenGeneratorService anschreibenGeneratorService,
                              ChangeDetectionService changeDetectionService,
-                             FileOutputService fileOutputService) {
+                             FileOutputService fileOutputService,
+                             PdfGenerationService pdfGenerationService) {
         this.vacancyAnalyzerService = vacancyAnalyzerService;
         this.biographyService = biographyService;
         this.biographyFileAnalyzerService = biographyFileAnalyzerService;
@@ -57,6 +64,7 @@ public class GenerateController {
         this.anschreibenGeneratorService = anschreibenGeneratorService;
         this.changeDetectionService = changeDetectionService;
         this.fileOutputService = fileOutputService;
+        this.pdfGenerationService = pdfGenerationService;
         this.gson = new Gson();
     }
 
@@ -76,6 +84,16 @@ public class GenerateController {
         logger.info("Data received - Vacancy: {} chars, CV (biography): {} chars", 
             vacancyText != null ? vacancyText.length() : 0,
             cvText != null ? cvText.length() : 0);
+        
+        // Log preview of data for debugging
+        if (vacancyText != null && !vacancyText.isEmpty()) {
+            String vacancyPreview = vacancyText.length() > 200 ? vacancyText.substring(0, 200) + "..." : vacancyText;
+            logger.debug("Vacancy preview: {}", vacancyPreview.replace("\n", "\\n"));
+        }
+        if (cvText != null && !cvText.isEmpty()) {
+            String cvPreview = cvText.length() > 200 ? cvText.substring(0, 200) + "..." : cvText;
+            logger.debug("CV preview: {}", cvPreview.replace("\n", "\\n"));
+        }
 
         // Check for changes
         ChangeDetectionService.ChangeResult changeResult = changeDetectionService.checkAndSave(vacancyText, cvText);
@@ -107,18 +125,34 @@ public class GenerateController {
         if (changeResult.isVacancyChanged() || changeResult.isCvChanged()) {
             if (jobRequirements == null) {
                 // Need to analyze even if vacancy didn't change, for anschreiben generation
+                logger.info("Job requirements null, analyzing vacancy for anschreiben generation");
                 jobRequirements = vacancyAnalyzerService.analyzeVacancy(request.getJobPosting());
             }
+            logger.info("Generating anschreiben...");
             String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography);
+            logger.info("Anschreiben generated (length: {} chars), writing to file...", coverLetter.length());
+            
+            // Save to both output directory and data directory
             fileOutputService.writeAnschreiben(coverLetter);
+            String dataAnschreibenPath = "data/anschreiben.txt";
+            fileOutputService.writeAnschreiben(coverLetter, dataAnschreibenPath);
+            
+            // Save path to state
+            changeDetectionService.saveAnschreibenPath(dataAnschreibenPath);
+            
+            logger.info("Anschreiben file write completed");
+        } else {
+            logger.info("No changes detected, skipping anschreiben generation");
         }
 
         // Write notes
         fileOutputService.writeNotes(changeResult.getDescription(), 
             changeResult.isVacancyChanged(), changeResult.isCvChanged());
         
+        String outputPath = Paths.get("output/anschreiben.md").toAbsolutePath().toString();
         logger.info("Processing complete. Results written to output files.");
-        return ResponseEntity.ok("Processing complete. Results written to output files.");
+        logger.info("Anschreiben file location: {}", outputPath);
+        return ResponseEntity.ok("Processing complete. Results written to output files. Anschreiben: " + outputPath);
     }
 
     @PostMapping("/cover-letter")
@@ -137,9 +171,20 @@ public class GenerateController {
         // Check for changes
         ChangeDetectionService.ChangeResult changeResult = changeDetectionService.checkAndSave(vacancyText, cvText);
 
-        // If no changes detected, return early without AI processing
+        // If no changes detected, try to load saved Anschreiben
         if (!changeResult.hasChanges()) {
-            logger.info("No changes detected. Skipping AI processing.");
+            logger.info("No changes detected. Attempting to load saved Anschreiben...");
+            String savedAnschreibenPath = changeDetectionService.getSavedAnschreibenPath();
+            if (savedAnschreibenPath != null && !savedAnschreibenPath.isEmpty()) {
+                String savedAnschreiben = fileOutputService.readAnschreiben(savedAnschreibenPath);
+                if (savedAnschreiben != null && !savedAnschreiben.trim().isEmpty()) {
+                    logger.info("Successfully loaded saved Anschreiben from: {}", savedAnschreibenPath);
+                    // Also save to output directory for consistency
+                    fileOutputService.writeAnschreiben(savedAnschreiben);
+                    return ResponseEntity.ok("No changes detected. Using saved Anschreiben from: " + savedAnschreibenPath);
+                }
+            }
+            logger.info("No saved Anschreiben found. Skipping AI processing.");
             return ResponseEntity.ok("No changes detected. Existing analysis is still valid. AI processing skipped to save tokens.");
         }
 
@@ -158,7 +203,14 @@ public class GenerateController {
 
         // Generate cover letter (Anschreiben)
         String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography);
+        
+        // Save to both output directory and data directory
         fileOutputService.writeAnschreiben(coverLetter);
+        String dataAnschreibenPath = "data/anschreiben.txt";
+        fileOutputService.writeAnschreiben(coverLetter, dataAnschreibenPath);
+        
+        // Save path to state
+        changeDetectionService.saveAnschreibenPath(dataAnschreibenPath);
 
         // Write notes
         fileOutputService.writeNotes(changeResult.getDescription(), 
@@ -184,10 +236,46 @@ public class GenerateController {
             throw new IllegalArgumentException("Job posting must not be blank");
         }
 
+        // Read file content for change detection
+        String biographyText;
+        try {
+            biographyText = new String(biographyFile.getBytes(), StandardCharsets.UTF_8);
+            logger.info("Read biography file - length: {} chars", biographyText.length());
+        } catch (Exception e) {
+            logger.error("Error reading biography file", e);
+            throw new IllegalArgumentException("Failed to read biography file", e);
+        }
+
+        logger.info("Checking changes - Job posting length: {} chars, Biography length: {} chars", 
+            jobPosting != null ? jobPosting.length() : 0,
+            biographyText != null ? biographyText.length() : 0);
+
+        // Check for changes
+        ChangeDetectionService.ChangeResult changeResult = changeDetectionService.checkAndSave(jobPosting, biographyText);
+        
+        logger.info("Change detection result - hasChanges: {}, vacancyChanged: {}, cvChanged: {}", 
+            changeResult.hasChanges(), changeResult.isVacancyChanged(), changeResult.isCvChanged());
+
+        // If no changes detected, try to load saved Anschreiben
+        if (!changeResult.hasChanges()) {
+            logger.info("No changes detected. Attempting to load saved Anschreiben...");
+            String savedAnschreibenPath = changeDetectionService.getSavedAnschreibenPath();
+            if (savedAnschreibenPath != null && !savedAnschreibenPath.isEmpty()) {
+                String savedAnschreiben = fileOutputService.readAnschreiben(savedAnschreibenPath);
+                if (savedAnschreiben != null && !savedAnschreiben.trim().isEmpty()) {
+                    logger.info("Successfully loaded saved Anschreiben from: {}", savedAnschreibenPath);
+                    // Also save to output directory for consistency
+                    fileOutputService.writeAnschreiben(savedAnschreiben);
+                    GenerateResponseDto response = new GenerateResponseDto(savedAnschreiben);
+                    return ResponseEntity.ok(response);
+                }
+            }
+            logger.info("No saved Anschreiben found. Will generate new one.");
+        }
+
         // Read file content and parse using AI
         Biography biography;
         try {
-            String biographyText = new String(biographyFile.getBytes(), StandardCharsets.UTF_8);
             // Use AI parser for free-form text
             biography = biographyAiAnalyzerService.parseBiography(biographyText);
         } catch (Exception e) {
@@ -201,12 +289,48 @@ public class GenerateController {
 
         // Generate cover letter (Anschreiben) - pass full biography for experience/education reference
         String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography);
+        
+        // Save to both output directory and data directory
+        fileOutputService.writeAnschreiben(coverLetter);
+        String dataAnschreibenPath = "data/anschreiben.txt";
+        fileOutputService.writeAnschreiben(coverLetter, dataAnschreibenPath);
+        
+        // Save path to state
+        changeDetectionService.saveAnschreibenPath(dataAnschreibenPath);
 
         // Build response
         GenerateResponseDto response = new GenerateResponseDto(coverLetter);
         
         logger.info("Successfully generated cover letter from file");
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/pdf")
+    public ResponseEntity<byte[]> generatePdf(@RequestBody PdfRequestDto request) {
+        String coverLetterText = request.getCoverLetter();
+        logger.info("Received PDF generation request (text length: {} chars)", 
+            coverLetterText != null ? coverLetterText.length() : 0);
+        
+        if (coverLetterText == null || coverLetterText.trim().isEmpty()) {
+            throw new IllegalArgumentException("Cover letter text must not be empty");
+        }
+        
+        try {
+            byte[] pdfBytes = pdfGenerationService.generatePdf(coverLetterText);
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", "Anschreiben.pdf");
+            headers.setContentLength(pdfBytes.length);
+            
+            logger.info("PDF generated successfully ({} bytes)", pdfBytes.length);
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(pdfBytes);
+        } catch (Exception e) {
+            logger.error("Error generating PDF", e);
+            throw new RuntimeException("Failed to generate PDF", e);
+        }
     }
 
     private String convertBiographyToText(java.util.Map<String, Object> biography) {
