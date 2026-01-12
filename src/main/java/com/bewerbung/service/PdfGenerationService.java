@@ -1,54 +1,5 @@
-package com.bewerbung.service;
 
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-
-/**
- * Service for generating PDF documents according to German DIN 5008 standard
- */
-@Service
-public class PdfGenerationService {
-
-    private static final Logger logger = LoggerFactory.getLogger(PdfGenerationService.class);
-    
-    // DIN 5008 margins: 2.5cm top/bottom/left, 2.0cm bottom (but we'll use 2.5cm for simplicity)
-    private static final float MARGIN_LEFT = 72f * 2.5f / 2.54f; // 2.5 cm in points (1 inch = 2.54 cm, 1 inch = 72 points)
-    private static final float MARGIN_RIGHT = 72f * 2.5f / 2.54f;
-    private static final float MARGIN_TOP = 72f * 2.5f / 2.54f;
-    private static final float MARGIN_BOTTOM = 72f * 2.0f / 2.54f; // 2.0 cm bottom
-    
-    private static final float FONT_SIZE = 11f; // DIN 5008: 11-12pt
-    private static final float LINE_HEIGHT = 13.5f; // Single line spacing (1.15 * font size)
-    
-    private static final PDType1Font FONT = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
-    private static final PDType1Font FONT_BOLD = new PDType1Font(Standard14Fonts.FontName.HELVETICA_BOLD);
-
-    /**
-     * Generates a PDF document from the cover letter text according to DIN 5008 standard
-     * 
-     * @param coverLetterText The cover letter text to convert to PDF
-     * @return Byte array containing the PDF document
-     * @throws IOException if PDF generation fails
-     */
-    public byte[] generatePdf(String coverLetterText) throws IOException {
-        logger.info("Generating PDF from cover letter text (length: {} chars)", coverLetterText.length());
-        
-        try (PDDocument document = new PDDocument()) {
-            PDPage page = new PDPage(PDRectangle.A4);
             document.addPage(page);
             
             float pageWidth = page.getMediaBox().getWidth();
