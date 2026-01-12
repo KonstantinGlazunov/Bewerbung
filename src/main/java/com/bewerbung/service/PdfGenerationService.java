@@ -1,5 +1,61 @@
+package com.bewerbung.service;
 
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Service for generating PDF documents according to German DIN 5008 standard
+ */
+@Service
+public class PdfGenerationService {
+
+    private static final Logger logger = LoggerFactory.getLogger(PdfGenerationService.class);
+    
+    // DIN 5008 margins: 2.5cm top/left/right, 2.0cm bottom
+    private static final float MARGIN_LEFT = 72f * 2.5f / 2.54f; // 2.5 cm in points (1 inch = 2.54 cm, 1 inch = 72 points)
+    private static final float MARGIN_RIGHT = 72f * 2.5f / 2.54f;
+    private static final float MARGIN_TOP = 72f * 2.5f / 2.54f;
+    private static final float MARGIN_BOTTOM = 72f * 2.0f / 2.54f; // 2.0 cm bottom
+    
+    private static final float FONT_SIZE = 11f; // DIN 5008: 11-12pt
+    private static final float LINE_HEIGHT = 13.5f; // Single line spacing (1.15 * font size)
+    
+    // Lazy initialization to avoid font scanning during class loading
+    private static PDType1Font FONT;
+    
+    private static synchronized PDType1Font getFont() {
+        if (FONT == null) {
+            FONT = new PDType1Font(Standard14Fonts.FontName.HELVETICA);
+        }
+        return FONT;
+    }
+
+    /**
+     * Generates a PDF document from the cover letter text according to DIN 5008 standard
+     * 
+     * @param coverLetterText The cover letter text to convert to PDF
+     * @return Byte array containing the PDF document
+     * @throws IOException if PDF generation fails
+     */
+    public byte[] generatePdf(String coverLetterText) throws IOException {
+        logger.info("Generating PDF from cover letter text (length: {} chars)", coverLetterText.length());
+        
+        try (PDDocument document = new PDDocument()) {
+            PDPage page = new PDPage(PDRectangle.A4);
             document.addPage(page);
             
             float pageWidth = page.getMediaBox().getWidth();
@@ -21,31 +77,18 @@
                 
                 // Draw date (right aligned)
                 String date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+                PDType1Font font = getFont();
+                float dateWidth = font.getStringWidth(date) / 1000f * FONT_SIZE;
                 contentStream.beginText();
-                contentStream.setFont(FONT, FONT_SIZE);
-                contentStream.newLineAtOffset(pageWidth - MARGIN_RIGHT - 
-                    FONT.getStringWidth(date) / 1000 * FONT_SIZE, yPosition);
+                contentStream.setFont(font, FONT_SIZE);
+                contentStream.newLineAtOffset(pageWidth - MARGIN_RIGHT - dateWidth, yPosition);
                 contentStream.showText(date);
                 contentStream.endText();
                 yPosition -= LINE_HEIGHT * 2;
                 
-                // Draw recipient address (if exists) - left aligned
-                if (parts.hasRecipientAddress()) {
-                    yPosition = drawRecipientAddress(contentStream, parts.getRecipientAddress(), 
-                        MARGIN_LEFT, yPosition);
-                    yPosition -= LINE_HEIGHT * 2;
-                }
-                
                 // Draw main content with proper line wrapping
                 yPosition = drawWrappedText(contentStream, parts.getMainContent(), 
                     MARGIN_LEFT, yPosition, contentWidth, FONT_SIZE, LINE_HEIGHT);
-                
-                // Draw signature (if exists) - left aligned
-                if (parts.hasSignature()) {
-                    yPosition -= LINE_HEIGHT * 2;
-                    yPosition = drawWrappedText(contentStream, parts.getSignature(), 
-                        MARGIN_LEFT, yPosition, contentWidth, FONT_SIZE, LINE_HEIGHT);
-                }
             }
             
             // Convert to byte array
@@ -90,9 +133,10 @@
                 String line = lines[i].trim();
                 if (line.isEmpty()) continue;
                 // Check if line looks like address (contains @, postal code pattern, or phone pattern, or street)
+                // Use case-insensitive patterns for German street names (Straße, Str., etc.)
                 if (line.contains("@") || line.matches(".*\\d{5}.*") || 
-                    line.matches(".*\\+49.*") || line.matches(".*straße.*") ||
-                    line.matches(".*str\\..*") || line.matches(".*Str\\..*")) {
+                    line.matches(".*\\+49.*") || line.matches("(?i).*straße.*") ||
+                    line.matches("(?i).*str\\..*")) {
                     senderAddressLines.add(line);
                 } else if (senderAddressLines.isEmpty() && line.length() > 0) {
                     // First non-empty line after name might be part of address
@@ -133,35 +177,14 @@
         String[] lines = address.split("\n");
         float yPosition = yStart;
         
+        PDType1Font font = getFont();
         for (String line : lines) {
             if (line.trim().isEmpty()) continue;
             
-            float textWidth = FONT.getStringWidth(line.trim()) / 1000 * FONT_SIZE;
+            float textWidth = font.getStringWidth(line.trim()) / 1000f * FONT_SIZE;
             contentStream.beginText();
-            contentStream.setFont(FONT, FONT_SIZE);
+            contentStream.setFont(font, FONT_SIZE);
             contentStream.newLineAtOffset(xRight - textWidth, yPosition);
-            contentStream.showText(line.trim());
-            contentStream.endText();
-            yPosition -= LINE_HEIGHT;
-        }
-        
-        return yPosition;
-    }
-    
-    /**
-     * Draws recipient address at the specified position (left aligned)
-     */
-    private float drawRecipientAddress(PDPageContentStream contentStream, String address, 
-                                      float xLeft, float yStart) throws IOException {
-        String[] lines = address.split("\n");
-        float yPosition = yStart;
-        
-        for (String line : lines) {
-            if (line.trim().isEmpty()) continue;
-            
-            contentStream.beginText();
-            contentStream.setFont(FONT, FONT_SIZE);
-            contentStream.newLineAtOffset(xLeft, yPosition);
             contentStream.showText(line.trim());
             contentStream.endText();
             yPosition -= LINE_HEIGHT;
@@ -176,12 +199,19 @@
     private float drawWrappedText(PDPageContentStream contentStream, String text, 
                                  float x, float yStart, float maxWidth, 
                                  float fontSize, float lineHeight) throws IOException {
-        String[] paragraphs = text.split("\n\n");
+        String[] lines = text.split("\n");
         float yPosition = yStart;
         
-        for (String paragraph : paragraphs) {
-            List<String> lines = wrapText(paragraph, maxWidth, fontSize);
-            for (String line : lines) {
+        for (String line : lines) {
+            if (line.trim().isEmpty()) {
+                // Empty line - just add spacing
+                yPosition -= lineHeight;
+                continue;
+            }
+            
+            List<String> wrappedLines = wrapText(line, maxWidth, fontSize);
+            PDType1Font font = getFont();
+            for (String wrappedLine : wrappedLines) {
                 if (yPosition < MARGIN_BOTTOM) {
                     // Would go below margin, but we continue anyway for simplicity
                     // In production, you might want to add a new page
@@ -189,13 +219,12 @@
                 }
                 
                 contentStream.beginText();
-                contentStream.setFont(FONT, fontSize);
+                contentStream.setFont(font, fontSize);
                 contentStream.newLineAtOffset(x, yPosition);
-                contentStream.showText(line);
+                contentStream.showText(wrappedLine);
                 contentStream.endText();
                 yPosition -= lineHeight;
             }
-            yPosition -= lineHeight * 0.5f; // Space between paragraphs
         }
         
         return yPosition;
@@ -208,10 +237,11 @@
         List<String> lines = new ArrayList<>();
         String[] words = text.split(" ");
         StringBuilder currentLine = new StringBuilder();
+        PDType1Font font = getFont();
         
         for (String word : words) {
             String testLine = currentLine.length() == 0 ? word : currentLine + " " + word;
-            float width = FONT.getStringWidth(testLine) / 1000 * fontSize;
+            float width = font.getStringWidth(testLine) / 1000f * fontSize;
             
             if (width > maxWidth && currentLine.length() > 0) {
                 lines.add(currentLine.toString());
@@ -237,9 +267,6 @@
     private static class CoverLetterParts {
         private String mainContent = "";
         private String senderAddress = "";
-        private String recipientAddress = "";
-        private String signature = "";
-        private String signatureName = "";
         
         public String getMainContent() {
             return mainContent;
@@ -260,38 +287,5 @@
         public boolean hasSenderAddress() {
             return senderAddress != null && !senderAddress.trim().isEmpty();
         }
-        
-        public String getRecipientAddress() {
-            return recipientAddress;
-        }
-        
-        public void setRecipientAddress(String recipientAddress) {
-            this.recipientAddress = recipientAddress;
-        }
-        
-        public boolean hasRecipientAddress() {
-            return recipientAddress != null && !recipientAddress.trim().isEmpty();
-        }
-        
-        public String getSignature() {
-            return signature;
-        }
-        
-        public void setSignature(String signature) {
-            this.signature = signature;
-        }
-        
-        public boolean hasSignature() {
-            return signature != null && !signature.trim().isEmpty();
-        }
-        
-        public String getSignatureName() {
-            return signatureName;
-        }
-        
-        public void setSignatureName(String signatureName) {
-            this.signatureName = signatureName;
-        }
     }
 }
-

@@ -215,6 +215,7 @@
             <div class="result-section">
                 <h2>Cover Letter (Anschreiben)</h2>
                 <textarea id="coverLetterTextarea" class="result-content editable"></textarea>
+                <button type="button" id="downloadButton" style="margin-top: 15px;">Herunterladen (PDF)</button>
             </div>
         </div>
 
@@ -323,6 +324,51 @@
                 // Hide loading state
                 loading.classList.add('hidden');
                 generateButton.disabled = false;
+            }
+        });
+
+        // Download PDF button handler
+        document.getElementById('downloadButton').addEventListener('click', async function() {
+            const coverLetterText = document.getElementById('coverLetterTextarea').value;
+            const downloadButton = document.getElementById('downloadButton');
+            
+            if (!coverLetterText || coverLetterText.trim().length === 0) {
+                alert('Bitte füllen Sie zuerst das Anschreiben aus.');
+                return;
+            }
+            
+            downloadButton.disabled = true;
+            downloadButton.textContent = 'PDF wird generiert...';
+            
+            try {
+                const response = await fetch('/api/generate/pdf', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ coverLetter: coverLetterText })
+                });
+                
+                if (!response.ok) {
+                    throw new Error('PDF-Generierung fehlgeschlagen');
+                }
+                
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'Anschreiben.pdf';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+            } catch (error) {
+                console.error('Error downloading PDF:', error);
+                alert('Fehler beim Generieren des PDFs: ' + error.message);
+            } finally {
+                downloadButton.disabled = false;
+                downloadButton.textContent = 'Herunterladen (PDF)';
             }
         });
     </script>

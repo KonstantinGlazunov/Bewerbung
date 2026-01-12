@@ -2,6 +2,7 @@ package com.bewerbung.controller;
 
 import com.bewerbung.dto.GenerateRequestDto;
 import com.bewerbung.dto.GenerateResponseDto;
+import com.bewerbung.dto.PdfRequestDto;
 import com.bewerbung.model.Biography;
 import com.bewerbung.model.JobRequirements;
 import com.bewerbung.service.AnschreibenGeneratorService;
@@ -10,6 +11,7 @@ import com.bewerbung.service.BiographyFileAnalyzerService;
 import com.bewerbung.service.BiographyService;
 import com.bewerbung.service.ChangeDetectionService;
 import com.bewerbung.service.FileOutputService;
+import com.bewerbung.service.PdfGenerationService;
 import com.bewerbung.service.VacancyAnalyzerService;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -24,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
@@ -41,6 +45,7 @@ public class GenerateController {
     private final AnschreibenGeneratorService anschreibenGeneratorService;
     private final ChangeDetectionService changeDetectionService;
     private final FileOutputService fileOutputService;
+    private final PdfGenerationService pdfGenerationService;
     private final Gson gson;
 
     @Autowired
@@ -50,7 +55,8 @@ public class GenerateController {
                              BiographyAiAnalyzerService biographyAiAnalyzerService,
                              AnschreibenGeneratorService anschreibenGeneratorService,
                              ChangeDetectionService changeDetectionService,
-                             FileOutputService fileOutputService) {
+                             FileOutputService fileOutputService,
+                             PdfGenerationService pdfGenerationService) {
         this.vacancyAnalyzerService = vacancyAnalyzerService;
         this.biographyService = biographyService;
         this.biographyFileAnalyzerService = biographyFileAnalyzerService;
@@ -58,6 +64,7 @@ public class GenerateController {
         this.anschreibenGeneratorService = anschreibenGeneratorService;
         this.changeDetectionService = changeDetectionService;
         this.fileOutputService = fileOutputService;
+        this.pdfGenerationService = pdfGenerationService;
         this.gson = new Gson();
     }
 
@@ -296,6 +303,34 @@ public class GenerateController {
         
         logger.info("Successfully generated cover letter from file");
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/pdf")
+    public ResponseEntity<byte[]> generatePdf(@RequestBody PdfRequestDto request) {
+        String coverLetterText = request.getCoverLetter();
+        logger.info("Received PDF generation request (text length: {} chars)", 
+            coverLetterText != null ? coverLetterText.length() : 0);
+        
+        if (coverLetterText == null || coverLetterText.trim().isEmpty()) {
+            throw new IllegalArgumentException("Cover letter text must not be empty");
+        }
+        
+        try {
+            byte[] pdfBytes = pdfGenerationService.generatePdf(coverLetterText);
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", "Anschreiben.pdf");
+            headers.setContentLength(pdfBytes.length);
+            
+            logger.info("PDF generated successfully ({} bytes)", pdfBytes.length);
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(pdfBytes);
+        } catch (Exception e) {
+            logger.error("Error generating PDF", e);
+            throw new RuntimeException("Failed to generate PDF", e);
+        }
     }
 
     private String convertBiographyToText(java.util.Map<String, Object> biography) {
