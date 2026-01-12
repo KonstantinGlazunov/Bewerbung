@@ -117,6 +117,30 @@
             line-height: 1.5;
         }
 
+        .result-content.editable {
+            padding: 0;
+            border: none;
+            background: transparent;
+        }
+
+        #coverLetterTextarea {
+            width: 100%;
+            min-height: 400px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+            resize: vertical;
+            background: white;
+        }
+
+        #coverLetterTextarea:focus {
+            outline: 2px solid #007bff;
+            outline-offset: -2px;
+        }
+
         .error {
             background-color: #fff5f5;
             border-left-color: #dc3545;
@@ -136,20 +160,42 @@
         .hidden {
             display: none;
         }
+
+        footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        footer h3 {
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        footer p {
+            margin: 5px 0;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Bewerbung AI - Document Generator</h1>
+        <h1>Bewerbunganschreiben AI Generator</h1>
         
         <form id="generateForm">
             <div class="form-group">
-                <label for="biographyTextarea">Biography (Text):</label>
+                <label for="biographyTextarea">Biography - Verfassen Sie Ihren Lebenslauf in einem freien Format: Persönliches
+                    Daten, Ihre Fähigkeiten, Berufserfahrung, Ausbildung:</label>
                 <textarea id="biographyTextarea" name="biography" required></textarea>
             </div>
             
             <div class="form-group">
-                <label for="jobPostingTextarea">Job Posting:</label>
+                <label for="jobPostingTextarea">Job Posting - kopieren Sie einfach den Text der Stellenanzeige hierher.:</label>
                 <textarea id="jobPostingTextarea" name="jobPosting" required></textarea>
             </div>
             
@@ -168,9 +214,14 @@
         <div id="results" class="results hidden">
             <div class="result-section">
                 <h2>Cover Letter (Anschreiben)</h2>
-                <div class="result-content" id="coverLetterContent"></div>
+                <textarea id="coverLetterTextarea" class="result-content editable"></textarea>
             </div>
         </div>
+
+        <footer>
+            <h3>Datenschutz</h3>
+            <p>Wir speichern keine personenbezogenen Daten dauerhaft. Eingegebene Inhalte werden ausschließlich zur unmittelbaren Verarbeitung verwendet und nach Beendigung der Sitzung automatisch gelöscht. Die technische Bereitstellung erfolgt über Railway, die Verarbeitung bestimmter Inhalte über die OpenAI-API – jeweils gemäß den Anforderungen der DSGVO.</p>
+        </footer>
     </div>
 
     <script>
@@ -260,7 +311,7 @@
                 }
                 
                 // Display results
-                document.getElementById('coverLetterContent').textContent = responseData.coverLetter || 'No cover letter generated';
+                document.getElementById('coverLetterTextarea').value = responseData.coverLetter || 'No cover letter generated';
                 results.classList.remove('hidden');
                 
             } catch (error) {
