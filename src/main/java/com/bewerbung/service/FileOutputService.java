@@ -73,12 +73,53 @@ public class FileOutputService {
     }
 
     public void writeAnschreiben(String anschreiben) {
+        writeAnschreiben(anschreiben, ANSCHREIBEN_FILE);
+    }
+    
+    public void writeAnschreiben(String anschreiben, String filePath) {
         try {
-            Files.write(Paths.get(ANSCHREIBEN_FILE), anschreiben.getBytes(StandardCharsets.UTF_8));
-            logger.info("Anschreiben written to: {}", ANSCHREIBEN_FILE);
+            if (anschreiben == null || anschreiben.trim().isEmpty()) {
+                logger.warn("Anschreiben is null or empty, skipping write");
+                return;
+            }
+            
+            java.nio.file.Path path = Paths.get(filePath).toAbsolutePath();
+            logger.info("Writing anschreiben to: {} (length: {} chars)", path, anschreiben.length());
+            
+            // Ensure parent directory exists
+            Files.createDirectories(path.getParent());
+            
+            Files.write(path, anschreiben.getBytes(StandardCharsets.UTF_8));
+            
+            // Verify file was written
+            if (Files.exists(path)) {
+                long fileSize = Files.size(path);
+                logger.info("Anschreiben successfully written to: {} ({} bytes)", path, fileSize);
+            } else {
+                logger.error("File was not created: {}", path);
+                throw new RuntimeException("File was not created: " + path);
+            }
         } catch (IOException e) {
-            logger.error("Failed to write anschreiben", e);
+            logger.error("Failed to write anschreiben to: {}", filePath, e);
             throw new RuntimeException("Failed to write anschreiben", e);
+        }
+    }
+    
+    public String readAnschreiben(String filePath) {
+        try {
+            java.nio.file.Path path = Paths.get(filePath).toAbsolutePath();
+            
+            if (!Files.exists(path)) {
+                logger.warn("Anschreiben file does not exist: {}", path);
+                return null;
+            }
+            
+            String content = Files.readString(path, StandardCharsets.UTF_8);
+            logger.info("Successfully read anschreiben from: {} ({} chars)", path, content.length());
+            return content;
+        } catch (IOException e) {
+            logger.error("Failed to read anschreiben from: {}", filePath, e);
+            return null;
         }
     }
 
