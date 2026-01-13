@@ -400,7 +400,8 @@
                 document.getElementById('progressPercent').textContent = Math.round(this.currentProgress) + '%';
                 
                 // Update message - find the last message where progress is >= current progress
-                let message = this.messages[this.messages.length - 1];
+                // Initialize with first message as fallback for progress < first threshold
+                let message = this.messages[0];
                 for (let i = this.messages.length - 1; i >= 0; i--) {
                     if (this.currentProgress >= this.messages[i].progress) {
                         message = this.messages[i];

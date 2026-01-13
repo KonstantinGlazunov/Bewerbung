@@ -1,21 +1,21 @@
 Sehr geehrte Damen und Herren,
 
-mit großem Interesse bewerbe ich mich auf die Stelle als Java Softwareentwickler bei der Finanz Informatik GmbH & Co. KG, da ich meine umfangreiche Erfahrung im Bereich Softwareentwicklung und meine Expertise in den geforderten Technologien gewinnbringend in Ihr Unternehmen einbringen möchte.
+bezugnehmend auf Ihre Stellenausschreibung für die Position als Verkäufer (m/w/d) technischer Service Außendienst bei Crown in Hessen, bewerbe ich mich mit großem Interesse. Mit langjähriger Erfahrung im Vertrieb und Teamleitung sowie fundierten technischen Kenntnissen bin ich überzeugt, dass ich einen wertvollen Beitrag zu Ihrem Unternehmen leisten kann.
 
-In meinen derzeitigen sowie früheren Positionen als Softwareentwickler habe ich umfassende Erfahrungen in der Entwicklung von Web-Anwendungen mit Java sammeln können. Bei der Tech Solutions GmbH war ich insbesondere für die Backend-Entwicklung, das API-Design und die Optimierung von Datenbanken verantwortlich, was mir tiefe Einblicke in agile Entwicklungsprozesse ermöglichte. Hierbei habe ich intensiv mit Java und weiteren relevanten Technologien wie Spring Boot und Git gearbeitet. Diese Erfahrungen haben mich gut auf die Herausforderungen bei der Finanz Informatik vorbereitet.
+Während meiner Tätigkeit als Teamleiter bei Pilteh leitete ich ein Team von Verkaufsleitern und war maßgeblich an der Bewerbung und Präsentation von Produkten beteiligt. Diese Rolle erforderte ausgeprägte Fähigkeiten in der Akquise von Neukunden sowie in der Betreuung von Bestandskunden, was perfekt mit den Kernverantwortlichkeiten Ihrer ausgeschriebenen Position übereinstimmt. Die hier gesammelte Erfahrung in der Nutzung von CRM-Systemen und digitalem Marketing hat meine kommunikativen und ergebnisorientierten Fähigkeiten gestärkt, die entscheidend für den Außendienst sind.
 
-Mein Abschluss als Bachelor of Science in Informatik von der Technischen Universität Berlin gewährleistet ein solides theoretisches Fundament, das durch die Oracle-Zertifizierung als Java SE 11 Developer weiter untermauert wird. Diese Qualifikationen, gepaart mit meiner jüngsten Berufserfahrung, entsprechen den Anforderungen Ihrer Stellenausschreibung und qualifizieren mich für die anspruchsvollen Aufgaben in Ihrem Unternehmen.
+Meine akademische Ausbildung im Bereich Betriebswirtschaft, kombiniert mit technischen Kenntnissen aus meiner Zeit als Elektrotechnik-Techniker, bietet mir die notwendige Basis, um die komplexen Produkte und Dienstleistungen von Crown effektiv zu vermarkten und zu verkaufen. Diese Kombination aus wirtschaftlichem Verständnis und technischem Wissen wird mir ermöglichen, anspruchsvolle Verkaufsverhandlungen zu führen und Kunden von den Vorteilen Ihrer Produkte zu überzeugen.
 
-Besonders ansprechend finde ich die Möglichkeit, bei der Finanz Informatik GmbH & Co. KG zu arbeiten, da Ihr Unternehmen für innovative Finanzlösungen bekannt ist und die Möglichkeit bietet, in einem dynamischen Umfeld zu arbeiten. Werte wie Innovation und Präzision, die Ihr Unternehmen auszeichnen, stimmen mit meinen beruflichen Überzeugungen überein und motivieren mich, Teil Ihres Teams zu werden.
+Darüber hinaus hat meine aktuelle Tätigkeit als Autovorbereiter bei FixAuto Weilburg meine technische Feinarbeit und mein Verantwortungsbewusstsein weiterentwickelt. Ich bin motiviert, diese praktischen Fähigkeiten in den Dienst Ihrer innovativen Lösungen zu stellen und den Erfolg von Crown aktiv mitzugestalten.
 
-Ich freue mich darauf, meine Fähigkeiten in einem persönlichen Gespräch näher darzulegen und mehr darüber zu erfahren, wie ich zum Erfolg Ihres Unternehmens beitragen kann.
+Crown fasziniert mich aufgrund seiner Innovationskraft und dem Bestreben, durch herausragenden Service und Top-Produkte Maßstäbe in der Branche zu setzen. Ich teile diese Leidenschaft für Qualität und bin überzeugt, dass meine Werte und Fähigkeiten hervorragend mit der Unternehmenskultur von Crown in Einklang stehen.
+
+Ich freue mich darauf, Ihnen in einem persönlichen Gespräch darzulegen, wie ich mein Know-how und meine Erfahrung gewinnbringend für Crown einsetzen kann. Vielen Dank für die Berücksichtigung meiner Bewerbung.
 
 Mit freundlichen Grüßen,
 
-Max Mustermann
+Konstantin Glazunov
 
-Max Mustermann  
-Musterstraße 123  
-12345 Berlin  
-E-Mail: max.mustermann@email.de  
-Telefon: +49 30 12345678  
+glazunov.const@gmail.com  
+0 1511 0974353  
+35619 Braunfels, Germany  
