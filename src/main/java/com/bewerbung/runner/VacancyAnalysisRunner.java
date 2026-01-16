@@ -35,14 +35,16 @@ public class VacancyAnalysisRunner implements ApplicationRunner {
         logger.info("Application started - Running vacancy analysis...");
         
         try {
-            JobRequirements jobRequirements = vacancyAnalyzerService.analyzeVacancy();
+            // Get full vacancy text for better prompt generation
+            String vacancyFullText = readVacancyFile();
+            JobRequirements jobRequirements = vacancyAnalyzerService.analyzeVacancy(vacancyFullText);
             logger.info("Vacancy analysis completed successfully");
             
             logger.info("Loading biography data...");
             Biography biography = biographyService.loadBiography();
             
             logger.info("Generating Bewerbungsanschreiben...");
-            String anschreiben = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography);
+            String anschreiben = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography, vacancyFullText);
             
             logger.info("=== Generated Bewerbungsanschreiben ===");
             logger.info("\n{}", anschreiben);
@@ -50,6 +52,19 @@ public class VacancyAnalysisRunner implements ApplicationRunner {
             
         } catch (Exception e) {
             logger.error("Error during vacancy analysis or Anschreiben generation on startup", e);
+        }
+    }
+    
+    private String readVacancyFile() {
+        try {
+            org.springframework.core.io.ClassPathResource resource = 
+                new org.springframework.core.io.ClassPathResource("input/job_posting.txt");
+            @SuppressWarnings("null")
+            String content = resource.getContentAsString(java.nio.charset.StandardCharsets.UTF_8);
+            return content;
+        } catch (Exception e) {
+            logger.warn("Could not read full vacancy text, will use structured data only", e);
+            return null;
         }
     }
 }

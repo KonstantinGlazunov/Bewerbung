@@ -16,6 +16,10 @@ public class AnschreibenGeneratorService {
     private OpenAiService openAiService;
 
     public String generateAnschreiben(JobRequirements job, Biography biography) {
+        return generateAnschreiben(job, biography, null);
+    }
+
+    public String generateAnschreiben(JobRequirements job, Biography biography, String vacancyFullText) {
         // Validate biography has data
         if (biography == null) {
             logger.error("Biography is null!");
@@ -28,7 +32,7 @@ public class AnschreibenGeneratorService {
                 job.getLocation(), 
                 job.getRequiredSkills() != null ? String.join(", ", job.getRequiredSkills()) : "none");
         
-        String prompt = buildPrompt(job, biography);
+        String prompt = buildPrompt(job, biography, vacancyFullText);
         logger.debug("Generated prompt for Anschreiben (length: {} chars)", prompt.length());
         
         // Log a summary of what data is available
@@ -47,158 +51,299 @@ public class AnschreibenGeneratorService {
         return anschreiben;
     }
 
-    private String buildPrompt(JobRequirements job, Biography biography) {
+    private String buildPrompt(JobRequirements job, Biography biography, String vacancyFullText) {
         StringBuilder prompt = new StringBuilder();
         
-        prompt.append("META-PROMPT: GENERIERUNG VON BEWERBUNGSANSCHREIBEN\n\n");
+        prompt.append("MISSION\n\n");
+        prompt.append("You are a professional German job application consultant and prompt-engineer. ");
+        prompt.append("Your task is to write a cover letter (Motivationsschreiben / Anschreiben). ");
+        prompt.append("You must analyze a CV (biography) and a job description, and then ");
+        prompt.append("create a high-quality German Motivationsschreiben / Anschreiben.\n\n");
         
-        prompt.append("Rolle:\n");
-        prompt.append("Du bist ein professioneller Karriereberater und deutscher Geschäftsschriftsteller. ");
-        prompt.append("Deine Aufgabe ist es, ein hochwertiges Bewerbungsanschreiben auf Deutsch zu erstellen, ");
-        prompt.append("basierend auf einer Kandidatenbiografie und einer Stellenausschreibung.\n\n");
+        prompt.append("You must strictly follow the following 6-step methodology. ");
+        prompt.append("Steps 1-5 are performed INTERNALLY and used ONLY for analysis. ");
+        prompt.append("Your final output must contain ONLY the completed cover letter, WITHOUT any intermediate results.\n\n");
         
-        prompt.append("Du musst strikt der folgenden mehrstufigen analytischen Methodik folgen.\n\n");
+        prompt.append("CRITICAL: The final cover letter MUST be written in GERMAN language, following German business standards (DIN 5008). ");
+        prompt.append("However, you will receive instructions in English for better understanding.\n\n");
         
         // === INPUTS ===
-        prompt.append("📥 EINGABEN\n\n");
+        prompt.append("INPUT\n\n");
+        prompt.append("The user provides:\n");
+        prompt.append("- A candidate biography / CV (free text)\n");
+        prompt.append("- A job description / vacancy text\n\n");
         
-        prompt.append("WICHTIG: Die folgenden Daten sind bereits vollständig bereitgestellt. ");
-        prompt.append("Du MUSST diese Daten verwenden, um das Anschreiben zu erstellen.\n\n");
+        prompt.append("IMPORTANT: The following data is already fully provided. ");
+        prompt.append("You MUST use this data to create the cover letter.\n\n");
         
-        prompt.append("=== STELLENAUSSCHREIBUNG ===\n");
+        // Include full vacancy text if available
+        if (vacancyFullText != null && !vacancyFullText.trim().isEmpty()) {
+            prompt.append("=== FULL JOB POSTING TEXT ===\n");
+            prompt.append(vacancyFullText).append("\n\n");
+        }
+        
+        prompt.append("=== STRUCTURED JOB POSTING ===\n");
         appendJobPosting(prompt, job);
         prompt.append("\n");
         
-        prompt.append("=== KANDIDATENBIOGRAFIE ===\n");
+        prompt.append("=== CANDIDATE BIOGRAPHY ===\n");
         appendBiography(prompt, biography);
         prompt.append("\n");
         
-        prompt.append("ENDE DER EINGABEDATEN\n");
-        prompt.append("Die obigen Informationen sind vollständig und müssen für die Erstellung des Anschreibens verwendet werden.\n\n");
+        prompt.append("END OF INPUT DATA\n");
+        prompt.append("The above information is complete and must be used for creating the cover letter.\n\n");
+        prompt.append("CRITICAL REMINDERS:\n");
+        prompt.append("1. NAME: The candidate's name is in the section \"CANDIDATE BIOGRAPHY\" under \"Name:\" ");
+        prompt.append("and MUST be used EXACTLY at the end of the letter after \"Mit freundlichen Grüßen\" - NO placeholders!\n");
+        prompt.append("2. FACTS: Use ONLY information that is ACTUALLY in the biography. ");
+        prompt.append("If it says \"unvollständige Ausbildung\" (incomplete education), do NOT write \"abgeschlossenen Ausbildung\" (completed education).\n");
+        prompt.append("3. EXPERIENCE: Do NOT invent experiences. If there is no experience with agricultural machinery/vehicles mentioned, ");
+        prompt.append("then do NOT write \"langjährige Erfahrung\" (extensive experience) - accept the gap.\n\n");
         
-        // === STEP 1: FORMAL DECONSTRUCTION ===
-        prompt.append("🧠 SCHRITT 1 — FORMALE DEKONSTRUKTION\n\n");
+        // === STEP 1: EXTRACT FORMAL JOB REQUIREMENTS ===
+        prompt.append("METHODOLOGY\n\n");
+        prompt.append("STEP 1 — EXTRACT FORMAL JOB REQUIREMENTS\n\n");
         
-        prompt.append("Extrahiere aus der Stellenausschreibung:\n");
-        prompt.append("- Kernverantwortlichkeiten\n");
-        prompt.append("- Erforderliche Fähigkeiten und Qualifikationen\n");
-        prompt.append("- Soft Skills und Persönlichkeitsmerkmale\n");
-        prompt.append("- Implizite Erwartungen (Ton, Arbeitsstil, Seniorität, Branchennormen)\n\n");
+        prompt.append("From the job posting text:\n");
+        prompt.append("Identify and list ALL explicit requirements, including:\n");
+        prompt.append("- Skills\n");
+        prompt.append("- Qualifications\n");
+        prompt.append("- Work experience\n");
+        prompt.append("- Soft skills\n");
+        prompt.append("- Industry knowledge\n");
+        prompt.append("- Tools/Technologies\n");
+        prompt.append("- Languages\n");
+        prompt.append("- Education\n\n");
         
-        prompt.append("Extrahiere aus der Biografie:\n");
-        prompt.append("- Berufserfahrung (vorläufige Analyse der Relevanz zur Position und Branche)\n");
-        prompt.append("- Ausbildung (vorläufige Bewertung der Passung zu den Anforderungen)\n");
-        prompt.append("- Technische und übertragbare Fähigkeiten (nur relevante)\n");
-        prompt.append("- Erfolge und messbare Ergebnisse (aus relevanten Bereichen)\n");
-        prompt.append("- Motivationsfaktoren und Werte\n");
-        prompt.append("- Sprachniveau, Kommunikationsstil, kultureller Kontext\n\n");
+        prompt.append("Reformulate them as clear, neutral requirement statements.\n");
+        prompt.append("Do not add interpretation yet.\n\n");
         
-        prompt.append("WICHTIG: Verwende die oben bereitgestellten Daten aus der Biografie und Stellenausschreibung. ");
-        prompt.append("Analysiere diese Daten auf Relevanz zur Position und Branche, dann erstelle das Anschreiben mit NUR relevanten Informationen.\n\n");
+        prompt.append("Output format:\n");
+        prompt.append("• Bullet list: \"Requirement: ...\"\n\n");
         
-        // === STEP 2: SEMANTIC MATCHING ===
-        prompt.append("🔎 SCHRITT 2 — SEMANTISCHE ZUORDNUNG UND RELEVANZFILTERUNG\n\n");
+        // === STEP 2: INFER IMPLIED REQUIREMENTS ===
+        prompt.append("STEP 2 — INFER IMPLIED REQUIREMENTS\n\n");
         
-        prompt.append("KRITISCH: Verwende NUR relevanten Erfahrungen und Ausbildungen, die zur Position und Branche passen.\n\n");
+        prompt.append("Based on role type, industry, and responsibilities:\n");
+        prompt.append("Derive plausible but unstated expectations, such as:\n");
+        prompt.append("- Self-management / Self-responsibility\n");
+        prompt.append("- Customer orientation\n");
+        prompt.append("- Documentation skills\n");
+        prompt.append("- Cross-functional communication\n");
+        prompt.append("- Compliance / Regulatory conformity\n");
+        prompt.append("- KPI orientation\n");
+        prompt.append("- Project management skills\n");
+        prompt.append("- Teamwork and cooperation skills\n");
+        prompt.append("- Problem-solving skills\n");
+        prompt.append("- Quality assurance\n\n");
         
-        prompt.append("RELEVANZPRÜFUNG:\n");
-        prompt.append("Analysiere jeden Eintrag aus Berufserfahrung und Ausbildung:\n");
-        prompt.append("- Ist dieser Erfahrung/Ausbildung relevant für die beworbene Position?\n");
-        prompt.append("- Passt sie zur Branche und den Anforderungen der Stelle?\n");
-        prompt.append("- Könnte HR denken, dass der Kandidat überqualifiziert ist?\n\n");
+        prompt.append("These must be reasonable for the German labor market and the given role.\n");
+        prompt.append("Clearly mark them as inferred, not explicitly stated.\n\n");
         
-        prompt.append("FILTERREGELN - AUSSCHLIESSEN bei Nichtrelevanz:\n");
-        prompt.append("- Erfahrungen aus völlig anderen Branchen/Fachgebieten (z.B. Programmierer-Erfahrung für Lieferant-Position)\n");
-        prompt.append("- Höherwertige Qualifikationen, die deutlich über den Anforderungen liegen\n");
-        prompt.append("- Spezialisierungen, die nicht zur Position passen und Signal senden, dass der Kandidat die Stelle nicht ernst nimmt\n\n");
+        prompt.append("Output format:\n");
+        prompt.append("• Bullet list: \"Implied requirement: ...\"\n\n");
         
-        prompt.append("EINBEZIEHEN:\n");
-        prompt.append("- Direkt relevante Berufserfahrung zur Position oder Branche\n");
-        prompt.append("- Übertragbare Fähigkeiten, die zur Stelle passen\n");
-        prompt.append("- Ausbildung, die den Anforderungen entspricht oder leicht darüber liegt\n");
-        prompt.append("- Branchenrelevante Erfahrungen, auch wenn Position leicht anders war\n\n");
+        // === STEP 3: ANALYZE THE CV / BIOGRAPHY ===
+        prompt.append("STEP 3 — ANALYZE THE CV / BIOGRAPHY\n\n");
         
-        prompt.append("Für jede RELEVANTE Schlüsselanforderung aus der Stellenausschreibung:\n");
-        prompt.append("- Identifiziere die relevanteste passende Evidenz aus den GEFILTERTEN Biografiedaten.\n");
-        prompt.append("- Priorisiere:\n");
-        prompt.append("  • Direkte relevante Erfahrung über indirekte\n");
-        prompt.append("  • Messbare Ergebnisse über generische Aussagen\n");
-        prompt.append("  • Branchenrelevante Terminologie über allgemeine Sprache\n\n");
+        prompt.append("From the CANDIDATE BIOGRAPHY:\n");
+        prompt.append("Extract skills, experience, achievements, education, tools, languages, certifications.\n");
+        prompt.append("Do not summarize everything.\n");
+        prompt.append("Focus on FACTS that could be matched to the job requirements.\n\n");
         
-        prompt.append("Wenn eine Anforderung nicht direkt erfüllt wird:\n");
-        prompt.append("- Formuliere angrenzende Kompetenzen oder übertragbare Fähigkeiten um (nur wenn relevant).\n");
-        prompt.append("- Vermeide Erfindungen.\n");
-        prompt.append("- Wenn keine relevanten Erfahrungen vorhanden sind, konzentriere dich auf Motivation und potenzielle Passung.\n\n");
+        prompt.append("IMPORTANT - USE EXACT FORMULATIONS:\n");
+        prompt.append("- If the biography says \"unvollständige Ausbildung\" (incomplete education), use EXACTLY this formulation\n");
+        prompt.append("- If the biography says \"Elektrotechniker\" (electrical technician), use this designation\n");
+        prompt.append("- If NO experience with agricultural machinery/vehicles is mentioned, then this experience does NOT exist for this candidate\n");
+        prompt.append("- Do NOT invent additional qualifications or experiences\n\n");
         
-        // === STEP 3: RHETORICAL STRUCTURE ===
-        prompt.append("🧩 SCHRITT 3 — RHETORISCHE STRUKTUR\n\n");
+        prompt.append("Extract:\n");
+        prompt.append("- Work experience (with relevance assessment to position and industry) - ONLY if mentioned in CV\n");
+        prompt.append("- Education (with fit assessment to requirements) - use EXACT formulations like \"unvollständig\" (incomplete) or \"abgeschlossen\" (completed)\n");
+        prompt.append("- Technical and transferable skills (only relevant and mentioned in CV)\n");
+        prompt.append("- Achievements and measurable results (from relevant areas) - ONLY if mentioned in CV\n");
+        prompt.append("- Certifications and further training - ONLY if mentioned in CV\n");
+        prompt.append("- Languages and language skills - use exact levels from CV\n\n");
         
-        prompt.append("Konstruiere das Bewerbungsanschreiben mit folgender Logik:\n\n");
+        prompt.append("Output format:\n");
+        prompt.append("• Bullet list: \"Candidate data: ...\"\n\n");
         
-        prompt.append("Eröffnungsparagraph:\n");
-        prompt.append("- Verweise explizit auf die Position.\n");
-        prompt.append("- Zeige professionelle Absicht und hohe Passung auf.\n\n");
+        // === STEP 4: MATCH CV TO REQUIREMENTS ===
+        prompt.append("STEP 4 — MATCH CV TO REQUIREMENTS\n\n");
         
-        prompt.append("Kompetenzparagraph(e):\n");
-        prompt.append("- Ordne Stellenanforderungen → Kandidatenqualifikationen zu.\n");
-        prompt.append("- Verwende konkrete Beispiele.\n");
-        prompt.append("- Halte deutsche Geschäftsschreibkonventionen ein.\n\n");
+        prompt.append("Create a structured mapping:\n");
+        prompt.append("For each explicit and implied requirement, identify:\n");
+        prompt.append("- Direct match (explicitly present in CV)\n");
+        prompt.append("- Indirect match (transferable experience)\n");
+        prompt.append("- Gap (not covered; must NOT be invented)\n\n");
         
-        prompt.append("Motivation & Kulturelle Passung:\n");
-        prompt.append("- Erkläre, warum das Unternehmen, nicht nur die Rolle.\n");
-        prompt.append("- Verbinde persönliche Werte mit der Organisationsmission.\n\n");
+        prompt.append("CRITICAL - PROHIBITION OF INVENTED FACTS:\n");
+        prompt.append("- Use ONLY relevant experiences and education that are ACTUALLY in the biography\n");
+        prompt.append("- If education is described as \"unvollständig\" (incomplete) or \"unvollständige Ausbildung\" (incomplete education), ");
+        prompt.append("you must NOT write \"abgeschlossenen Ausbildung\" (completed education) - use the exact formulation from the biography\n");
+        prompt.append("- If the CV does not mention experience in a specific area (e.g., agricultural machinery, vehicles), ");
+        prompt.append("you must NOT write \"langjährige Erfahrung\" (extensive experience) or similar formulations\n");
+        prompt.append("- Use ONLY what is EXPLICITLY in the biography - NO interpretations or additions\n");
+        prompt.append("- If something is NOT in the CV, accept the gap - do NOT invent experiences or qualifications\n\n");
         
-        prompt.append("Schlussparagraph:\n");
-        prompt.append("- Drücke Bereitschaft für ein Vorstellungsgespräch aus.\n");
-        prompt.append("- Verwende formelle deutsche Schlussetikette.\n\n");
+        prompt.append("CRITICAL: Use ONLY relevant experiences and education that match the position and industry AND are in the biography.\n\n");
         
-        // === STEP 4: STYLE & LANGUAGE CONSTRAINTS ===
-        prompt.append("✍️ SCHRITT 4 — STIL & SPRACHBESCHRÄNKUNGEN\n\n");
+        prompt.append("RELEVANCE CHECK:\n");
+        prompt.append("Analyze each entry from work experience and education:\n");
+        prompt.append("- Is this experience/education relevant for the advertised position?\n");
+        prompt.append("- Does it fit the industry and job requirements?\n");
+        prompt.append("- Could HR think the candidate is overqualified?\n\n");
         
-        prompt.append("Sprache: Deutsch\n");
-        prompt.append("Register: Formal, professionell, muttersprachlich\n");
-        prompt.append("Ton: Selbstbewusst, präzise, nicht übertrieben\n");
-        prompt.append("Länge: 1 Seite (≈ 250–400 Wörter)\n\n");
+        prompt.append("FILTER RULES - EXCLUDE if not relevant:\n");
+        prompt.append("- Experiences from completely different industries/fields\n");
+        prompt.append("- Higher qualifications that are significantly above requirements\n");
+        prompt.append("- Specializations that do not fit the position\n\n");
         
-        prompt.append("Vermeide:\n");
-        prompt.append("- Generische Füllphrasen\n");
-        prompt.append("- Übermäßig emotionale oder werbliche Sprache\n");
-        prompt.append("- Direktes Kopieren aus der Stellenausschreibung\n\n");
+        prompt.append("INCLUDE:\n");
+        prompt.append("- Directly relevant work experience for the position or industry\n");
+        prompt.append("- Transferable skills that fit the position\n");
+        prompt.append("- Education that meets requirements or slightly exceeds them\n");
+        prompt.append("- Industry-relevant experiences, even if position was slightly different\n\n");
         
-        prompt.append("Wenn die Biografie nicht-muttersprachliches Deutsch zeigt:\n");
-        prompt.append("- Verwende klare, einfache aber korrekte Strukturen.\n");
-        prompt.append("- Vermeide unnötige Idiome.\n\n");
+        prompt.append("Output format:\n");
+        prompt.append("Requirement → Match type → Supporting CV evidence (if any)\n\n");
+        
+        // === STEP 5: DEFINE COVER LETTER STRATEGY ===
+        prompt.append("STEP 5 — DEFINE COVER LETTER STRATEGY\n\n");
+        
+        prompt.append("Derive the rhetorical and structural strategy for the cover letter:\n\n");
+        
+        prompt.append("What should be emphasized? (Core competencies, motivation, career logic)\n");
+        prompt.append("• Emphasis:\n");
+        prompt.append("  - Core competencies that directly match requirements\n");
+        prompt.append("  - Motivation for the position and company\n");
+        prompt.append("  - Logical career development and professional continuity\n");
+        prompt.append("  - Measurable achievements and concrete results\n\n");
+        
+        prompt.append("What should be de-emphasized or avoided?\n");
+        prompt.append("• De-emphasis:\n");
+        prompt.append("  - Non-relevant experiences from other industries\n");
+        prompt.append("  - Overqualification that could raise doubts about seriousness\n");
+        prompt.append("  - Generic filler phrases without substance\n");
+        prompt.append("  - Negative aspects or deficits\n\n");
+        
+        prompt.append("What positioning profile should be used?\n");
+        prompt.append("• Positioning:\n");
+        prompt.append("  - Experienced specialist (with corresponding experience)\n");
+        prompt.append("  - Career changer (with industry change)\n");
+        prompt.append("  - Technical generalist (with broad skillset)\n");
+        prompt.append("  - Customer-oriented profile (with service/customer contact)\n");
+        prompt.append("  - Solution-oriented problem solver (for analytical roles)\n");
+        prompt.append("  - Team player and cooperation partner (for team roles)\n\n");
+        
+        prompt.append("What tone is appropriate?\n");
+        prompt.append("• Tone & Style:\n");
+        prompt.append("  - Formal, professional, German business style (Standard) - BUT write in German!\n");
+        prompt.append("  - Confident, but not arrogant\n");
+        prompt.append("  - Precise and concrete, not exaggerated\n");
+        prompt.append("  - Adapted to industry and company size:\n");
+        prompt.append("    * Public sector / NGO → more formal, mission-oriented tone\n");
+        prompt.append("    * Startup / Tech → concise, results-oriented language\n");
+        prompt.append("    * Healthcare / Education → empathetic, responsibility-oriented formulation\n");
+        prompt.append("    * Finance → precise, compliance-oriented\n\n");
+        
+        // === STEP 6: CONSTRUCT THE FINAL GENERATION PROMPT ===
+        prompt.append("STEP 6 — CONSTRUCT THE FINAL GENERATION PROMPT\n\n");
+        
+        prompt.append("Use all previous steps to generate the cover letter.\n\n");
+        
+        prompt.append("Specify:\n");
+        prompt.append("- Language: GERMAN (formal business style, DIN 5008 standard) - THE FINAL LETTER MUST BE IN GERMAN!\n");
+        prompt.append("- Length: 1 page / 3-4 paragraphs (approx. 250-400 words)\n");
+        prompt.append("- Structure:\n");
+        prompt.append("  1. Introduction paragraph: Reference to position, professional intent, high fit\n");
+        prompt.append("  2. Qualification paragraph(s): Mapping job requirements → candidate qualifications with concrete examples\n");
+        prompt.append("  3. Motivation & Cultural Fit: Why the company, not just the role; connection of personal values with organizational mission\n");
+        prompt.append("  4. Closing paragraph: Readiness for interview, formal German closing etiquette\n\n");
+        
+        prompt.append("- Usage:\n");
+        prompt.append("  * Job title: \"").append(job.getPosition()).append("\" MUST be in the subject line (Betreff)\n");
+        prompt.append("  * Company name: \"").append(job.getCompany()).append("\" MUST be mentioned in the text\n");
+        prompt.append("  * Salutation: \"Sehr geehrte Damen und Herren\" (Standard German greeting)\n");
+        prompt.append("  * Closing: \"Mit freundlichen Grüßen\" followed by the candidate's name\n");
+        prompt.append("  * CRITICAL - Candidate's name (MUST be used):\n");
+        prompt.append("    - The name is in the CANDIDATE BIOGRAPHY section under \"Name:\"\n");
+        prompt.append("    - You MUST use this name EXACTLY and COMPLETELY in the closing at the end\n");
+        prompt.append("    - If the CV says \"Konstantin Glazunov\", use EXACTLY \"Konstantin Glazunov\", not just \"Konstantin\"\n");
+        prompt.append("    - NO placeholders like [Name], [Kandidatenname], [Ihr Name] or similar - USE THE REAL NAME\n");
+        prompt.append("    - The name MUST be on a new line after \"Mit freundlichen Grüßen\"\n");
+        prompt.append("    - IF the name is NOT in the biography, then write \"Mit freundlichen Grüßen\" and leave a blank line\n");
+        prompt.append("    - BUT: In 99% of cases the name is in the biography - use it!\n\n");
+        
+        prompt.append("- Prohibitions - ABSOLUTE PROHIBITION OF INVENTED INFORMATION:\n");
+        prompt.append("  * NO invented facts - use ONLY what is in the CANDIDATE BIOGRAPHY\n");
+        prompt.append("  * NO changing formulations: if it says \"unvollständige Ausbildung\" (incomplete education), you must NOT write \"abgeschlossenen Ausbildung\" (completed education)\n");
+        prompt.append("  * NO invented experiences: if there is no experience with agricultural machinery in the CV, you must NOT write \"langjährige Erfahrung im Bereich Landmaschinen\" (extensive experience in agricultural machinery)\n");
+        prompt.append("  * NO interpretations or additions - use EXACT formulations from the biography\n");
+        prompt.append("  * ONLY use matched CV data - they MUST be explicitly in the biography\n");
+        prompt.append("  * NO placeholders like [Name], [Kandidatenname], [Ihr Name], [Unternehmen] or similar\n");
+        prompt.append("  * NO meta-commentary or process explanations\n");
+        prompt.append("  * NO headings like \"Anschreiben\" or \"Motivationsschreiben\"\n");
+        prompt.append("  * NO apologies or hints about missing data\n");
+        prompt.append("  * NO omitting the name - the name MUST be present and from the biography\n\n");
+        
+        prompt.append("Instruction:\n");
+        prompt.append("Integrate explicit + implied requirements with the candidate's relevant experiences.\n");
+        prompt.append("BUT: Use ONLY experiences and qualifications that are ACTUALLY in the CANDIDATE BIOGRAPHY.\n");
+        prompt.append("If something is NOT in the CV, accept it - do NOT invent and do NOT rephrase.\n");
+        prompt.append("Use a professional German business tone.\n");
+        prompt.append("The text must be ready to send.\n\n");
         
         // === OUTPUT FORMAT ===
-        prompt.append("📤 AUSGABEFORMAT\n\n");
+        prompt.append("OUTPUT\n\n");
         
-        prompt.append("WICHTIG: Verwende NUR die relevanten Daten aus der Biografie, die zur Position und Branche passen. ");
-        prompt.append("Nicht relevante Erfahrungen oder überqualifizierende Qualifikationen müssen ausgeschlossen werden, ");
-        prompt.append("um zu vermeiden, dass HR denkt, der Kandidat sei überqualifiziert oder nehme die Stelle nicht ernst.\n\n");
+        prompt.append("CRITICAL - OUTPUT FORMAT:\n\n");
+        prompt.append("You MUST perform all 6 steps (1-6) INTERNALLY and analyze, BUT:\n\n");
+        prompt.append("Your FINAL OUTPUT must contain ONLY the completed cover letter!\n\n");
         
-        prompt.append("Gib NUR das finale Bewerbungsanschreiben auf Deutsch zurück, mit:\n");
-        prompt.append("- Keiner Meta-Kommentierung\n");
-        prompt.append("- Keiner Erklärung deines Prozesses\n");
-        prompt.append("- Keinen Überschriften wie \"Anschreiben\"\n");
-        prompt.append("- Keinen Entschuldigungen oder Hinweisen auf fehlende Daten\n");
-        prompt.append("- Der Text muss versandbereit sein und die bereitgestellten Informationen verwenden\n\n");
+        prompt.append("FORBIDDEN in the output:\n");
+        prompt.append("- NO Extracted Requirements (Step 1) in the output\n");
+        prompt.append("- NO Implied Requirements (Step 2) in the output\n");
+        prompt.append("- NO Relevant CV Data (Step 3) in the output\n");
+        prompt.append("- NO Requirement-CV Mapping (Step 4) in the output\n");
+        prompt.append("- NO Cover Letter Strategy (Step 5) in the output\n");
+        prompt.append("- NO numbering or headings like \"1. Extracted Requirements\"\n");
+        prompt.append("- NO bullet points with analysis results\n");
+        prompt.append("- NO meta-commentary\n");
+        prompt.append("- NO explanation of your process\n");
+        prompt.append("- NO intermediate results or analyses\n\n");
         
-        prompt.append("WICHTIGE FORMALE ANFORDERUNGEN:\n");
-        prompt.append("- Der Betreff MUSS die exakte Stellenbezeichnung \"").append(job.getPosition()).append("\" enthalten\n");
-        prompt.append("- Der Firmenname \"").append(job.getCompany()).append("\" MUSS im Text genannt werden\n");
-        prompt.append("- Beginne mit \"Sehr geehrte Damen und Herren\"\n");
-        prompt.append("- Verwende \"Mit freundlichen Grüßen\" als Grußformel\n");
-        prompt.append("- KEINE Platzhalter wie [Name] oder [Unternehmen] verwenden!\n\n");
+        prompt.append("ALLOWED in the output:\n");
+        prompt.append("- ONLY the final cover letter in GERMAN language\n");
+        prompt.append("- The text starts directly with the subject line (Betreff) or salutation\n");
+        prompt.append("- The text ends with THE REAL NAME from the biography after the closing\n");
+        prompt.append("- The name MUST be taken from the section \"CANDIDATE BIOGRAPHY\" → \"Name:\"\n");
+        prompt.append("- The text is completely ready to send\n\n");
         
-        // === OPTIONAL ADVANCED MODE ===
-        prompt.append("✅ OPTIONALER ERWEITERTER MODUS (falls zutreffend)\n\n");
+        prompt.append("PROCESS:\n");
+        prompt.append("1. Perform steps 1-5 INTERNALLY (do not show in output)\n");
+        prompt.append("2. Use the results of steps 1-5 to create the cover letter\n");
+        prompt.append("3. Output ONLY the completed cover letter (Step 6) - IN GERMAN!\n\n");
         
-        prompt.append("Wenn die Stellenausschreibung impliziert:\n");
-        prompt.append("- Öffentlicher Sektor / NGO → formellerer, missionsorientierter Ton\n");
-        prompt.append("- Startup / Tech → prägnante, ergebnisorientierte Sprache\n");
-        prompt.append("- Gesundheitswesen / Bildung → empathische, verantwortungsorientierte Formulierung\n\n");
-        
-        prompt.append("Dann passe die rhetorische Betonung entsprechend an.\n");
+        prompt.append("EXAMPLE of correct output (with real name from biography):\n");
+        prompt.append("Betreff: Bewerbung als ").append(job.getPosition() != null ? job.getPosition() : "[Job Title]").append("\n\n");
+        prompt.append("Sehr geehrte Damen und Herren,\n\n");
+        prompt.append("[Cover letter text here - 3-4 paragraphs, ONLY with facts from the biography, written in German]\n\n");
+        prompt.append("Mit freundlichen Grüßen\n");
+        if (biography != null && biography.getName() != null && !biography.getName().isEmpty()) {
+            prompt.append(biography.getName()).append("\n\n");
+            prompt.append("IMPORTANT: In the above example, the name \"").append(biography.getName()).append("\" from the biography was used. ");
+            prompt.append("You MUST use the actual name from the \"CANDIDATE BIOGRAPHY\" section.\n\n");
+        } else {
+            prompt.append("[WRONG - do NOT do this!]\n");
+            prompt.append("[Here the name from CANDIDATE BIOGRAPHY → Name: must stand - NO placeholders!]\n\n");
+        }
+        prompt.append("FORBIDDEN examples for names (do NOT do this!):\n");
+        prompt.append("- [Ihr Name] ❌\n");
+        prompt.append("- [Name] ❌\n");
+        prompt.append("- [Kandidatenname] ❌\n");
+        prompt.append("- Konstantin (if full name is Konstantin Glazunov) ❌\n\n");
+        prompt.append("CORRECT: Use the EXACT full name from the biography (e.g., \"Konstantin Glazunov\") ✓\n\n");
         
         return prompt.toString();
     }
