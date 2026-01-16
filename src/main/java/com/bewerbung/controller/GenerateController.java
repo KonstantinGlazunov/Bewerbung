@@ -129,7 +129,7 @@ public class GenerateController {
                 jobRequirements = vacancyAnalyzerService.analyzeVacancy(request.getJobPosting());
             }
             logger.info("Generating anschreiben...");
-            String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography);
+            String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography, request.getJobPosting());
             logger.info("Anschreiben generated (length: {} chars), writing to file...", coverLetter.length());
             
             // Save to both output directory and data directory
@@ -202,7 +202,7 @@ public class GenerateController {
         }
 
         // Generate cover letter (Anschreiben)
-        String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography);
+        String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography, request.getJobPosting());
         
         // Save to both output directory and data directory
         fileOutputService.writeAnschreiben(coverLetter);
@@ -288,7 +288,7 @@ public class GenerateController {
         JobRequirements jobRequirements = vacancyAnalyzerService.analyzeVacancy(jobPosting);
 
         // Generate cover letter (Anschreiben) - pass full biography for experience/education reference
-        String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography);
+        String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography, jobPosting);
         
         // Save to both output directory and data directory
         fileOutputService.writeAnschreiben(coverLetter);
