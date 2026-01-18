@@ -85,6 +85,25 @@ public class GenerateController {
             vacancyText != null ? vacancyText.length() : 0,
             cvText != null ? cvText.length() : 0);
         
+        // Check if data matches default samples - if so, use sample cover letter without AI
+        if (fileOutputService.isDefaultData(vacancyText, cvText)) {
+            logger.info("Data matches default samples - using sample cover letter without AI processing");
+            String sampleCoverLetter = fileOutputService.loadSampleCoverLetter();
+            if (sampleCoverLetter != null && !sampleCoverLetter.trim().isEmpty()) {
+                // Save to output files
+                fileOutputService.writeAnschreiben(sampleCoverLetter);
+                String dataAnschreibenPath = "data/anschreiben.txt";
+                fileOutputService.writeAnschreiben(sampleCoverLetter, dataAnschreibenPath);
+                changeDetectionService.saveAnschreibenPath(dataAnschreibenPath);
+                
+                logger.info("Sample cover letter loaded and saved to output files ({} chars)", sampleCoverLetter.length());
+                String outputPath = java.nio.file.Paths.get("output/anschreiben.md").toAbsolutePath().toString();
+                return ResponseEntity.ok("Using sample cover letter (default data detected, AI skipped). File: " + outputPath);
+            } else {
+                logger.warn("Sample cover letter not found, falling back to AI generation");
+            }
+        }
+        
         // Log preview of data for debugging
         if (vacancyText != null && !vacancyText.isEmpty()) {
             String vacancyPreview = vacancyText.length() > 200 ? vacancyText.substring(0, 200) + "..." : vacancyText;
@@ -249,6 +268,25 @@ public class GenerateController {
         logger.info("Checking changes - Job posting length: {} chars, Biography length: {} chars", 
             jobPosting != null ? jobPosting.length() : 0,
             biographyText != null ? biographyText.length() : 0);
+
+        // Check if data matches default samples - if so, use sample cover letter without AI
+        if (fileOutputService.isDefaultData(jobPosting, biographyText)) {
+            logger.info("Data matches default samples - using sample cover letter without AI processing");
+            String sampleCoverLetter = fileOutputService.loadSampleCoverLetter();
+            if (sampleCoverLetter != null && !sampleCoverLetter.trim().isEmpty()) {
+                // Save to output files
+                fileOutputService.writeAnschreiben(sampleCoverLetter);
+                String dataAnschreibenPath = "data/anschreiben.txt";
+                fileOutputService.writeAnschreiben(sampleCoverLetter, dataAnschreibenPath);
+                changeDetectionService.saveAnschreibenPath(dataAnschreibenPath);
+                
+                logger.info("Sample cover letter loaded and saved to output files ({} chars)", sampleCoverLetter.length());
+                GenerateResponseDto response = new GenerateResponseDto(sampleCoverLetter);
+                return ResponseEntity.ok(response);
+            } else {
+                logger.warn("Sample cover letter not found, falling back to AI generation");
+            }
+        }
 
         // Check for changes
         ChangeDetectionService.ChangeResult changeResult = changeDetectionService.checkAndSave(jobPosting, biographyText);
