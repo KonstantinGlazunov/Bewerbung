@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -140,6 +141,110 @@ public class FileOutputService {
             logger.error("Failed to write notes", e);
             throw new RuntimeException("Failed to write notes", e);
         }
+    }
+    
+    public String loadSampleCoverLetter() {
+        try {
+            ClassPathResource resource = new ClassPathResource("static/sample_coverLetter.txt");
+            if (!resource.exists()) {
+                logger.warn("Sample cover letter file not found: static/sample_coverLetter.txt");
+                return null;
+            }
+            
+            String content = resource.getContentAsString(StandardCharsets.UTF_8);
+            logger.info("Loaded sample cover letter ({} chars)", content.length());
+            return content;
+        } catch (IOException e) {
+            logger.error("Failed to load sample cover letter", e);
+            return null;
+        }
+    }
+    
+    public String loadDefaultJobPosting() {
+        try {
+            ClassPathResource resource = new ClassPathResource("static/sample_job_posting.txt");
+            if (!resource.exists()) {
+                logger.warn("Default job posting file not found: static/sample_job_posting.txt");
+                return null;
+            }
+            
+            String content = resource.getContentAsString(StandardCharsets.UTF_8);
+            logger.debug("Loaded default job posting ({} chars)", content.length());
+            return content.trim();
+        } catch (IOException e) {
+            logger.error("Failed to load default job posting", e);
+            return null;
+        }
+    }
+    
+    public String loadDefaultBiography() {
+        // Try JSON format first
+        try {
+            ClassPathResource resource = new ClassPathResource("input/biography.json");
+            if (resource.exists()) {
+                String content = resource.getContentAsString(StandardCharsets.UTF_8);
+                logger.debug("Loaded default biography JSON ({} chars)", content.length());
+                return content.trim();
+            }
+        } catch (IOException e) {
+            logger.debug("Failed to load biography.json, trying text format", e);
+        }
+        
+        // Try text format as fallback
+        try {
+            ClassPathResource resource = new ClassPathResource("static/sample_biography.txt");
+            if (resource.exists()) {
+                String content = resource.getContentAsString(StandardCharsets.UTF_8);
+                logger.debug("Loaded default biography text ({} chars)", content.length());
+                return content.trim();
+            }
+        } catch (IOException e) {
+            logger.warn("Default biography file not found (neither JSON nor text format)");
+        }
+        
+        return null;
+    }
+    
+    public boolean isDefaultData(String vacancyText, String cvText) {
+        String defaultJobPosting = loadDefaultJobPosting();
+        String defaultBiography = loadDefaultBiography();
+        
+        if (defaultJobPosting == null || defaultBiography == null) {
+            logger.warn("Cannot compare with defaults - default files not found");
+            return false;
+        }
+        
+        // Normalize vacancy text for comparison (trim whitespace)
+        boolean vacancyMatches = vacancyText != null && vacancyText.trim().equals(defaultJobPosting);
+        
+        // Normalize biography for comparison (handle both JSON and text formats)
+        boolean cvMatches = false;
+        if (cvText != null && !cvText.trim().isEmpty()) {
+            try {
+                // Try to parse both as JSON
+                JsonObject defaultJson = gson.fromJson(defaultBiography, JsonObject.class);
+                JsonObject incomingJson = gson.fromJson(cvText, JsonObject.class);
+                
+                // Compare normalized JSON strings
+                String normalizedDefault = gson.toJson(defaultJson);
+                String normalizedIncoming = gson.toJson(incomingJson);
+                cvMatches = normalizedDefault.equals(normalizedIncoming);
+            } catch (Exception e) {
+                // If JSON parsing fails, compare as plain text (for text format biography)
+                logger.debug("Biography not in JSON format, using text comparison");
+                cvMatches = cvText.trim().equals(defaultBiography);
+            }
+        }
+        
+        boolean isDefault = vacancyMatches && cvMatches;
+        
+        if (isDefault) {
+            logger.info("Data matches default samples - will use sample cover letter without AI");
+        } else {
+            logger.debug("Data does not match defaults - vacancy match: {}, cv match: {}", vacancyMatches, cvMatches);
+        }
+        
+        return isDefault;
     }
 }
 

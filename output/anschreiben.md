@@ -1,14 +1,14 @@
-Betreff: Bewerbung als Servicetechniker (m/w/d) Außendienst
+Betreff: Bewerbung als Java Softwareentwickler
 
 Sehr geehrte Damen und Herren,
 
-mit großem Interesse habe ich Ihre Stellenausschreibung für die Position des Servicetechnikers im Außendienst bei Crown gelesen. Die Möglichkeit, meine technischen Fähigkeiten und meine Freude am direkten Kundenkontakt in einem führenden Unternehmen für elektrisch betriebene Flurförderzeuge einzubringen, spricht mich sehr an. 
+mit großem Interesse habe ich Ihre Stellenausschreibung für die Position eines Java Softwareentwicklers bei der Finanz Informatik GmbH & Co. KG gelesen. Aufgrund meiner langjährigen Erfahrung in der Softwareentwicklung und meinen fundierten Kenntnissen in Java sowie JavaScript bin ich überzeugt, eine wertvolle Ergänzung für Ihr Team zu sein.
 
-Ihre Anforderungen an einen Servicetechniker decken sich weitgehend mit meinen bisherigen Erfahrungen und Qualifikationen. In meiner bisherigen Tätigkeit habe ich fundierte Kenntnisse in technischen Wartungs- und Diagnosearbeiten erworben und kann auf eine verkürzte technische Ausbildung zurückblicken. Diese Erfahrung hat meine Fähigkeit zur selbstständigen Problemlösung gestärkt und meine Kundenorientierung weiterentwickelt.
+Während meines Studiums der Informatik an der Technischen Universität Berlin legte ich meinen Schwerpunkt auf die Softwareentwicklung und Datenbanken, was die Grundlage für meine über sechsjährige Berufserfahrung in der Softwareentwicklung schuf. Bei meiner aktuellen Position bei Tech Solutions GmbH entwickle ich Web-Anwendungen mit Java Spring Boot und bin verantwortlich für die Backend-Entwicklung, API-Design und Datenbankoptimierung. Der Einsatz von Tools wie Git und Maven ist dabei Teil meines Arbeitsalltags. Bei Startup Innovations AG sammelte ich zudem wertvolle Erfahrung in der Weiterentwicklung von Java-Anwendungen, was meine Fähigkeiten insbesondere bei der Implementierung neuer Features und Bug-Fixes stärkte.
 
-Die Aussicht, beim Marktführer für elektrisch betriebene Flurförderzeuge tätig zu sein und meine Fähigkeiten in einem modernen Schulungszentrum kontinuierlich weiterzuentwickeln, motiviert mich besonders. Ich schätze die Möglichkeit, in enger Zusammenarbeit mit dem Innendienst und dem Verkaufsaußendienst einen exzellenten Service zu gewährleisten.
+Besonders reizt mich an der ausgeschriebenen Stelle die Vielzahl an innovativen Projekten sowie die Aufgabenvielfalt, die von der Gestaltung über die Implementierung bis hin zur Qualitätssicherung reichen. Ihre Ausrichtung als einer der führenden Banken-IT-Dienstleister und Digitalisierungspartner Europas bietet ein inspirierendes Umfeld, das Raum für persönliche Weiterentwicklung und den Austausch in interdisziplinären Teams ermöglicht. Diese Werte finden auch in meiner Arbeitsweise Ausdruck, indem ich stets nach strukturierten und zielorientierten Lösungen strebe und gerne im Team arbeite, um gemeinsame Erfolge zu erzielen.
 
-Ich freue mich, meine Motivation und meine Qualifikationen in einem persönlichen Gespräch näher zu erläutern, und bin jederzeit bereit für ein Interview. 
+Ich freue mich auf die Möglichkeit, Ihnen in einem persönlichen Gespräch mehr über meine Motivation und wie ich Ihre Organisation unterstützen kann, zu vermitteln.
 
 Mit freundlichen Grüßen  
-Konstantin Glazunov
+Max Mustermann  

@@ -1,100 +1,57 @@
-Zum Hauptinhalt springen
-Alt
+Finanz Informatik GmbH & Co. KG logo
+Java Softwareentwickler (m/w/d)
+Finanz Informatik GmbH & Co. KG
+Hannover, Münster, Frankfurt am Main
+Feste Anstellung
+Homeoffice möglich, Vollzeit
+Erschienen: vor 3 Tagen
+52.000€ - 79.000€/Jahr (geschätzt für Vollzeit)
+Sei einer der ersten Bewerber
+Finanz Informatik GmbH & Co. KG logo
+Java Softwareentwickler (m/w/d)
+Finanz Informatik GmbH & Co. KG
+Passt dieser Job zu mir?
+Prüfe vor deiner Bewerbung, ob du die Voraussetzungen erfüllst.
 
+Passt weniger
+Passt hervorragend
+slide number 1
+Als einer der größten Banken-IT-Dienstleister und Digitalisierungspartner Europas sind wir der Treiber der Digitalisierung innerhalb der Sparkassen-Finanzgruppe. Mit über 5.000 Mitarbeitenden an 3 Standorten machen wir digitales Banking von heute leistungsfähig und entwickeln smarte Finanz-Services von morgen. Dabei bieten wir ein breites Aufgabenspektrum, in dem die individuellen Stärken hervorragend eingebracht werden können. Ob App-Entwicklung, Netzwerktechnologien und Serverbetrieb oder Beratung, Schulung und Support – bei uns findet jede:r seine bzw. ihre Berufung! Als Spezialist:in oder auch als Generalist:in. Alles mit besten Karrierechancen, viel Raum für persönliche Entfaltung und zahlreichen Benefits.
 
+Für die Organisationseinheit Rahmenkredite, Avale & Konsortial, suchen wir zum nächstmöglichen Termin für den Standort Hannover, Münster oder Frankfurt am Main einen
 
+Java Softwareentwickler (m/w/d).
 
+Hinweis: Das Team ist ausschließlich am Standort Hannover angesiedelt.
 
+#mitgestalten – was dich erwartet:
+Innovative Software-Entwicklung: Architekturelle Konzeption und eigenverantwortliche Neu- und Weiterentwicklung von Geschäftsprozessen, Services und Workflows in Java und JavaScript.
+Vielfältige Projekte: Verantwortungsübernahme und Mitarbeit in komplexen Projekten von der Analyse über Design bis hin zu Implementierung, Test, Dokumentation und Einführung.
+Koordination: Technischer Ansprechpartner (m/w/d) für Produktverantwortliche und Führungskräfte, sowie Steuerung der technischen Themen im Entwicklerteam. 
+Technische Implementierung: Enge Zusammenarbeit mit bankfachlichen Produktverantwortlichen und Implementierung von technischen Änderungswünschen.
+Qualitätssicherung & Performance-Optimierung: Konzeption und Durchführung von Maßnahmen zur Qualitätssicherung und Performance-Optimierung.
+Lösungsfinder: Übernahme des Last-Level-Supports für unsere entwickelten Komponenten und Management von Programmeinsätzen.
+#mitbringen – was wir erwarten:
+Background: Abgeschlossenes Studium der Informatik, Wirtschaftsinformatik oder vergleichbare Ausbildung (z.B. Fachinformatiker).
+Erfahrung: Mind. 6 Jahre fachbezogene Berufserfahrung und fundierte Kenntnisse in der Softwareentwicklung mit Java und JavaScript.
+Technologien: Kenntnisse in Tools wie IntelliJ, Subversion, Git, Maven, Harvest, Guice oder JUnit.
+Frontend-Entwicklung: Erfahrung mit React und Material UI ist wünschenswert.
+Arbeitsweise: Strukturierte, zielorientierte und eigenverantwortliche Herangehensweise an Aufgaben.
+Neugierde: Ausgeprägte Neugier und Ausdauer für neue Themen.
+Teamgeist: Freude an der Zusammenarbeit im Team, Zuverlässigkeit und Einsatzbereitschaft sowie Bereitschaft zu gelegentlichen Reisen.
+Ihre Benefits bei der Finanz Informatik:
+Sie fragen sich, warum Sie bei der Finanz Informatik arbeiten sollten? Wir hätten da ein paar gute Gründe für Sie. Neben flexiblen Arbeitszeiten, vergünstigten Jobtickets oder der Möglichkeit, mobil zu arbeiten, bieten wir Ihnen noch viel mehr:
 
-
-Servicetechniker (m/w/d) Außendienst in deiner Region
-Vollzeit
-Deutschland
-mit / ohne Berufserfahrung
-12. Januar 2026
-Deine Leidenschaft als Techniker wird ergänzt durch deine Lust auf den direkten Kundenkontakt? Du hast schon Erfahrung als Techniker für komplexe Maschinen oder möchtest dich nun beim Marktführer von elektrisch betriebenen Flurförderzeugen weiterentwickeln?
-
-Wir suchen dich! Egal ob als erfahrener Techniker aus unserer Branche oder als Quereinsteiger. Wir haben für jeden die passende Stelle.
-
-Als Servicetechniker im Außendienst (m/w/d) bist du selbständig und eigenverantwortlich in deiner Region unterwegs und bist bei unseren Kunden vor Ort dafür verantwortlich, dass diese den optimalen Service an unseren Fahrzeugen erhalten.
-
- 
-
-Das erwartet dich bei uns
-
-Der Einstieg in einen Außendienstjob, bspw. rund um Hamburg, Dortmund oder Neufahrn
-Ein sehr gut ausgestattetes Servicefahrzeug mit integrierter Werkstatt als Firmenwagen
-Unser modernes Schulungszentrum begleitet dich nachhaltig auf deinem Weg und vermittelt dir stetig das aktuellste Wissen
-Eine spezifische, auf dich zugeschnittene Einarbeitung gewährleistet deinen optimalen Einstiegt und gibt dir die Sicherheit in deinem Job perfekt auf alle Herausforderungen vorbereitet zu sein
-Unterstützt wirst du durch die Serviceleitung und Disposition unserer regionalen Niederlassungen
-Zusätzlich stehst du in regelmäßigem und engem Kontakt zu unserem Innendienst und dem Verkaufsaußendienst
-Außerdem erwarten dich Benefits wie Fitness-Rabatte, Mitarbeiterangebote (corporate benefits), unser Bikeleasing oder die Teilhabe in einem BAV-Gruppenvertrag
- 
-
-Das kannst du für uns tun
-
-Du übernimmst selbständig Wartungs-, Diagnose-, Reparatur- und Einstellarbeiten sowie Sicherheitsprüfungen an Flurförderzeugen vor Ort bei unseren Kunden  
-Außerdem führst du Um- und Nachrüstung an den Fahrzeugen durch
-Als erste Ansprechperson für alle technischen Fragen vor Ort stellst du sicher, dass unsere Kunden den perfekten Service erhalten
- 
-
-Das solltest du mitbringen
-
-Du hast eine technische Ausbildung erfolgreich abgeschlossen oder bringst eine vergleichbare Qualifikation oder die entsprechende Erfahrung mit?
-Möglicherweise konntest du schon Erfahrung im Bereich Landmaschinen, Baumaschinen, Nutzfahrzeuge oder KFZ sammeln?
-Auf jeden Fall aber bringst du Interesse an Gabelstaplern mit und würdest nun gerne beim Marktführer von elektrisch betriebenen Flurförderzeugen durchstarten?
-Du liebst abwechslungsreiche Tätigkeiten, magst den direkten Kundenkontakt und bist gerne im Außendienst unterwegs?
- 
-
-Du konntest viele dieser Fragen mit “JA” beantworten? Perfekt! Dann lade deine Bewerbung über den untenstehenden Link hoch und werde Teil von Crown.
-
-Jetzt bewerben
-Exzellent
-4.61/5 (2106)
-Impressum
-Datenschutz
-powered by softgarden
-Tracker image
-Logo
-QR Code
-https://servicetechnikercrown-crown.career.softgarden.de/jobs/11469492/Servicetechniker-m-w-d-Au%C3%9Fendienst-in-deiner-Region/?sa=false&locale=de
-Servicetechniker (m/w/d) Außendienst in deiner Region
-Deutschland
-Vollzeit
-mit / ohne Berufserfahrung
-12. Januar 2026
-Deine Leidenschaft als Techniker wird ergänzt durch deine Lust auf den direkten Kundenkontakt? Du hast schon Erfahrung als Techniker für komplexe Maschinen oder möchtest dich nun beim Marktführer von elektrisch betriebenen Flurförderzeugen weiterentwickeln?
-
-Wir suchen dich! Egal ob als erfahrener Techniker aus unserer Branche oder als Quereinsteiger. Wir haben für jeden die passende Stelle.
-
-Als Servicetechniker im Außendienst (m/w/d) bist du selbständig und eigenverantwortlich in deiner Region unterwegs und bist bei unseren Kunden vor Ort dafür verantwortlich, dass diese den optimalen Service an unseren Fahrzeugen erhalten.
-
- 
-
-Das erwartet dich bei uns
-
-Der Einstieg in einen Außendienstjob, bspw. rund um Hamburg, Dortmund oder Neufahrn
-Ein sehr gut ausgestattetes Servicefahrzeug mit integrierter Werkstatt als Firmenwagen
-Unser modernes Schulungszentrum begleitet dich nachhaltig auf deinem Weg und vermittelt dir stetig das aktuellste Wissen
-Eine spezifische, auf dich zugeschnittene Einarbeitung gewährleistet deinen optimalen Einstiegt und gibt dir die Sicherheit in deinem Job perfekt auf alle Herausforderungen vorbereitet zu sein
-Unterstützt wirst du durch die Serviceleitung und Disposition unserer regionalen Niederlassungen
-Zusätzlich stehst du in regelmäßigem und engem Kontakt zu unserem Innendienst und dem Verkaufsaußendienst
-Außerdem erwarten dich Benefits wie Fitness-Rabatte, Mitarbeiterangebote (corporate benefits), unser Bikeleasing oder die Teilhabe in einem BAV-Gruppenvertrag
- 
-
-Das kannst du für uns tun
-
-Du übernimmst selbständig Wartungs-, Diagnose-, Reparatur- und Einstellarbeiten sowie Sicherheitsprüfungen an Flurförderzeugen vor Ort bei unseren Kunden  
-Außerdem führst du Um- und Nachrüstung an den Fahrzeugen durch
-Als erste Ansprechperson für alle technischen Fragen vor Ort stellst du sicher, dass unsere Kunden den perfekten Service erhalten
- 
-
-Das solltest du mitbringen
-
-Du hast eine technische Ausbildung erfolgreich abgeschlossen oder bringst eine vergleichbare Qualifikation oder die entsprechende Erfahrung mit?
-Möglicherweise konntest du schon Erfahrung im Bereich Landmaschinen, Baumaschinen, Nutzfahrzeuge oder KFZ sammeln?
-Auf jeden Fall aber bringst du Interesse an Gabelstaplern mit und würdest nun gerne beim Marktführer von elektrisch betriebenen Flurförderzeugen durchstarten?
-Du liebst abwechslungsreiche Tätigkeiten, magst den direkten Kundenkontakt und bist gerne im Außendienst unterwegs?
- 
-
-Du konntest viele dieser Fragen mit “JA” beantworten? Perfekt! Dann lade deine Bewerbung über den untenstehenden Link hoch und werde Teil von Crown.
+Altersvorsorge
+Barrierefrei
+Betriebssport
+Familienservice
+Firmenevents
+Flexible Arbeitszeiten
+Mobiles Arbeiten
+Jobticket
+Kantine
+Tarifvertrag
+Weiterbildung
+Fitnessförderung
+Bei uns erwartet Sie eine attraktive Vergütung basierend auf Ihrer Qualifikation sowie Ihrer relevanten, praktischen Erfahrung.
