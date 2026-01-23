@@ -81,12 +81,14 @@ public class GenerateController {
         String cvText = convertBiographyToText(request.getBiography());
         String vacancyText = request.getJobPosting();
         
-        logger.info("Data received - Vacancy: {} chars, CV (biography): {} chars", 
+        logger.info("Data received - Vacancy: {} chars, CV (biography): {} chars, Wishes: {} chars", 
             vacancyText != null ? vacancyText.length() : 0,
-            cvText != null ? cvText.length() : 0);
+            cvText != null ? cvText.length() : 0,
+            request.getWishes() != null ? request.getWishes().length() : 0);
         
         // Check if data matches default samples - if so, use sample cover letter without AI
-        if (fileOutputService.isDefaultData(vacancyText, cvText)) {
+        // BUT: if wishes are provided, we need to regenerate even for default data
+        if (fileOutputService.isDefaultData(vacancyText, cvText) && (request.getWishes() == null || request.getWishes().trim().isEmpty())) {
             logger.info("Data matches default samples - using sample cover letter without AI processing");
             String sampleCoverLetter = fileOutputService.loadSampleCoverLetter();
             if (sampleCoverLetter != null && !sampleCoverLetter.trim().isEmpty()) {
@@ -114,8 +116,8 @@ public class GenerateController {
             logger.debug("CV preview: {}", cvPreview.replace("\n", "\\n"));
         }
 
-        // Check for changes
-        ChangeDetectionService.ChangeResult changeResult = changeDetectionService.checkAndSave(vacancyText, cvText);
+        // Check for changes (including wishes)
+        ChangeDetectionService.ChangeResult changeResult = changeDetectionService.checkAndSave(vacancyText, cvText, request.getWishes());
 
         // If no changes detected, return early without AI processing
         if (!changeResult.hasChanges()) {
@@ -140,15 +142,15 @@ public class GenerateController {
             logger.info("Vacancy unchanged, skipping analysis");
         }
 
-        // Generate cover letter (Anschreiben) - only if vacancy or CV changed
-        if (changeResult.isVacancyChanged() || changeResult.isCvChanged()) {
+        // Generate cover letter (Anschreiben) - only if vacancy, CV, or wishes changed
+        if (changeResult.isVacancyChanged() || changeResult.isCvChanged() || changeResult.isWishesChanged()) {
             if (jobRequirements == null) {
                 // Need to analyze even if vacancy didn't change, for anschreiben generation
                 logger.info("Job requirements null, analyzing vacancy for anschreiben generation");
                 jobRequirements = vacancyAnalyzerService.analyzeVacancy(request.getJobPosting());
             }
             logger.info("Generating anschreiben...");
-            String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography, request.getJobPosting());
+            String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography, request.getJobPosting(), request.getWishes());
             logger.info("Anschreiben generated (length: {} chars), writing to file...", coverLetter.length());
             
             // Save to both output directory and data directory
@@ -187,8 +189,8 @@ public class GenerateController {
         String cvText = convertBiographyToText(request.getBiography());
         String vacancyText = request.getJobPosting();
 
-        // Check for changes
-        ChangeDetectionService.ChangeResult changeResult = changeDetectionService.checkAndSave(vacancyText, cvText);
+        // Check for changes (including wishes)
+        ChangeDetectionService.ChangeResult changeResult = changeDetectionService.checkAndSave(vacancyText, cvText, request.getWishes());
 
         // If no changes detected, try to load saved Anschreiben
         if (!changeResult.hasChanges()) {
@@ -221,7 +223,7 @@ public class GenerateController {
         }
 
         // Generate cover letter (Anschreiben)
-        String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography, request.getJobPosting());
+        String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography, request.getJobPosting(), request.getWishes());
         
         // Save to both output directory and data directory
         fileOutputService.writeAnschreiben(coverLetter);
@@ -243,8 +245,16 @@ public class GenerateController {
     @PostMapping("/from-file")
     public ResponseEntity<GenerateResponseDto> generateFromFile(
             @RequestParam("biographyFile") MultipartFile biographyFile,
-            @RequestParam("jobPosting") String jobPosting) {
+            @RequestParam("jobPosting") String jobPosting,
+            @RequestParam(value = "wishes", required = false) String wishes) {
         logger.info("Received generate request from file");
+        
+        // Log user wishes if provided
+        if (wishes != null && !wishes.trim().isEmpty()) {
+            logger.info("User wishes/corrections received (length: {} chars): {}", wishes.length(), wishes);
+        } else {
+            logger.info("No user wishes/corrections provided");
+        }
         
         // Validate inputs
         if (biographyFile == null || biographyFile.isEmpty()) {
@@ -288,11 +298,11 @@ public class GenerateController {
             }
         }
 
-        // Check for changes
-        ChangeDetectionService.ChangeResult changeResult = changeDetectionService.checkAndSave(jobPosting, biographyText);
+        // Check for changes (including wishes)
+        ChangeDetectionService.ChangeResult changeResult = changeDetectionService.checkAndSave(jobPosting, biographyText, wishes);
         
-        logger.info("Change detection result - hasChanges: {}, vacancyChanged: {}, cvChanged: {}", 
-            changeResult.hasChanges(), changeResult.isVacancyChanged(), changeResult.isCvChanged());
+        logger.info("Change detection result - hasChanges: {}, vacancyChanged: {}, cvChanged: {}, wishesChanged: {}", 
+            changeResult.hasChanges(), changeResult.isVacancyChanged(), changeResult.isCvChanged(), changeResult.isWishesChanged());
 
         // If no changes detected, try to load saved Anschreiben
         if (!changeResult.hasChanges()) {
@@ -326,7 +336,7 @@ public class GenerateController {
         JobRequirements jobRequirements = vacancyAnalyzerService.analyzeVacancy(jobPosting);
 
         // Generate cover letter (Anschreiben) - pass full biography for experience/education reference
-        String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography, jobPosting);
+        String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography, jobPosting, wishes);
         
         // Save to both output directory and data directory
         fileOutputService.writeAnschreiben(coverLetter);

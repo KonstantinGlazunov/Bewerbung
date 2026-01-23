@@ -66,6 +66,10 @@ public class ChangeDetectionService {
     }
 
     public ChangeResult checkAndSave(String vacancyText, String cvText) {
+        return checkAndSave(vacancyText, cvText, null);
+    }
+
+    public ChangeResult checkAndSave(String vacancyText, String cvText, String wishesText) {
         try {
             // Handle null inputs
             if (vacancyText == null) {
@@ -76,28 +80,35 @@ public class ChangeDetectionService {
                 cvText = "";
                 logger.warn("CV text is null, using empty string");
             }
+            if (wishesText == null) {
+                wishesText = "";
+            }
 
-            logger.info("Checking changes - Vacancy length: {} chars, CV length: {} chars", 
-                vacancyText.length(), cvText.length());
+            logger.info("Checking changes - Vacancy length: {} chars, CV length: {} chars, Wishes length: {} chars", 
+                vacancyText.length(), cvText.length(), wishesText.length());
 
             // Calculate hashes BEFORE saving (to compare with existing state)
             String vacancyHash = calculateHash(vacancyText);
             String cvHash = calculateHash(cvText);
+            String wishesHash = calculateHash(wishesText);
             
-            logger.info("Calculated hashes - Vacancy: {}..., CV: {}...", 
+            logger.info("Calculated hashes - Vacancy: {}..., CV: {}..., Wishes: {}...", 
                 vacancyHash.substring(0, Math.min(8, vacancyHash.length())),
-                cvHash.substring(0, Math.min(8, cvHash.length())));
+                cvHash.substring(0, Math.min(8, cvHash.length())),
+                wishesHash.substring(0, Math.min(8, wishesHash.length())));
 
             // Load existing state
             State state = loadState();
             
-            logger.info("Existing state - Vacancy hash: {}..., CV hash: {}...",
+            logger.info("Existing state - Vacancy hash: {}..., CV hash: {}..., Wishes hash: {}...",
                 state.getVacancyHash().isEmpty() ? "(empty)" : state.getVacancyHash().substring(0, Math.min(8, state.getVacancyHash().length())),
-                state.getCvHash().isEmpty() ? "(empty)" : state.getCvHash().substring(0, Math.min(8, state.getCvHash().length())));
+                state.getCvHash().isEmpty() ? "(empty)" : state.getCvHash().substring(0, Math.min(8, state.getCvHash().length())),
+                state.getWishesHash().isEmpty() ? "(empty)" : state.getWishesHash().substring(0, Math.min(8, state.getWishesHash().length())));
 
-            // Check if both hashes match
+            // Check if hashes match
             boolean vacancyChanged = !vacancyHash.equals(state.getVacancyHash());
             boolean cvChanged = !cvHash.equals(state.getCvHash());
+            boolean wishesChanged = !wishesHash.equals(state.getWishesHash());
             
             // Check if this is the first run (empty state) or if we have data to save
             boolean isFirstRun = state.getVacancyHash().isEmpty() && state.getCvHash().isEmpty();
@@ -105,13 +116,15 @@ public class ChangeDetectionService {
                                    (cvText != null && !cvText.trim().isEmpty());
 
             // Always save files if we have data (first run or changes detected)
-            if (isFirstRun || vacancyChanged || cvChanged || hasDataToSave) {
+            if (isFirstRun || vacancyChanged || cvChanged || wishesChanged || hasDataToSave) {
                 if (isFirstRun) {
-                    logger.info("First run detected - saving files. Vacancy length: {}, CV length: {}", 
+                    logger.info("First run detected - saving files. Vacancy length: {}, CV length: {}, Wishes length: {}", 
                         vacancyText != null ? vacancyText.length() : 0, 
-                        cvText != null ? cvText.length() : 0);
-                } else if (vacancyChanged || cvChanged) {
-                    logger.info("Changes detected - saving files. Vacancy changed: {}, CV changed: {}", vacancyChanged, cvChanged);
+                        cvText != null ? cvText.length() : 0,
+                        wishesText != null ? wishesText.length() : 0);
+                } else if (vacancyChanged || cvChanged || wishesChanged) {
+                    logger.info("Changes detected - saving files. Vacancy changed: {}, CV changed: {}, Wishes changed: {}", 
+                        vacancyChanged, cvChanged, wishesChanged);
                 } else {
                     logger.info("Saving files with available data");
                 }
@@ -131,40 +144,56 @@ public class ChangeDetectionService {
             }
 
             // Only skip AI processing if no changes AND not first run
-            if (!vacancyChanged && !cvChanged && !isFirstRun) {
+            if (!vacancyChanged && !cvChanged && !wishesChanged && !isFirstRun) {
                 logger.info("No changes detected. Hashes match existing state. Skipping AI processing.");
-                return new ChangeResult(false, false, false, "No changes detected");
+                return new ChangeResult(false, false, false, false, "No changes detected");
             }
 
             // Update state with new hashes
             state.setVacancyHash(vacancyHash);
             state.setCvHash(cvHash);
+            state.setWishesHash(wishesHash);
             state.setVacancyLastProcessed(vacancyChanged ? Instant.now().toString() : state.getVacancyLastProcessed());
             state.setCvLastProcessed(cvChanged ? Instant.now().toString() : state.getCvLastProcessed());
             saveState(state);
             
             logger.info("State updated with new hashes");
 
-            String changeDescription = buildChangeDescription(vacancyChanged, cvChanged);
+            String changeDescription = buildChangeDescription(vacancyChanged, cvChanged, wishesChanged);
             logger.info("Changes detected: {}", changeDescription);
 
-            return new ChangeResult(true, vacancyChanged, cvChanged, changeDescription);
+            return new ChangeResult(true, vacancyChanged, cvChanged, wishesChanged, changeDescription);
 
         } catch (Exception e) {
             logger.error("Error in change detection", e);
             // On error, assume changes detected to ensure processing
-            return new ChangeResult(true, true, true, "Error during change detection, processing anyway");
+            return new ChangeResult(true, true, true, true, "Error during change detection, processing anyway");
         }
     }
 
-    private String buildChangeDescription(boolean vacancyChanged, boolean cvChanged) {
-        if (vacancyChanged && cvChanged) {
-            return "Vacancy and CV changed";
-        } else if (vacancyChanged) {
-            return "Vacancy changed";
-        } else {
-            return "CV changed";
+    private String buildChangeDescription(boolean vacancyChanged, boolean cvChanged, boolean wishesChanged) {
+        StringBuilder desc = new StringBuilder();
+        boolean first = true;
+        
+        if (vacancyChanged) {
+            desc.append("Vacancy changed");
+            first = false;
         }
+        if (cvChanged) {
+            if (!first) desc.append(", ");
+            desc.append("CV changed");
+            first = false;
+        }
+        if (wishesChanged) {
+            if (!first) desc.append(", ");
+            desc.append("Wishes changed");
+            first = false;
+        }
+        
+        if (first) {
+            return "No changes detected";
+        }
+        return desc.toString();
     }
 
     private void saveTextToFile(String filePath, String content) throws IOException {
@@ -247,12 +276,15 @@ public class ChangeDetectionService {
             if (jsonObject.has("cvLastProcessed")) {
                 state.setCvLastProcessed(jsonObject.get("cvLastProcessed").getAsString());
             }
+            if (jsonObject.has("wishesHash")) {
+                state.setWishesHash(jsonObject.get("wishesHash").getAsString());
+            }
             if (jsonObject.has("anschreibenFile")) {
                 state.setAnschreibenFile(jsonObject.get("anschreibenFile").getAsString());
             }
             
-            logger.debug("Loaded state - Vacancy hash length: {}, CV hash length: {}", 
-                state.getVacancyHash().length(), state.getCvHash().length());
+            logger.debug("Loaded state - Vacancy hash length: {}, CV hash length: {}, Wishes hash length: {}", 
+                state.getVacancyHash().length(), state.getCvHash().length(), state.getWishesHash().length());
             
             return state;
         } catch (Exception e) {
@@ -266,6 +298,7 @@ public class ChangeDetectionService {
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("vacancyHash", state.getVacancyHash());
             jsonObject.addProperty("cvHash", state.getCvHash());
+            jsonObject.addProperty("wishesHash", state.getWishesHash());
             jsonObject.addProperty("vacancyLastProcessed", state.getVacancyLastProcessed());
             jsonObject.addProperty("cvLastProcessed", state.getCvLastProcessed());
             jsonObject.addProperty("anschreibenFile", state.getAnschreibenFile());
@@ -283,13 +316,20 @@ public class ChangeDetectionService {
         private final boolean hasChanges;
         private final boolean vacancyChanged;
         private final boolean cvChanged;
+        private final boolean wishesChanged;
         private final String description;
 
-        public ChangeResult(boolean hasChanges, boolean vacancyChanged, boolean cvChanged, String description) {
+        public ChangeResult(boolean hasChanges, boolean vacancyChanged, boolean cvChanged, boolean wishesChanged, String description) {
             this.hasChanges = hasChanges;
             this.vacancyChanged = vacancyChanged;
             this.cvChanged = cvChanged;
+            this.wishesChanged = wishesChanged;
             this.description = description;
+        }
+
+        // Legacy constructor for backward compatibility
+        public ChangeResult(boolean hasChanges, boolean vacancyChanged, boolean cvChanged, String description) {
+            this(hasChanges, vacancyChanged, cvChanged, false, description);
         }
 
         public boolean hasChanges() {
@@ -304,6 +344,10 @@ public class ChangeDetectionService {
             return cvChanged;
         }
 
+        public boolean isWishesChanged() {
+            return wishesChanged;
+        }
+
         public String getDescription() {
             return description;
         }
@@ -312,6 +356,7 @@ public class ChangeDetectionService {
     private static class State {
         private String vacancyHash = "";
         private String cvHash = "";
+        private String wishesHash = "";
         private String vacancyLastProcessed = "";
         private String cvLastProcessed = "";
         private String anschreibenFile = "";
@@ -330,6 +375,14 @@ public class ChangeDetectionService {
 
         public void setCvHash(String cvHash) {
             this.cvHash = cvHash;
+        }
+
+        public String getWishesHash() {
+            return wishesHash;
+        }
+
+        public void setWishesHash(String wishesHash) {
+            this.wishesHash = wishesHash;
         }
 
         public String getVacancyLastProcessed() {
