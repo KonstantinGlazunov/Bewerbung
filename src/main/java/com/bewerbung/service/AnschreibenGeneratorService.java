@@ -16,10 +16,14 @@ public class AnschreibenGeneratorService {
     private OpenAiService openAiService;
 
     public String generateAnschreiben(JobRequirements job, Biography biography) {
-        return generateAnschreiben(job, biography, null);
+        return generateAnschreiben(job, biography, null, null);
     }
 
     public String generateAnschreiben(JobRequirements job, Biography biography, String vacancyFullText) {
+        return generateAnschreiben(job, biography, vacancyFullText, null);
+    }
+
+    public String generateAnschreiben(JobRequirements job, Biography biography, String vacancyFullText, String wishes) {
         // Validate biography has data
         if (biography == null) {
             logger.error("Biography is null!");
@@ -32,7 +36,14 @@ public class AnschreibenGeneratorService {
                 job.getLocation(), 
                 job.getRequiredSkills() != null ? String.join(", ", job.getRequiredSkills()) : "none");
         
-        String prompt = buildPrompt(job, biography, vacancyFullText);
+        // Log user wishes if provided
+        if (wishes != null && !wishes.trim().isEmpty()) {
+            logger.info("User wishes/corrections provided (length: {} chars): {}", wishes.length(), wishes);
+        } else {
+            logger.info("No user wishes/corrections provided");
+        }
+        
+        String prompt = buildPrompt(job, biography, vacancyFullText, wishes);
         logger.debug("Generated prompt for Anschreiben (length: {} chars)", prompt.length());
         
         // Log a summary of what data is available
@@ -51,7 +62,7 @@ public class AnschreibenGeneratorService {
         return anschreiben;
     }
 
-    private String buildPrompt(JobRequirements job, Biography biography, String vacancyFullText) {
+    private String buildPrompt(JobRequirements job, Biography biography, String vacancyFullText, String wishes) {
         StringBuilder prompt = new StringBuilder();
         
         prompt.append("MISSION\n\n");
@@ -92,6 +103,19 @@ public class AnschreibenGeneratorService {
         
         prompt.append("END OF INPUT DATA\n");
         prompt.append("The above information is complete and must be used for creating the cover letter.\n\n");
+        
+        // Add priority rule for wishes vs biography
+        if (wishes != null && !wishes.trim().isEmpty()) {
+            prompt.append("⚠️ PRIORITY RULE - WISHES OVER BIOGRAPHY:\n");
+            prompt.append("If there is a CONFLICT or CONTRADICTION between the CANDIDATE BIOGRAPHY and USER WISHES, ");
+            prompt.append("the USER WISHES have ABSOLUTE PRIORITY and MUST be followed.\n");
+            prompt.append("For example:\n");
+            prompt.append("- If biography says \"Sehr geehrte Damen und Herren\" should be used, but user wishes say \"Hallo\", use \"Hallo\"\n");
+            prompt.append("- If biography contains certain information, but user wishes request different information or emphasis, follow the wishes\n");
+            prompt.append("- If user wishes contradict biography data, the wishes WIN - use what the user requested\n");
+            prompt.append("User wishes override biography data in case of conflict.\n\n");
+        }
+        
         prompt.append("CRITICAL REMINDERS:\n");
         prompt.append("1. NAME: The candidate's name is in the section \"CANDIDATE BIOGRAPHY\" under \"Name:\" ");
         prompt.append("and MUST be used EXACTLY at the end of the letter after \"Mit freundlichen Grüßen\" - NO placeholders!\n");
@@ -250,6 +274,69 @@ public class AnschreibenGeneratorService {
         // === STEP 6: CONSTRUCT THE FINAL GENERATION PROMPT ===
         prompt.append("STEP 6 — CONSTRUCT THE FINAL GENERATION PROMPT\n\n");
         
+        // Add user wishes/corrections at the beginning of STEP 6 - HIGHEST PRIORITY
+        if (wishes != null && !wishes.trim().isEmpty()) {
+            prompt.append("⚠️⚠️⚠️ CRITICAL: USER WISHES AND CORRECTIONS - HIGHEST PRIORITY ⚠️⚠️⚠️\n\n");
+            prompt.append("The user has provided specific wishes or corrections that MUST be followed:\n\n");
+            prompt.append("\"").append(wishes.trim()).append("\"\n\n");
+            prompt.append("IMPORTANT: User wishes may be written in different languages (German, Russian, English, etc.). ");
+            prompt.append("You MUST understand and interpret them correctly regardless of language.\n\n");
+            
+            // Check for negative statements (no experience, never worked, etc.)
+            String wishesLower = wishes.toLowerCase();
+            boolean hasNegativeStatement = wishesLower.contains("нет опыта") || wishesLower.contains("no experience") || 
+                                         wishesLower.contains("keine erfahrung") || wishesLower.contains("никогда не работал") ||
+                                         wishesLower.contains("never worked") || wishesLower.contains("nie gearbeitet") ||
+                                         wishesLower.contains("не работал") || wishesLower.contains("didn't work") ||
+                                         wishesLower.contains("не имею") || wishesLower.contains("don't have");
+            
+            if (hasNegativeStatement) {
+                prompt.append("🚨🚨🚨 CRITICAL NEGATIVE STATEMENT DETECTED 🚨🚨🚨\n\n");
+                prompt.append("The user has explicitly stated that they DO NOT have experience, have NEVER worked, or DO NOT have certain qualifications.\n");
+                prompt.append("This is an ABSOLUTE PROHIBITION - you MUST NOT mention or imply any experience, work history, or qualifications ");
+                prompt.append("that the user explicitly denies, EVEN IF they appear in the CANDIDATE BIOGRAPHY.\n\n");
+                prompt.append("STRICT RULES FOR NEGATIVE STATEMENTS:\n");
+                prompt.append("1. If user says \"I never worked as X\" or \"У меня нет опыта\" or \"Ich habe keine Erfahrung\" → ");
+                prompt.append("DO NOT mention ANY work experience as X, even if biography shows it\n");
+                prompt.append("2. If user says \"I don't have experience\" → DO NOT mention ANY professional experience, ");
+                prompt.append("even if biography contains work experience entries\n");
+                prompt.append("3. If user explicitly denies something from biography → That information is FORBIDDEN to use\n");
+                prompt.append("4. You MUST write the cover letter as if the denied experience/qualification DOES NOT EXIST\n");
+                prompt.append("5. Focus on motivation, education, transferable skills, or other aspects that are NOT denied\n");
+                prompt.append("6. DO NOT invent or imply experience that user explicitly says they don't have\n\n");
+                prompt.append("EXAMPLE: If user says \"Я никогда не работал разработчиком. У меня нет опыта\" ");
+                prompt.append("(I never worked as developer. I have no experience), then:\n");
+                prompt.append("❌ FORBIDDEN: \"In meiner aktuellen Position... habe ich über fünf Jahre Erfahrung...\"\n");
+                prompt.append("❌ FORBIDDEN: Any mention of software development work experience\n");
+                prompt.append("❌ FORBIDDEN: Any mention of developer positions, even if in biography\n");
+                prompt.append("✓ ALLOWED: Focus on education, motivation, willingness to learn, transferable skills\n");
+                prompt.append("✓ ALLOWED: \"Obwohl ich noch keine Berufserfahrung als Entwickler habe, bin ich...\"\n");
+                prompt.append("✓ ALLOWED: Honest statement about lack of experience and motivation to learn\n\n");
+            }
+            
+            prompt.append("ABSOLUTE REQUIREMENT: These user wishes have HIGHEST PRIORITY and MUST override:\n");
+            prompt.append("1. Any default instructions\n");
+            prompt.append("2. Standard German business letter conventions\n");
+            prompt.append("3. Data from CANDIDATE BIOGRAPHY (if there is a conflict)\n");
+            prompt.append("4. ANY information from biography that contradicts user wishes\n\n");
+            prompt.append("CONFLICT RESOLUTION RULE:\n");
+            prompt.append("If user wishes CONTRADICT or CONFLICT with information from CANDIDATE BIOGRAPHY, ");
+            prompt.append("the USER WISHES have ABSOLUTE PRIORITY. Use what the user requested, not what is in the biography.\n");
+            prompt.append("The biography is a reference, but user wishes are DIRECT INSTRUCTIONS that must be followed.\n");
+            prompt.append("If user explicitly denies experience/qualifications, IGNORE that information from biography completely.\n\n");
+            prompt.append("If the user requests changes to salutation, tone, structure, or content, you MUST follow these requests exactly.\n");
+            prompt.append("Examples of user wishes:\n");
+            prompt.append("- \"Вместо Sehr geehrte Damen und Herren, Hallo\" → Use \"Hallo\" instead of \"Sehr geehrte Damen und Herren\"\n");
+            prompt.append("- \"Instead of Sehr geehrte Damen und Herren, use Hallo\" → Use \"Hallo\" instead\n");
+            prompt.append("- \"Statt Sehr geehrte Damen und Herren, Hallo\" → Use \"Hallo\" instead\n");
+            prompt.append("- If user says \"Don't mention X from biography\" → Do NOT mention X, even if it's in biography\n");
+            prompt.append("- If user says \"Emphasize Y instead of Z\" → Emphasize Y, even if Z is more prominent in biography\n");
+            prompt.append("- Any other request about salutation, tone, structure, or content → Follow it exactly\n\n");
+            prompt.append("User wishes take precedence over standard German business letter conventions.\n");
+            prompt.append("User wishes take precedence over CANDIDATE BIOGRAPHY data in case of conflict.\n");
+            prompt.append("If there is a conflict between user wishes and ANY other source (biography, conventions, etc.), user wishes WIN.\n\n");
+        }
+        
         prompt.append("Use all previous steps to generate the cover letter.\n\n");
         
         prompt.append("Specify:\n");
@@ -264,7 +351,13 @@ public class AnschreibenGeneratorService {
         prompt.append("- Usage:\n");
         prompt.append("  * Job title: \"").append(job.getPosition()).append("\" MUST be in the subject line (Betreff)\n");
         prompt.append("  * Company name: \"").append(job.getCompany()).append("\" MUST be mentioned in the text\n");
-        prompt.append("  * Salutation: \"Sehr geehrte Damen und Herren\" (Standard German greeting)\n");
+        
+        // Make salutation conditional on user wishes
+        if (wishes != null && !wishes.trim().isEmpty()) {
+            prompt.append("  * Salutation: FOLLOW USER WISHES ABOVE - if user specified a different salutation, use that instead of default\n");
+        } else {
+            prompt.append("  * Salutation: \"Sehr geehrte Damen und Herren\" (Standard German greeting)\n");
+        }
         prompt.append("  * Closing: \"Mit freundlichen Grüßen\" followed by the candidate's name\n");
         prompt.append("  * CRITICAL - Candidate's name (MUST be used):\n");
         prompt.append("    - The name is in the CANDIDATE BIOGRAPHY section under \"Name:\"\n");
@@ -276,21 +369,101 @@ public class AnschreibenGeneratorService {
         prompt.append("    - BUT: In 99% of cases the name is in the biography - use it!\n\n");
         
         prompt.append("- Prohibitions - ABSOLUTE PROHIBITION OF INVENTED INFORMATION:\n");
-        prompt.append("  * NO invented facts - use ONLY what is in the CANDIDATE BIOGRAPHY\n");
+        if (wishes != null && !wishes.trim().isEmpty()) {
+            String wishesLower = wishes.toLowerCase();
+            boolean hasNegativeStatement = wishesLower.contains("нет опыта") || wishesLower.contains("no experience") || 
+                                         wishesLower.contains("keine erfahrung") || wishesLower.contains("никогда не работал") ||
+                                         wishesLower.contains("never worked") || wishesLower.contains("nie gearbeitet") ||
+                                         wishesLower.contains("не работал") || wishesLower.contains("didn't work") ||
+                                         wishesLower.contains("не имею") || wishesLower.contains("don't have");
+            
+            if (hasNegativeStatement) {
+                prompt.append("  * 🚨 CRITICAL: User has explicitly denied experience/qualifications - DO NOT use ANY denied information from biography\n");
+                prompt.append("  * If user says \"no experience\" or \"never worked\" → DO NOT mention work experience, even if in biography\n");
+                prompt.append("  * If user denies something → That information is FORBIDDEN, treat it as if it doesn't exist\n");
+            }
+            prompt.append("  * EXCEPTION: If USER WISHES request something that contradicts biography, follow USER WISHES (they have priority)\n");
+        }
+        prompt.append("  * NO invented facts - use ONLY what is in the CANDIDATE BIOGRAPHY (unless user wishes specify otherwise)\n");
+        if (wishes != null && !wishes.trim().isEmpty()) {
+            String wishesLower = wishes.toLowerCase();
+            boolean hasNegativeStatement = wishesLower.contains("нет опыта") || wishesLower.contains("no experience") || 
+                                         wishesLower.contains("keine erfahrung") || wishesLower.contains("никогда не работал") ||
+                                         wishesLower.contains("never worked") || wishesLower.contains("nie gearbeitet") ||
+                                         wishesLower.contains("не работал") || wishesLower.contains("didn't work") ||
+                                         wishesLower.contains("не имею") || wishesLower.contains("don't have");
+            if (hasNegativeStatement) {
+                prompt.append("  * 🚨 SPECIAL RULE FOR NEGATIVE STATEMENTS: If user denies experience, DO NOT use work experience from biography AT ALL\n");
+            }
+        }
         prompt.append("  * NO changing formulations: if it says \"unvollständige Ausbildung\" (incomplete education), you must NOT write \"abgeschlossenen Ausbildung\" (completed education)\n");
+        prompt.append("    UNLESS: User wishes explicitly request to change or omit this information - then follow wishes\n");
         prompt.append("  * NO invented experiences: if there is no experience with agricultural machinery in the CV, you must NOT write \"langjährige Erfahrung im Bereich Landmaschinen\" (extensive experience in agricultural machinery)\n");
+        prompt.append("    UNLESS: User wishes explicitly request to mention or emphasize something different - then follow wishes\n");
         prompt.append("  * NO interpretations or additions - use EXACT formulations from the biography\n");
+        prompt.append("    UNLESS: User wishes request different formulations or emphasis - then follow wishes\n");
         prompt.append("  * ONLY use matched CV data - they MUST be explicitly in the biography\n");
+        prompt.append("    UNLESS: User wishes request to omit, change, or emphasize differently - then follow wishes\n");
         prompt.append("  * NO placeholders like [Name], [Kandidatenname], [Ihr Name], [Unternehmen] or similar\n");
         prompt.append("  * NO meta-commentary or process explanations\n");
         prompt.append("  * NO headings like \"Anschreiben\" or \"Motivationsschreiben\"\n");
         prompt.append("  * NO apologies or hints about missing data\n");
-        prompt.append("  * NO omitting the name - the name MUST be present and from the biography\n\n");
+        prompt.append("  * NO omitting the name - the name MUST be present and from the biography\n");
+        if (wishes != null && !wishes.trim().isEmpty()) {
+            prompt.append("    UNLESS: User wishes explicitly request different name handling - then follow wishes\n");
+        }
+        prompt.append("\n");
         
         prompt.append("Instruction:\n");
-        prompt.append("Integrate explicit + implied requirements with the candidate's relevant experiences.\n");
-        prompt.append("BUT: Use ONLY experiences and qualifications that are ACTUALLY in the CANDIDATE BIOGRAPHY.\n");
+        if (wishes != null && !wishes.trim().isEmpty()) {
+            String wishesLower = wishes.toLowerCase();
+            boolean hasNegativeStatement = wishesLower.contains("нет опыта") || wishesLower.contains("no experience") || 
+                                         wishesLower.contains("keine erfahrung") || wishesLower.contains("никогда не работал") ||
+                                         wishesLower.contains("never worked") || wishesLower.contains("nie gearbeitet") ||
+                                         wishesLower.contains("не работал") || wishesLower.contains("didn't work") ||
+                                         wishesLower.contains("не имею") || wishesLower.contains("don't have");
+            
+            if (hasNegativeStatement) {
+                prompt.append("🚨 CRITICAL INSTRUCTION FOR NEGATIVE STATEMENTS:\n");
+                prompt.append("The user has explicitly stated they DO NOT have experience or have NEVER worked in a certain field.\n");
+                prompt.append("You MUST write the cover letter as if that experience DOES NOT EXIST, even if it appears in CANDIDATE BIOGRAPHY.\n");
+                prompt.append("DO NOT mention, reference, or imply any work experience that the user explicitly denies.\n");
+                prompt.append("Instead, focus on:\n");
+                prompt.append("- Education and training\n");
+                prompt.append("- Motivation and willingness to learn\n");
+                prompt.append("- Transferable skills from other areas\n");
+                prompt.append("- Personal qualities and enthusiasm\n");
+                prompt.append("- Honest acknowledgment of lack of experience with emphasis on learning ability\n\n");
+                prompt.append("EXAMPLE APPROACH:\n");
+                prompt.append("If user says \"Я никогда не работал разработчиком. У меня нет опыта\" (I never worked as developer. I have no experience):\n");
+                prompt.append("✓ Write: \"Obwohl ich noch keine Berufserfahrung als Entwickler habe, bin ich sehr motiviert...\"\n");
+                prompt.append("✓ Write: \"Trotz fehlender Berufserfahrung in der Softwareentwicklung...\"\n");
+                prompt.append("✓ Focus on education, courses, projects, motivation\n");
+                prompt.append("❌ DO NOT write: \"In meiner aktuellen Position... habe ich Erfahrung...\"\n");
+                prompt.append("❌ DO NOT mention any developer positions, even if in biography\n");
+                prompt.append("❌ DO NOT imply professional experience\n\n");
+            } else {
+                prompt.append("Integrate explicit + implied requirements with the candidate's relevant experiences.\n");
+                prompt.append("PRIORITY: If USER WISHES conflict with CANDIDATE BIOGRAPHY, USER WISHES have ABSOLUTE PRIORITY.\n");
+                prompt.append("Use experiences and qualifications from CANDIDATE BIOGRAPHY, BUT if user wishes request different emphasis, ");
+                prompt.append("omission, or changes, follow the wishes instead.\n");
+            }
+        } else {
+            prompt.append("Integrate explicit + implied requirements with the candidate's relevant experiences.\n");
+            prompt.append("BUT: Use ONLY experiences and qualifications that are ACTUALLY in the CANDIDATE BIOGRAPHY.\n");
+        }
         prompt.append("If something is NOT in the CV, accept it - do NOT invent and do NOT rephrase.\n");
+        if (wishes != null && !wishes.trim().isEmpty()) {
+            String wishesLower = wishes.toLowerCase();
+            boolean hasNegativeStatement = wishesLower.contains("нет опыта") || wishesLower.contains("no experience") || 
+                                         wishesLower.contains("keine erfahrung") || wishesLower.contains("никогда не работал") ||
+                                         wishesLower.contains("never worked") || wishesLower.contains("nie gearbeitet") ||
+                                         wishesLower.contains("не работал") || wishesLower.contains("didn't work") ||
+                                         wishesLower.contains("не имею") || wishesLower.contains("don't have");
+            if (!hasNegativeStatement) {
+                prompt.append("UNLESS: User wishes explicitly request to mention or emphasize something - then follow wishes.\n");
+            }
+        }
         prompt.append("Use a professional German business tone.\n");
         prompt.append("The text must be ready to send.\n\n");
         
@@ -320,14 +493,73 @@ public class AnschreibenGeneratorService {
         prompt.append("- The name MUST be taken from the section \"CANDIDATE BIOGRAPHY\" → \"Name:\"\n");
         prompt.append("- The text is completely ready to send\n\n");
         
+        // Reinforce user wishes in OUTPUT section
+        if (wishes != null && !wishes.trim().isEmpty()) {
+            prompt.append("⚠️ FINAL REMINDER - USER WISHES MUST BE APPLIED:\n");
+            prompt.append("Before generating the final output, check again: Did you follow ALL user wishes?\n");
+            prompt.append("User wishes: \"").append(wishes.trim()).append("\"\n");
+            prompt.append("If the user requested specific changes (e.g., different salutation, tone, content), ");
+            prompt.append("these MUST be reflected in the final output.\n\n");
+            
+            String wishesLower = wishes.toLowerCase();
+            boolean hasNegativeStatement = wishesLower.contains("нет опыта") || wishesLower.contains("no experience") || 
+                                         wishesLower.contains("keine erfahrung") || wishesLower.contains("никогда не работал") ||
+                                         wishesLower.contains("never worked") || wishesLower.contains("nie gearbeitet") ||
+                                         wishesLower.contains("не работал") || wishesLower.contains("didn't work") ||
+                                         wishesLower.contains("не имею") || wishesLower.contains("don't have");
+            
+            if (hasNegativeStatement) {
+                prompt.append("🚨🚨🚨 CRITICAL FINAL CHECK FOR NEGATIVE STATEMENTS 🚨🚨🚨\n");
+                prompt.append("The user explicitly stated they DO NOT have experience or have NEVER worked.\n");
+                prompt.append("BEFORE OUTPUTTING, VERIFY:\n");
+                prompt.append("1. Did I mention ANY work experience that user explicitly denied? → If YES, REMOVE IT\n");
+                prompt.append("2. Did I write phrases like \"In meiner aktuellen Position...\" or \"Während meiner Tätigkeit...\"? → If YES, REMOVE IT\n");
+                prompt.append("3. Did I imply professional experience in the denied field? → If YES, REMOVE IT\n");
+                prompt.append("4. Did I use biography work experience entries? → If user denied experience, DO NOT USE THEM\n");
+                prompt.append("5. Instead, did I focus on education, motivation, learning ability? → If NO, ADD IT\n");
+                prompt.append("6. Did I write honestly about lack of experience? → If NO, ADD IT\n\n");
+                prompt.append("REMEMBER: If user says \"Я никогда не работал разработчиком. У меня нет опыта\", ");
+                prompt.append("then DO NOT write \"In meiner aktuellen Position bei der Tech Solutions GmbH... habe ich Erfahrung...\"\n");
+                prompt.append("Write instead: \"Obwohl ich noch keine Berufserfahrung als Entwickler habe...\" or similar honest statement.\n\n");
+            }
+            
+            prompt.append("CONFLICT RESOLUTION CHECK:\n");
+            prompt.append("If user wishes CONTRADICT information from CANDIDATE BIOGRAPHY, you MUST follow USER WISHES.\n");
+            prompt.append("User wishes have ABSOLUTE PRIORITY over biography data.\n");
+            prompt.append("Example: If biography suggests formal tone but user wishes say \"use informal tone\", use informal tone.\n");
+            prompt.append("Example: If biography contains certain skills but user wishes say \"don't mention X\", don't mention X.\n");
+            prompt.append("Example: If biography has certain experience but user wishes say \"emphasize Y instead\", emphasize Y.\n");
+            if (hasNegativeStatement) {
+                prompt.append("Example: If user says \"I never worked as X\" but biography shows X experience, DO NOT mention X experience.\n");
+            }
+            prompt.append("\n");
+        }
+        
         prompt.append("PROCESS:\n");
         prompt.append("1. Perform steps 1-5 INTERNALLY (do not show in output)\n");
         prompt.append("2. Use the results of steps 1-5 to create the cover letter\n");
+        if (wishes != null && !wishes.trim().isEmpty()) {
+            prompt.append("2a. CRITICAL: Apply user wishes/corrections from STEP 6 - they override standard conventions\n");
+        }
         prompt.append("3. Output ONLY the completed cover letter (Step 6) - IN GERMAN!\n\n");
         
         prompt.append("EXAMPLE of correct output (with real name from biography):\n");
         prompt.append("Betreff: Bewerbung als ").append(job.getPosition() != null ? job.getPosition() : "[Job Title]").append("\n\n");
-        prompt.append("Sehr geehrte Damen und Herren,\n\n");
+        
+        // Show example that respects user wishes
+        if (wishes != null && !wishes.trim().isEmpty()) {
+            prompt.append("(IMPORTANT: If user wishes specify a different salutation, use that instead of the default below)\n");
+            String wishesLower = wishes.toLowerCase();
+            if (wishesLower.contains("hallo") || wishesLower.contains("вместо") && wishesLower.contains("hallo")) {
+                prompt.append("Hallo,\n\n");
+                prompt.append("(Example shows 'Hallo' because user requested it - follow user wishes exactly)\n\n");
+            } else {
+                prompt.append("Sehr geehrte Damen und Herren,\n\n");
+                prompt.append("(Note: If user wishes specify a different salutation, use that instead)\n\n");
+            }
+        } else {
+            prompt.append("Sehr geehrte Damen und Herren,\n\n");
+        }
         prompt.append("[Cover letter text here - 3-4 paragraphs, ONLY with facts from the biography, written in German]\n\n");
         prompt.append("Mit freundlichen Grüßen\n");
         if (biography != null && biography.getName() != null && !biography.getName().isEmpty()) {
