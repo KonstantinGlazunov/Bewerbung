@@ -189,6 +189,19 @@
         body.dark footer h3 {
             color: #e2e8f0;
         }
+
+        html.dark .app-title,
+        body.dark .app-title {
+            color: #f8fafc;
+        }
+
+        /* Language selector styling */
+        #languageSelector {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            padding-right: 2rem;
+        }
     </style>
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-800 antialiased dark:bg-slate-900 dark:text-slate-100 dark" style="font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;">
@@ -196,30 +209,47 @@
     <div class="container mx-auto max-w-5xl rounded-2xl bg-white px-6 py-8 shadow-sm ring-1 ring-slate-200 dark:bg-slate-950 dark:ring-slate-800 sm:px-10 sm:py-10">
         <!-- Header: title and theme toggle -->
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <h1 class="text-center text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100 sm:text-left sm:text-3xl">Bewerbunganschreiben AI</h1>
-            <!-- Theme toggle (pure frontend; no backend interaction) -->
-            <button type="button" id="themeToggle" class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800">Dunkelmodus</button>
+            <h1 class="app-title text-center text-2xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-left sm:text-3xl" data-i18n="appTitle">Bewerbunganschreiben AI</h1>
+            <div class="flex items-center gap-2">
+                <!-- Language selector -->
+                <div class="relative inline-block">
+                    <select id="languageSelector" class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 appearance-none pr-8 cursor-pointer">
+                        <option value="de">DE</option>
+                        <option value="ru">RU</option>
+                        <option value="en">EN</option>
+                    </select>
+                </div>
+                <!-- Theme toggle (pure frontend; no backend interaction) -->
+                <button type="button" id="themeToggle" class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800" data-i18n="themeToggle">Dunkelmodus</button>
+            </div>
+        </div>
+
+        <div class="mt-6 rounded-2xl border border-slate-200 bg-slate-50/60 px-6 py-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/60">
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <p class="text-sm text-slate-600 dark:text-slate-300" data-i18n="reviewPrompt">Ich wäre Ihnen dankbar, wenn Sie mir ein paar Zeilen mit Ihren Eindrücken zu diesem Service hinterlassen</p>
+                <a href="/reviews.html" class="inline-flex items-center justify-center rounded-xl border border-blue-600 bg-white px-5 py-2 text-sm font-semibold text-blue-700 shadow-sm transition-colors hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:border-blue-500 dark:bg-slate-900 dark:text-blue-200 dark:hover:bg-slate-800" data-i18n="submitReview">Bewertung abgeben</a>
+            </div>
         </div>
         
         <!-- Input form (IDs must stay stable for JS bindings) -->
         <form id="generateForm" class="mt-8 space-y-6">
             <div class="form-group space-y-2">
-                <label for="biographyTextarea" class="block text-sm font-medium text-slate-700 dark:text-slate-200">Biography - Verfassen Sie Ihren Lebenslauf in einem freien Format: Persönliches
+                <label for="biographyTextarea" class="block text-sm font-medium text-slate-700 dark:text-slate-200" data-i18n="biographyLabel">Biography - Verfassen Sie Ihren Lebenslauf in einem freien Format: Persönliches
                     Daten, Ihre Fähigkeiten, Berufserfahrung, Ausbildung:</label>
                 <textarea id="biographyTextarea" name="biography" required class="min-h-[300px] w-full resize-y rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-blue-400 dark:focus:ring-blue-900"></textarea>
             </div>
             
             <div class="form-group space-y-2">
-                <label for="jobPostingTextarea" class="block text-sm font-medium text-slate-700 dark:text-slate-200">Job Posting - kopieren Sie einfach den Text der Stellenanzeige hierher.:</label>
+                <label for="jobPostingTextarea" class="block text-sm font-medium text-slate-700 dark:text-slate-200" data-i18n="jobPostingLabel">Job Posting - kopieren Sie einfach den Text der Stellenanzeige hierher.:</label>
                 <textarea id="jobPostingTextarea" name="jobPosting" required class="min-h-[200px] w-full resize-y rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-blue-400 dark:focus:ring-blue-900"></textarea>
             </div>
             
             <div class="form-group space-y-2">
-                <label for="wishesTextarea" class="block text-sm font-medium text-slate-700 dark:text-slate-200">Wünsche und Korrekturen - schreiben Sie Ihre Wünsche oder Korrekturen, wenn Sie mit dem Ergebnis nicht einverstanden sind (optional):</label>
+                <label for="wishesTextarea" class="block text-sm font-medium text-slate-700 dark:text-slate-200" data-i18n="wishesLabel">Wünsche und Korrekturen - schreiben Sie Ihre Wünsche oder Korrekturen, wenn Sie mit dem Ergebnis nicht einverstanden sind (optional):</label>
                 <textarea id="wishesTextarea" name="wishes" class="min-h-[150px] w-full resize-y rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-blue-400 dark:focus:ring-blue-900"></textarea>
             </div>
             
-            <button type="submit" id="generateButton" class="w-full rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-300 dark:bg-blue-500 dark:hover:bg-blue-600 dark:disabled:bg-slate-700">Generate Documents</button>
+            <button type="submit" id="generateButton" class="w-full rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-300 dark:bg-blue-500 dark:hover:bg-blue-600 dark:disabled:bg-slate-700" data-i18n="generateButton">Dokumente erstellen</button>
         </form>
 
         <!-- Loading state (visibility controlled by JS via .hidden class) -->
@@ -237,14 +267,14 @@
                     </svg>
                     <div class="progress-text" id="progressPercent">0%</div>
                 </div>
-                <div class="progress-label" id="progressLabel">Initialisiere...</div>
+                <div class="progress-label" id="progressLabel" data-i18n="progressInitializing">Initialisiere...</div>
             </div>
         </div>
 
         <!-- Error output (filled by JS) -->
         <div id="errorSection" class="results hidden mt-8">
             <div class="result-section error rounded-2xl border border-red-200 bg-red-50 px-6 py-5 text-red-700 shadow-sm dark:border-red-900/60 dark:bg-red-950/40 dark:text-red-200">
-                <h2 class="text-base font-semibold text-red-700 dark:text-red-200">Error</h2>
+                <h2 class="text-base font-semibold text-red-700 dark:text-red-200" data-i18n="errorTitle">Error</h2>
                 <div class="result-content mt-3 whitespace-pre-wrap rounded-xl border border-red-200 bg-white px-4 py-3 text-sm text-red-700 dark:border-red-900/60 dark:bg-slate-900 dark:text-red-200" id="errorContent"></div>
             </div>
         </div>
@@ -252,16 +282,16 @@
         <!-- Results output (filled by JS) -->
         <div id="results" class="results hidden mt-8">
             <div class="result-section rounded-2xl border border-slate-200 bg-slate-50/60 px-6 py-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/60">
-                <h2 class="text-base font-semibold text-slate-900 dark:text-slate-100">Cover Letter (Anschreiben)</h2>
+                <h2 class="text-base font-semibold text-slate-900 dark:text-slate-100" data-i18n="coverLetterTitle">Cover Letter (Anschreiben)</h2>
                 <textarea id="coverLetterTextarea" class="result-content editable mt-3 min-h-[400px] w-full resize-y rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-blue-400 dark:focus:ring-blue-900"></textarea>
-                <button type="button" id="downloadButton" class="mt-4 w-full rounded-xl border border-blue-600 bg-white px-6 py-3 text-sm font-semibold text-blue-700 shadow-sm transition-colors hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 dark:border-blue-500 dark:bg-slate-900 dark:text-blue-200 dark:hover:bg-slate-800">Herunterladen (PDF)</button>
+                <button type="button" id="downloadButton" class="mt-4 w-full rounded-xl border border-blue-600 bg-white px-6 py-3 text-sm font-semibold text-blue-700 shadow-sm transition-colors hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 dark:border-blue-500 dark:bg-slate-900 dark:text-blue-200 dark:hover:bg-slate-800" data-i18n="downloadButton">Herunterladen (PDF)</button>
             </div>
         </div>
 
         <!-- Legal footer / privacy note -->
         <footer class="mt-10 border-t border-slate-200 pt-6 text-center text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
-            <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200">Datenschutz</h3>
-            <p class="mt-2 leading-relaxed">Wir speichern keine personenbezogenen Daten dauerhaft. Eingegebene Inhalte werden ausschließlich zur unmittelbaren Verarbeitung verwendet und nach Beendigung der Sitzung automatisch gelöscht. Die technische Bereitstellung erfolgt über Railway, die Verarbeitung bestimmter Inhalte über die OpenAI-API – jeweils gemäß den Anforderungen der DSGVO.</p>
+            <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200" data-i18n="privacyTitle">Datenschutz</h3>
+            <p class="mt-2 leading-relaxed" data-i18n="privacyText">Wir speichern keine personenbezogenen Daten dauerhaft. Eingegebene Inhalte werden ausschließlich zur unmittelbaren Verarbeitung verwendet und nach Beendigung der Sitzung automatisch gelöscht. Die technische Bereitstellung erfolgt über Railway, die Verarbeitung bestimmter Inhalte über die OpenAI-API – jeweils gemäß den Anforderungen der DSGVO.</p>
         </footer>
     </div>
 
@@ -296,7 +326,11 @@
                 if (document.body) {
                     document.body.classList.toggle('dark', isDark);
                 }
-                if (themeToggle) {
+                if (themeToggle && window.i18n) {
+                    themeToggle.textContent = isDark 
+                        ? window.i18n.translate('themeToggleLight') 
+                        : window.i18n.translate('themeToggle');
+                } else if (themeToggle) {
                     themeToggle.textContent = isDark ? 'Hellmodus' : 'Dunkelmodus';
                 }
             }
@@ -325,19 +359,193 @@
             }
         })();
 
+        // Language/i18n Management
+        (function initLanguageSystem() {
+            const LANGUAGE_STORAGE_KEY = 'bewerbung-ai-language';
+            const translations = {
+                de: {
+                    appTitle: 'Bewerbunganschreiben AI',
+                    themeToggle: 'Dunkelmodus',
+                    themeToggleLight: 'Hellmodus',
+                    reviewPrompt: 'Ich wäre Ihnen dankbar, wenn Sie mir ein paar Zeilen mit Ihren Eindrücken zu diesem Service hinterlassen',
+                    submitReview: 'Bewertung abgeben',
+                    biographyLabel: 'Biography - Verfassen Sie Ihren Lebenslauf in einem freien Format: Ihre Fähigkeiten, Berufserfahrung, Ausbildung:',
+                    jobPostingLabel: 'Job Posting - kopieren Sie einfach den Text der Stellenanzeige hierher.:',
+                    wishesLabel: 'Wünsche und Korrekturen - schreiben Sie Ihre Wünsche oder Korrekturen, wenn Sie mit dem Ergebnis nicht einverstanden sind (optional):',
+                    generateButton: 'Dokumente erstellen',
+                    progressInitializing: 'Initialisiere...',
+                    progressReadingBiography: 'Lese Lebenslauf',
+                    progressAnalyzingBiography: 'Analysiere Lebenslauf',
+                    progressReadingJobPosting: 'Lese Stellenausschreibung',
+                    progressAnalyzingJobPosting: 'Analysiere Stellenausschreibung',
+                    progressCreatingLetter: 'Erstelle Anschreiben',
+                    progressGenerating: 'Generiere Inhalt...',
+                    progressFinalizing: 'Finalisiere Dokument',
+                    progressComplete: 'Abgeschlossen',
+                    errorTitle: 'Error',
+                    coverLetterTitle: 'Cover Letter (Anschreiben)',
+                    downloadButton: 'Herunterladen (PDF)',
+                    downloadButtonGenerating: 'PDF wird generiert...',
+                    privacyTitle: 'Datenschutz',
+                    privacyText: 'Wir speichern keine personenbezogenen Daten dauerhaft. Eingegebene Inhalte werden ausschließlich zur unmittelbaren Verarbeitung verwendet und nach Beendigung der Sitzung automatisch gelöscht. Die technische Bereitstellung erfolgt über Railway, die Verarbeitung bestimmter Inhalte über die OpenAI-API – jeweils gemäß den Anforderungen der DSGVO.',
+                    errorBiographyEmpty: 'Biography cannot be empty',
+                    errorJobPostingEmpty: 'Job posting cannot be empty',
+                    errorInvalidResponse: 'Invalid response from server',
+                    errorApiError: 'An error occurred',
+                    errorPdfGeneration: 'PDF-Generierung fehlgeschlagen',
+                    errorPdfError: 'Fehler beim Generieren des PDFs: ',
+                    alertFillLetter: 'Bitte füllen Sie zuerst das Anschreiben aus.'
+                },
+                ru: {
+                    appTitle: 'Bewerbunganschreiben AI',
+                    themeToggle: 'Темный режим',
+                    themeToggleLight: 'Светлый режим',
+                    reviewPrompt: 'Буду благодарен, если вы оставите несколько строк с вашими впечатлениями об этом сервисе',
+                    submitReview: 'Оставить отзыв',
+                    biographyLabel: 'Биография - Составьте свое резюме в свободном формате: ваши навыки, профессиональный опыт, образование:',
+                    jobPostingLabel: 'Вакансия - просто скопируйте текст объявления о вакансии сюда.:',
+                    wishesLabel: 'Пожелания и исправления - напишите ваши пожелания или исправления, если вы не согласны с результатом (необязательно):',
+                    generateButton: 'Создать документы',
+                    progressInitializing: 'Инициализация...',
+                    progressReadingBiography: 'Чтение резюме',
+                    progressAnalyzingBiography: 'Анализ резюме',
+                    progressReadingJobPosting: 'Чтение вакансии',
+                    progressAnalyzingJobPosting: 'Анализ вакансии',
+                    progressCreatingLetter: 'Создание письма',
+                    progressGenerating: 'Генерация содержимого...',
+                    progressFinalizing: 'Завершение документа',
+                    progressComplete: 'Завершено',
+                    errorTitle: 'Ошибка',
+                    coverLetterTitle: 'Cover Letter (Anschreiben)',
+                    downloadButton: 'Скачать (PDF)',
+                    downloadButtonGenerating: 'Генерация PDF...',
+                    privacyTitle: 'Конфиденциальность',
+                    privacyText: 'Мы не храним персональные данные постоянно. Введенный контент используется исключительно для немедленной обработки и автоматически удаляется после завершения сессии. Техническое обеспечение осуществляется через Railway, обработка определенного контента через OpenAI API – каждый в соответствии с требованиями GDPR.',
+                    errorBiographyEmpty: 'Biography cannot be empty',
+                    errorJobPostingEmpty: 'Job posting cannot be empty',
+                    errorInvalidResponse: 'Invalid response from server',
+                    errorApiError: 'Произошла ошибка',
+                    errorPdfGeneration: 'Ошибка генерации PDF',
+                    errorPdfError: 'Ошибка при генерации PDF: ',
+                    alertFillLetter: 'Пожалуйста, сначала заполните письмо.'
+                },
+                en: {
+                    appTitle: 'Bewerbunganschreiben AI',
+                    themeToggle: 'Dark Mode',
+                    themeToggleLight: 'Light Mode',
+                    reviewPrompt: 'I would be grateful if you could leave a few lines with your impressions of this service',
+                    submitReview: 'Submit Review',
+                    biographyLabel: 'Biography - Write your resume in a free format: your skills, work experience, education:',
+                    jobPostingLabel: 'Job Posting - simply copy the job posting text here.:',
+                    wishesLabel: 'Wishes and Corrections - write your wishes or corrections if you are not satisfied with the result (optional):',
+                    generateButton: 'Create Documents',
+                    progressInitializing: 'Initializing...',
+                    progressReadingBiography: 'Reading Biography',
+                    progressAnalyzingBiography: 'Analyzing Biography',
+                    progressReadingJobPosting: 'Reading Job Posting',
+                    progressAnalyzingJobPosting: 'Analyzing Job Posting',
+                    progressCreatingLetter: 'Creating Cover Letter',
+                    progressGenerating: 'Generating Content...',
+                    progressFinalizing: 'Finalizing Document',
+                    progressComplete: 'Complete',
+                    errorTitle: 'Error',
+                    coverLetterTitle: 'Cover Letter (Anschreiben)',
+                    downloadButton: 'Download (PDF)',
+                    downloadButtonGenerating: 'Generating PDF...',
+                    privacyTitle: 'Privacy',
+                    privacyText: 'We do not store personal data permanently. Entered content is used exclusively for immediate processing and is automatically deleted after the session ends. Technical provision is done via Railway, processing of certain content via the OpenAI API – each in accordance with GDPR requirements.',
+                    errorBiographyEmpty: 'Biography cannot be empty',
+                    errorJobPostingEmpty: 'Job posting cannot be empty',
+                    errorInvalidResponse: 'Invalid response from server',
+                    errorApiError: 'An error occurred',
+                    errorPdfGeneration: 'PDF generation failed',
+                    errorPdfError: 'Error generating PDF: ',
+                    alertFillLetter: 'Please fill in the cover letter first.'
+                }
+            };
+
+            function safeGetStoredValue(key) {
+                try {
+                    return localStorage.getItem(key);
+                } catch (error) {
+                    return null;
+                }
+            }
+
+            function safeStoreValue(key, value) {
+                try {
+                    localStorage.setItem(key, value);
+                } catch (error) {
+                    // Storage can be blocked on some mobile browsers; ignore silently.
+                }
+            }
+
+            function getCurrentLanguage() {
+                const stored = safeGetStoredValue(LANGUAGE_STORAGE_KEY);
+                return (stored && (stored === 'de' || stored === 'ru' || stored === 'en')) ? stored : 'de';
+            }
+
+            function translate(key, lang) {
+                const langData = translations[lang] || translations.de;
+                return langData[key] || key;
+            }
+
+            function applyTranslations(lang) {
+                const elements = document.querySelectorAll('[data-i18n]');
+                elements.forEach(element => {
+                    const key = element.getAttribute('data-i18n');
+                    const text = translate(key, lang);
+                    if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
+                        element.placeholder = text;
+                    } else {
+                        element.textContent = text;
+                    }
+                });
+
+                // Update theme toggle text based on current theme
+                const themeToggle = document.getElementById('themeToggle');
+                if (themeToggle) {
+                    const isDark = document.documentElement.classList.contains('dark');
+                    themeToggle.textContent = isDark 
+                        ? translate('themeToggleLight', lang) 
+                        : translate('themeToggle', lang);
+                }
+            }
+
+            // Initialize language selector
+            const languageSelector = document.getElementById('languageSelector');
+            if (languageSelector) {
+                const currentLang = getCurrentLanguage();
+                languageSelector.value = currentLang;
+                applyTranslations(currentLang);
+
+                languageSelector.addEventListener('change', (e) => {
+                    const newLang = e.target.value;
+                    safeStoreValue(LANGUAGE_STORAGE_KEY, newLang);
+                    applyTranslations(newLang);
+                });
+            }
+
+            // Export translation function for use in other scripts
+            window.i18n = {
+                translate: (key) => translate(key, getCurrentLanguage()),
+                getCurrentLanguage: getCurrentLanguage
+            };
+        })();
+
         // Progress Bar Management
         class ProgressBar {
             constructor() {
                 this.segments = 24; // Number of segments in the ring
                 this.currentProgress = 0;
                 this.messages = [
-                    { text: "Lese Lebenslauf", progress: 5 },
-                    { text: "Analysiere Lebenslauf", progress: 15 },
-                    { text: "Lese Stellenausschreibung", progress: 25 },
-                    { text: "Analysiere Stellenausschreibung", progress: 40 },
-                    { text: "Erstelle Anschreiben", progress: 50 },
-                    { text: "Generiere Inhalt...", progress: 70 },
-                    { text: "Finalisiere Dokument", progress: 95 }
+                    { key: "progressReadingBiography", progress: 5 },
+                    { key: "progressAnalyzingBiography", progress: 15 },
+                    { key: "progressReadingJobPosting", progress: 25 },
+                    { key: "progressAnalyzingJobPosting", progress: 40 },
+                    { key: "progressCreatingLetter", progress: 50 },
+                    { key: "progressGenerating", progress: 70 },
+                    { key: "progressFinalizing", progress: 95 }
                 ];
                 this.currentMessageIndex = 0;
                 this.init();
@@ -419,7 +627,7 @@
                 }
                 if (message) {
                     const label = document.getElementById('progressLabel');
-                    label.textContent = message.text;
+                    label.textContent = window.i18n ? window.i18n.translate(message.key) : message.key;
                     label.classList.add('active');
                 }
             }
@@ -438,7 +646,7 @@
                     segment.classList.remove('blinking');
                 });
                 const label = document.getElementById('progressLabel');
-                label.textContent = "Abgeschlossen";
+                label.textContent = window.i18n ? window.i18n.translate('progressComplete') : 'Abgeschlossen';
                 label.classList.add('active');
             }
         }
@@ -500,13 +708,13 @@
                 // Validate biography text
                 const biographyText = biographyTextarea.value.trim();
                 if (!biographyText || biographyText.length === 0) {
-                    throw new Error('Biography cannot be empty');
+                    throw new Error(window.i18n ? window.i18n.translate('errorBiographyEmpty') : 'Biography cannot be empty');
                 }
                 
                 // Validate job posting
                 const jobPostingText = jobPostingTextarea.value.trim();
                 if (!jobPostingText || jobPostingText.length === 0) {
-                    throw new Error('Job posting cannot be empty');
+                    throw new Error(window.i18n ? window.i18n.translate('errorJobPostingEmpty') : 'Job posting cannot be empty');
                 }
                 
                 // Update progress: Reading biography
@@ -573,12 +781,12 @@
                 try {
                     responseData = await response.json();
                 } catch (jsonError) {
-                    throw new Error('Invalid response from server');
+                    throw new Error(window.i18n ? window.i18n.translate('errorInvalidResponse') : 'Invalid response from server');
                 }
                 
                 if (!response.ok) {
                     // Handle API error response
-                    const errorMessage = responseData.message || responseData.error || 'An error occurred';
+                    const errorMessage = responseData.message || responseData.error || (window.i18n ? window.i18n.translate('errorApiError') : 'An error occurred');
                     throw new Error(`API Error (${response.status}): ${errorMessage}`);
                 }
                 
@@ -622,12 +830,12 @@
             const downloadButton = document.getElementById('downloadButton');
             
             if (!coverLetterText || coverLetterText.trim().length === 0) {
-                alert('Bitte füllen Sie zuerst das Anschreiben aus.');
+                alert(window.i18n ? window.i18n.translate('alertFillLetter') : 'Bitte füllen Sie zuerst das Anschreiben aus.');
                 return;
             }
             
             downloadButton.disabled = true;
-            downloadButton.textContent = 'PDF wird generiert...';
+            downloadButton.textContent = window.i18n ? window.i18n.translate('downloadButtonGenerating') : 'PDF wird generiert...';
             
             try {
                 const response = await fetch('/api/generate/pdf', {
@@ -639,7 +847,7 @@
                 });
                 
                 if (!response.ok) {
-                    throw new Error('PDF-Generierung fehlgeschlagen');
+                    throw new Error(window.i18n ? window.i18n.translate('errorPdfGeneration') : 'PDF-Generierung fehlgeschlagen');
                 }
                 
                 const blob = await response.blob();
@@ -654,10 +862,11 @@
                 
             } catch (error) {
                 console.error('Error downloading PDF:', error);
-                alert('Fehler beim Generieren des PDFs: ' + error.message);
+                const errorMsg = window.i18n ? window.i18n.translate('errorPdfError') : 'Fehler beim Generieren des PDFs: ';
+                alert(errorMsg + error.message);
             } finally {
                 downloadButton.disabled = false;
-                downloadButton.textContent = 'Herunterladen (PDF)';
+                downloadButton.textContent = window.i18n ? window.i18n.translate('downloadButton') : 'Herunterladen (PDF)';
             }
         });
     </script>
