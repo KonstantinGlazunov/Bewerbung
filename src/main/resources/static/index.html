@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -252,31 +252,51 @@
 
     <script>
         // Theme toggle (frontend only, no backend dependency)
-        const themeToggle = document.getElementById('themeToggle');
-        const rootElement = document.documentElement;
-        const THEME_STORAGE_KEY = 'bewerbung-ai-theme';
+        (function initThemeToggle() {
+            const themeToggle = document.getElementById('themeToggle');
+            const rootElement = document.documentElement;
+            const THEME_STORAGE_KEY = 'bewerbung-ai-theme';
 
-        function applyTheme(theme) {
-            const isDark = theme === 'dark';
-            rootElement.classList.toggle('dark', isDark);
-            themeToggle.textContent = isDark ? 'Hellmodus' : 'Dunkelmodus';
-        }
-
-        function getPreferredTheme() {
-            const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
-            if (storedTheme === 'dark' || storedTheme === 'light') {
-                return storedTheme;
+            function safeGetStoredTheme() {
+                try {
+                    return localStorage.getItem(THEME_STORAGE_KEY);
+                } catch (error) {
+                    return null;
+                }
             }
-            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-        }
 
-        applyTheme(getPreferredTheme());
+            function safeStoreTheme(theme) {
+                try {
+                    localStorage.setItem(THEME_STORAGE_KEY, theme);
+                } catch (error) {
+                    // Storage can be blocked on some mobile browsers; ignore silently.
+                }
+            }
 
-        themeToggle.addEventListener('click', () => {
-            const nextTheme = rootElement.classList.contains('dark') ? 'light' : 'dark';
-            localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
-            applyTheme(nextTheme);
-        });
+            function applyTheme(theme) {
+                const isDark = theme === 'dark';
+                rootElement.classList.toggle('dark', isDark);
+                if (themeToggle) {
+                    themeToggle.textContent = isDark ? 'Hellmodus' : 'Dunkelmodus';
+                }
+            }
+
+            const storedTheme = safeGetStoredTheme();
+            if (storedTheme === 'dark' || storedTheme === 'light') {
+                applyTheme(storedTheme);
+            } else {
+                // Default theme is dark as requested
+                applyTheme('dark');
+            }
+
+            if (themeToggle) {
+                themeToggle.addEventListener('click', () => {
+                    const nextTheme = rootElement.classList.contains('dark') ? 'light' : 'dark';
+                    applyTheme(nextTheme);
+                    safeStoreTheme(nextTheme);
+                });
+            }
+        })();
 
         // Progress Bar Management
         class ProgressBar {
