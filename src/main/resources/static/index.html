@@ -271,18 +271,20 @@
             const themeToggle = document.getElementById('themeToggle');
             const rootElement = document.documentElement;
             const THEME_STORAGE_KEY = 'bewerbung-ai-theme';
+            const THEME_VERSION_KEY = 'bewerbung-ai-theme-version';
+            const THEME_VERSION = '2';
 
-            function safeGetStoredTheme() {
+            function safeGetStoredValue(key) {
                 try {
-                    return localStorage.getItem(THEME_STORAGE_KEY);
+                    return localStorage.getItem(key);
                 } catch (error) {
                     return null;
                 }
             }
 
-            function safeStoreTheme(theme) {
+            function safeStoreValue(key, value) {
                 try {
-                    localStorage.setItem(THEME_STORAGE_KEY, theme);
+                    localStorage.setItem(key, value);
                 } catch (error) {
                     // Storage can be blocked on some mobile browsers; ignore silently.
                 }
@@ -299,8 +301,14 @@
                 }
             }
 
-            const storedTheme = safeGetStoredTheme();
-            if (storedTheme === 'dark' || storedTheme === 'light') {
+            const storedTheme = safeGetStoredValue(THEME_STORAGE_KEY);
+            const storedVersion = safeGetStoredValue(THEME_VERSION_KEY);
+            if (storedVersion !== THEME_VERSION) {
+                // Force default dark when theme settings schema changes
+                applyTheme('dark');
+                safeStoreValue(THEME_STORAGE_KEY, 'dark');
+                safeStoreValue(THEME_VERSION_KEY, THEME_VERSION);
+            } else if (storedTheme === 'dark' || storedTheme === 'light') {
                 applyTheme(storedTheme);
             } else {
                 // Default theme is dark as requested
@@ -311,7 +319,8 @@
                 themeToggle.addEventListener('click', () => {
                     const nextTheme = rootElement.classList.contains('dark') ? 'light' : 'dark';
                     applyTheme(nextTheme);
-                    safeStoreTheme(nextTheme);
+                    safeStoreValue(THEME_STORAGE_KEY, nextTheme);
+                    safeStoreValue(THEME_VERSION_KEY, THEME_VERSION);
                 });
             }
         })();
