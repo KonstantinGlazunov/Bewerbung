@@ -14,6 +14,8 @@ public class GenerateRequestDto {
     private String jobPosting;
     
     private String wishes;
+    
+    private String language; // "de", "ru", or "en"
 
     public GenerateRequestDto() {
     }
@@ -51,6 +53,14 @@ public class GenerateRequestDto {
 
     public void setWishes(String wishes) {
         this.wishes = wishes;
+    }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
     }
 }
 
