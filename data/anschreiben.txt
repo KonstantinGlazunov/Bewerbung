@@ -1,14 +1,12 @@
-Betreff: Bewerbung als Java Softwareentwickler
+Халло,
 
-Sehr geehrte Damen und Herren,
+Меня зовут Макс Мустерманн, и я заинтересован в позиции Java Разработчика программного обеспечения в Finanz Informatik GmbH & Co. KG. Ваше объявление привлекло мое внимание, так как я обладаю более чем 6-летним опытом разработки программного обеспечения с использованием Java и JavaScript, а также обучением в области информатики.
 
-obwohl ich bisher noch keine direkte Berufserfahrung als Java Softwareentwickler gesammelt habe, bin ich hoch motiviert, Teil des Teams bei der Finanz Informatik GmbH & Co. KG zu werden. Mein abgeschlossener Bachelor of Science in Informatik von der Technischen Universität Berlin hat mir eine solide Grundlage in der Softwareentwicklung und im Umgang mit Datenbanken vermittelt. Besonders fasziniert mich die Möglichkeit, innovative Softwarelösungen zu gestalten und die Digitalisierung in der Finanzbranche voranzutreiben.
+На протяжении своей профессиональной карьеры я работаю над разработкой веб-приложений, используя Java и Spring Boot, в таких компаниях, как Tech Solutions GmbH и Startup Innovations AG. Я развивал бэкенд-системы, проектировал API и оптимизировал базы данных, руководствуясь принципами agile-разработки. Мой опыт работы с Java, Git и Maven соответствует требованиям вашей вакансии. Также я сертифицирован как Oracle Certified Professional, Java SE 11 Developer, что подтверждает мои навыки в области Java разработки.
 
-Meine Ausbildung hat mir nicht nur theoretische Kenntnisse in Java und weiteren Schlüsseltechnologien vermittelt, sondern auch meine analytischen Fähigkeiten sowie meine Problemlösungskompetenz gestärkt. Diese möchte ich nun in einer praktischen Umgebung weiterentwickeln. Ich bin bereit, meine Expertise in Java, JavaScript u.a. zugunsten effizienter und kreativer Lösungen einzubringen und freue mich auf die Möglichkeit, mit Ihrem Team zusammenzuarbeiten.
+Работа в вашей компании привлекает меня возможностью участвовать в инновационной разработке программного обеспечения и решать сложные задачи в кооперации с командой. Я восхищен возможностями личного и профессионального развития, которые предлагает ваша компания, и хочу внести свой вклад в ваш успешный и динамичный коллектив.
 
-Was mich besonders an Ihrem Unternehmen reizt, sind die vielfältigen Projekte und die dynamische Arbeitsweise. Die Finanz Informatik GmbH & Co. KG gilt als einer der führenden IT-Dienstleister im Finanzsektor, und ich identifiziere mich stark mit Ihrer Mission, zukunftsorientierte digitale Services zu entwickeln. Die angebotenen Weiterbildungsmöglichkeiten geben mir zudem die Perspektive, mich kontinuierlich weiterzuentwickeln und meinen Beitrag zu Ihrem innovativen Team zu leisten.
+Я был бы рад подробнее обсудить, как могу быть полезен вашей команде. Буду признателен за возможность встречи или телефонного разговора для обсуждения моих квалификаций.
 
-Ich freue mich darauf, meine Kenntnisse und Begeisterung in einem persönlichen Gespräch näher zu bringen und mehr über die spannende Position bei Ihnen zu erfahren.
-
-Mit freundlichen Grüßen  
-Max Mustermann  
+С уважением,  
+Макс Мустерманн

@@ -1,0 +1,15 @@
+Dear Hiring Manager,
+
+I am writing to express my interest in the position of Java Softwareentwickler at Finanz Informatik GmbH & Co. KG, as advertised. With a Bachelor of Science in Informatik from the Technische Universität Berlin and over eight years of professional experience in software development, I am excited about the opportunity to contribute to your team, particularly in advancing the digitalisation within the Sparkassen-Finanzgruppe.
+
+In my current role as a Software Developer at Tech Solutions GmbH, I focus on developing web applications using Java Spring Boot, involving extensive backend development, API design, and database optimisation. This experience has equipped me with the technical skills that align closely with the requirements of your vacancy, including proficiency in Java, JavaScript, and tools like Git and Maven. Additionally, my certification as an Oracle Certified Professional, Java SE 11 Developer, further validates my capabilities in these technologies.
+
+I am drawn to this opportunity at Finanz Informatik GmbH & Co. KG because of your reputation as a significant driver of digital innovation in the banking sector. I am particularly impressed by your commitment to personal development and the breadth of career opportunities available, which aligns with my professional aspirations for continual growth. I am particularly eager to contribute to your innovative projects and collaborate with cross-functional teams to deliver impactful software solutions.
+
+I am keen to bring my structured, goal-oriented approach to tasks, coupled with a strong inclination for teamwork, to your esteemed company. I am highly motivated to contribute to your success and am open to the occasional travel demands the role may require. I would welcome the opportunity to discuss how my background, skills, and enthusiasms align with the goals of Finanz Informatik GmbH & Co. KG.
+
+Thank you for considering my application. I look forward to the possibility of discussing this exciting opportunity with you.
+
+Yours sincerely,
+Max Mustermann
+

@@ -37,3 +37,4 @@ Java, Python, JavaScript, Spring Boot, Spring Framework, React, MySQL, PostgreSQ
 
 === СЕРТИФИКАТЫ ===
 Oracle Certified Professional, Java SE 11 Developer (Oracle, 2021-06)
+

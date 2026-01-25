@@ -189,8 +189,14 @@ public class GenerateController {
         String cvText = convertBiographyToText(request.getBiography());
         String vacancyText = request.getJobPosting();
 
-        // Check for changes (including wishes)
-        ChangeDetectionService.ChangeResult changeResult = changeDetectionService.checkAndSave(vacancyText, cvText, request.getWishes());
+        // Default to German if language not specified
+        String language = request.getLanguage();
+        if (language == null || language.trim().isEmpty()) {
+            language = "de";
+        }
+
+        // Check for changes (including wishes and language)
+        ChangeDetectionService.ChangeResult changeResult = changeDetectionService.checkAndSave(vacancyText, cvText, request.getWishes(), language);
 
         // If no changes detected, try to load saved Anschreiben
         if (!changeResult.hasChanges()) {
@@ -222,8 +228,8 @@ public class GenerateController {
             fileOutputService.writeAnalysis(jobRequirements);
         }
 
-        // Generate cover letter (Anschreiben)
-        String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography, request.getJobPosting(), request.getWishes());
+        // Generate cover letter (Anschreiben) - use the same language from request
+        String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography, request.getJobPosting(), request.getWishes(), language);
         
         // Save to both output directory and data directory
         fileOutputService.writeAnschreiben(coverLetter);
@@ -246,8 +252,10 @@ public class GenerateController {
     public ResponseEntity<GenerateResponseDto> generateFromFile(
             @RequestParam("biographyFile") MultipartFile biographyFile,
             @RequestParam("jobPosting") String jobPosting,
-            @RequestParam(value = "wishes", required = false) String wishes) {
+            @RequestParam(value = "wishes", required = false) String wishes,
+            @RequestParam(value = "language", required = false) String language) {
         logger.info("Received generate request from file");
+        logger.info("Requested language parameter: {}", language != null ? language : "null");
         
         // Log user wishes if provided
         if (wishes != null && !wishes.trim().isEmpty()) {
@@ -279,10 +287,19 @@ public class GenerateController {
             jobPosting != null ? jobPosting.length() : 0,
             biographyText != null ? biographyText.length() : 0);
 
+        // Default to German if language not specified
+        if (language == null || language.trim().isEmpty()) {
+            language = "de";
+        }
+        logger.info("Requested language: {}", language);
+
         // Check if data matches default samples - if so, use sample cover letter without AI
-        if (fileOutputService.isDefaultData(jobPosting, biographyText)) {
-            logger.info("Data matches default samples - using sample cover letter without AI processing");
-            String sampleCoverLetter = fileOutputService.loadSampleCoverLetter();
+        // BUT: if wishes are provided, we need to regenerate even for default data
+        // Use language-specific sample file
+        if (fileOutputService.isDefaultData(jobPosting, biographyText, language) 
+                && (wishes == null || wishes.trim().isEmpty())) {
+            logger.info("Data matches default samples for language '{}' and no wishes provided - using sample cover letter without AI processing", language);
+            String sampleCoverLetter = fileOutputService.loadSampleCoverLetter(language);
             if (sampleCoverLetter != null && !sampleCoverLetter.trim().isEmpty()) {
                 // Save to output files
                 fileOutputService.writeAnschreiben(sampleCoverLetter);
@@ -290,23 +307,28 @@ public class GenerateController {
                 fileOutputService.writeAnschreiben(sampleCoverLetter, dataAnschreibenPath);
                 changeDetectionService.saveAnschreibenPath(dataAnschreibenPath);
                 
-                logger.info("Sample cover letter loaded and saved to output files ({} chars)", sampleCoverLetter.length());
+                logger.info("Sample cover letter loaded and saved to output files ({} chars, language: {})", sampleCoverLetter.length(), language);
                 GenerateResponseDto response = new GenerateResponseDto(sampleCoverLetter);
                 return ResponseEntity.ok(response);
             } else {
-                logger.warn("Sample cover letter not found, falling back to AI generation");
+                logger.warn("Sample cover letter not found for language '{}', falling back to AI generation", language);
             }
+        } else if (fileOutputService.isDefaultData(jobPosting, biographyText, language) 
+                && wishes != null && !wishes.trim().isEmpty()) {
+            logger.info("Data matches default samples but wishes are provided - will use AI to generate cover letter with wishes");
         }
-
-        // Check for changes (including wishes)
-        ChangeDetectionService.ChangeResult changeResult = changeDetectionService.checkAndSave(jobPosting, biographyText, wishes);
         
-        logger.info("Change detection result - hasChanges: {}, vacancyChanged: {}, cvChanged: {}, wishesChanged: {}", 
-            changeResult.hasChanges(), changeResult.isVacancyChanged(), changeResult.isCvChanged(), changeResult.isWishesChanged());
+        // Check for changes (including wishes and language)
+        ChangeDetectionService.ChangeResult changeResult = changeDetectionService.checkAndSave(jobPosting, biographyText, wishes, language);
+        
+        logger.info("Change detection result - hasChanges: {}, vacancyChanged: {}, cvChanged: {}, wishesChanged: {}, languageChanged: {}", 
+            changeResult.hasChanges(), changeResult.isVacancyChanged(), changeResult.isCvChanged(), 
+            changeResult.isWishesChanged(), changeResult.isLanguageChanged());
 
-        // If no changes detected, try to load saved Anschreiben
-        if (!changeResult.hasChanges()) {
-            logger.info("No changes detected. Attempting to load saved Anschreiben...");
+        // If no changes detected AND language hasn't changed, try to load saved Anschreiben
+        // IMPORTANT: If language changed, we must regenerate even if other data hasn't changed
+        if (!changeResult.hasChanges() && !changeResult.isLanguageChanged()) {
+            logger.info("No changes detected and language hasn't changed. Attempting to load saved Anschreiben...");
             String savedAnschreibenPath = changeDetectionService.getSavedAnschreibenPath();
             if (savedAnschreibenPath != null && !savedAnschreibenPath.isEmpty()) {
                 String savedAnschreiben = fileOutputService.readAnschreiben(savedAnschreibenPath);
@@ -319,6 +341,8 @@ public class GenerateController {
                 }
             }
             logger.info("No saved Anschreiben found. Will generate new one.");
+        } else if (changeResult.isLanguageChanged()) {
+            logger.info("Language changed to: {}. Must regenerate cover letter even if other data hasn't changed.", language);
         }
 
         // Read file content and parse using AI
@@ -335,8 +359,15 @@ public class GenerateController {
         // Analyze job posting
         JobRequirements jobRequirements = vacancyAnalyzerService.analyzeVacancy(jobPosting);
 
+        // Default to German if language not specified
+        String languageForGeneration = language;
+        if (languageForGeneration == null || languageForGeneration.trim().isEmpty()) {
+            languageForGeneration = "de";
+        }
+        logger.info("Generating cover letter in language: {}", languageForGeneration);
+
         // Generate cover letter (Anschreiben) - pass full biography for experience/education reference
-        String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography, jobPosting, wishes);
+        String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography, jobPosting, wishes, languageForGeneration);
         
         // Save to both output directory and data directory
         fileOutputService.writeAnschreiben(coverLetter);

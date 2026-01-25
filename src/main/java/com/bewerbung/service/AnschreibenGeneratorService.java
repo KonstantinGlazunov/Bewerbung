@@ -16,14 +16,18 @@ public class AnschreibenGeneratorService {
     private OpenAiService openAiService;
 
     public String generateAnschreiben(JobRequirements job, Biography biography) {
-        return generateAnschreiben(job, biography, null, null);
+        return generateAnschreiben(job, biography, null, null, null);
     }
 
     public String generateAnschreiben(JobRequirements job, Biography biography, String vacancyFullText) {
-        return generateAnschreiben(job, biography, vacancyFullText, null);
+        return generateAnschreiben(job, biography, vacancyFullText, null, null);
     }
 
     public String generateAnschreiben(JobRequirements job, Biography biography, String vacancyFullText, String wishes) {
+        return generateAnschreiben(job, biography, vacancyFullText, wishes, null);
+    }
+
+    public String generateAnschreiben(JobRequirements job, Biography biography, String vacancyFullText, String wishes, String language) {
         // Validate biography has data
         if (biography == null) {
             logger.error("Biography is null!");
@@ -43,8 +47,22 @@ public class AnschreibenGeneratorService {
             logger.info("No user wishes/corrections provided");
         }
         
-        String prompt = buildPrompt(job, biography, vacancyFullText, wishes);
-        logger.debug("Generated prompt for Anschreiben (length: {} chars)", prompt.length());
+        // Default to German if language not specified
+        if (language == null || language.trim().isEmpty()) {
+            language = "de";
+        }
+        language = language.trim().toLowerCase(); // Normalize language
+        logger.info("Generating cover letter in language: {} (normalized)", language);
+        
+        String prompt = buildPrompt(job, biography, vacancyFullText, wishes, language);
+        logger.debug("Generated prompt for Anschreiben (length: {} chars, language: {})", prompt.length(), language);
+        
+        // Log a snippet of the prompt to verify language setting
+        if (prompt.contains("CRITICAL: The final cover letter MUST be written in")) {
+            int startIdx = prompt.indexOf("CRITICAL: The final cover letter MUST be written in");
+            String snippet = prompt.substring(startIdx, Math.min(startIdx + 150, prompt.length()));
+            logger.info("Prompt language instruction snippet: {}", snippet);
+        }
         
         // Log a summary of what data is available
         logger.info("Biography data summary - Name: {}, Education entries: {}, Work experience entries: {}, Skills: {}", 
@@ -62,21 +80,83 @@ public class AnschreibenGeneratorService {
         return anschreiben;
     }
 
-    private String buildPrompt(JobRequirements job, Biography biography, String vacancyFullText, String wishes) {
+    private String buildPrompt(JobRequirements job, Biography biography, String vacancyFullText, String wishes, String language) {
         StringBuilder prompt = new StringBuilder();
         
+        // Default to German if invalid language
+        if (language == null || (!language.equals("de") && !language.equals("ru") && !language.equals("en"))) {
+            logger.warn("Invalid language '{}' provided, defaulting to 'de'", language);
+            language = "de";
+        }
+        logger.info("Building prompt with language: {}", language);
+        
         prompt.append("MISSION\n\n");
-        prompt.append("You are a professional German job application consultant and prompt-engineer. ");
-        prompt.append("Your task is to write a cover letter (Motivationsschreiben / Anschreiben). ");
-        prompt.append("You must analyze a CV (biography) and a job description, and then ");
-        prompt.append("create a high-quality German Motivationsschreiben / Anschreiben.\n\n");
+        
+        // CRITICAL: Language specification at the very beginning
+        if ("ru".equals(language)) {
+            prompt.append("⚠️⚠️⚠️ CRITICAL LANGUAGE REQUIREMENT: YOU MUST WRITE THE ENTIRE COVER LETTER IN RUSSIAN LANGUAGE! ⚠️⚠️⚠️\n");
+            prompt.append("The output language is RUSSIAN. Every word, every sentence, every paragraph MUST be in RUSSIAN.\n");
+            prompt.append("Do NOT write in German. Do NOT write in English. Write ONLY in RUSSIAN.\n\n");
+        } else if ("en".equals(language)) {
+            prompt.append("⚠️⚠️⚠️ CRITICAL LANGUAGE REQUIREMENT: YOU MUST WRITE THE ENTIRE COVER LETTER IN BRITISH ENGLISH! ⚠️⚠️⚠️\n");
+            prompt.append("The output language is BRITISH ENGLISH. Every word, every sentence, every paragraph MUST be in BRITISH ENGLISH.\n");
+            prompt.append("Do NOT write in German. Do NOT write in American English. Write ONLY in BRITISH ENGLISH.\n\n");
+        } else {
+            prompt.append("⚠️⚠️⚠️ CRITICAL LANGUAGE REQUIREMENT: YOU MUST WRITE THE ENTIRE COVER LETTER IN GERMAN LANGUAGE! ⚠️⚠️⚠️\n");
+            prompt.append("The output language is GERMAN. Every word, every sentence, every paragraph MUST be in GERMAN.\n\n");
+        }
+        
+        // Language-specific mission statement
+        if ("de".equals(language)) {
+            prompt.append("You are a professional German job application consultant and prompt-engineer. ");
+            prompt.append("Your task is to write a cover letter (Motivationsschreiben / Anschreiben). ");
+            prompt.append("You must analyze a CV (biography) and a job description, and then ");
+            prompt.append("create a high-quality German Motivationsschreiben / Anschreiben.\n\n");
+        } else if ("ru".equals(language)) {
+            prompt.append("You are a professional Russian job application consultant and prompt-engineer. ");
+            prompt.append("Your task is to write a cover letter (мотивационное письмо / сопроводительное письмо). ");
+            prompt.append("You must analyze a CV (biography) and a job description, and then ");
+            prompt.append("create a high-quality Russian motivational letter following Russian standards.\n\n");
+        } else { // "en"
+            prompt.append("You are a professional British job application consultant and prompt-engineer. ");
+            prompt.append("Your task is to write a cover letter. ");
+            prompt.append("You must analyze a CV (biography) and a job description, and then ");
+            prompt.append("create a high-quality British-style cover letter following UK standards.\n\n");
+        }
         
         prompt.append("You must strictly follow the following 6-step methodology. ");
         prompt.append("Steps 1-5 are performed INTERNALLY and used ONLY for analysis. ");
         prompt.append("Your final output must contain ONLY the completed cover letter, WITHOUT any intermediate results.\n\n");
         
-        prompt.append("CRITICAL: The final cover letter MUST be written in GERMAN language, following German business standards (DIN 5008). ");
-        prompt.append("However, you will receive instructions in English for better understanding.\n\n");
+        // Language and country-specific requirements
+        if ("de".equals(language)) {
+            prompt.append("CRITICAL: The final cover letter MUST be written in GERMAN language, following German business standards (DIN 5008). ");
+            prompt.append("This includes:\n");
+            prompt.append("- Formal style and professional tone\n");
+            prompt.append("- Structure with Betreff (subject line)\n");
+            prompt.append("- Proper formatting according to DIN 5008\n");
+            prompt.append("- Formal greeting and closing\n");
+            prompt.append("- Professional, business-like language throughout\n");
+            prompt.append("However, you will receive instructions in English for better understanding.\n\n");
+        } else if ("ru".equals(language)) {
+            prompt.append("CRITICAL: The final cover letter MUST be written in RUSSIAN language, following Russian business standards. ");
+            prompt.append("This includes:\n");
+            prompt.append("- Warmer, more personal tone while maintaining professionalism\n");
+            prompt.append("- Strong emphasis on motivation and personal interest\n");
+            prompt.append("- Russian business letter formatting standards\n");
+            prompt.append("- Appropriate greeting and closing for Russian business correspondence\n");
+            prompt.append("- Balance between professionalism and personal touch\n");
+            prompt.append("However, you will receive instructions in English for better understanding.\n\n");
+        } else { // "en"
+            prompt.append("CRITICAL: The final cover letter MUST be written in BRITISH ENGLISH, following UK business standards. ");
+            prompt.append("This includes:\n");
+            prompt.append("- Balance between professionalism and personality\n");
+            prompt.append("- British English spelling and conventions (e.g., 'organise' not 'organize')\n");
+            prompt.append("- UK business letter formatting standards\n");
+            prompt.append("- Professional yet approachable tone\n");
+            prompt.append("- Appropriate greeting and closing for UK business correspondence\n");
+            prompt.append("However, you will receive instructions in English for better understanding.\n\n");
+        }
         
         // === INPUTS ===
         prompt.append("INPUT\n\n");
@@ -118,11 +198,20 @@ public class AnschreibenGeneratorService {
         
         prompt.append("CRITICAL REMINDERS:\n");
         prompt.append("1. NAME: The candidate's name is in the section \"CANDIDATE BIOGRAPHY\" under \"Name:\" ");
-        prompt.append("and MUST be used EXACTLY at the end of the letter after \"Mit freundlichen Grüßen\" - NO placeholders!\n");
+        if ("de".equals(language)) {
+            prompt.append("and MUST be used EXACTLY at the end of the letter after \"Mit freundlichen Grüßen\" - NO placeholders!\n");
+        } else if ("ru".equals(language)) {
+            prompt.append("and MUST be used EXACTLY at the end of the letter after appropriate Russian closing (e.g., \"С уважением\") - NO placeholders!\n");
+        } else { // "en"
+            prompt.append("and MUST be used EXACTLY at the end of the letter after appropriate British closing (e.g., \"Yours sincerely\") - NO placeholders!\n");
+        }
         prompt.append("2. FACTS: Use ONLY information that is ACTUALLY in the biography. ");
-        prompt.append("If it says \"unvollständige Ausbildung\" (incomplete education), do NOT write \"abgeschlossenen Ausbildung\" (completed education).\n");
-        prompt.append("3. EXPERIENCE: Do NOT invent experiences. If there is no experience with agricultural machinery/vehicles mentioned, ");
-        prompt.append("then do NOT write \"langjährige Erfahrung\" (extensive experience) - accept the gap.\n\n");
+        if ("de".equals(language)) {
+            prompt.append("If it says \"unvollständige Ausbildung\" (incomplete education), do NOT write \"abgeschlossenen Ausbildung\" (completed education).\n");
+        } else {
+            prompt.append("Use EXACT formulations from the biography - do NOT change or improve them.\n");
+        }
+        prompt.append("3. EXPERIENCE: Do NOT invent experiences. Use ONLY what is explicitly mentioned in the biography.\n\n");
         
         // === STEP 1: EXTRACT FORMAL JOB REQUIREMENTS ===
         prompt.append("METHODOLOGY\n\n");
@@ -262,14 +351,36 @@ public class AnschreibenGeneratorService {
         
         prompt.append("What tone is appropriate?\n");
         prompt.append("• Tone & Style:\n");
-        prompt.append("  - Formal, professional, German business style (Standard) - BUT write in German!\n");
-        prompt.append("  - Confident, but not arrogant\n");
-        prompt.append("  - Precise and concrete, not exaggerated\n");
-        prompt.append("  - Adapted to industry and company size:\n");
-        prompt.append("    * Public sector / NGO → more formal, mission-oriented tone\n");
-        prompt.append("    * Startup / Tech → concise, results-oriented language\n");
-        prompt.append("    * Healthcare / Education → empathetic, responsibility-oriented formulation\n");
-        prompt.append("    * Finance → precise, compliance-oriented\n\n");
+        if ("de".equals(language)) {
+            prompt.append("  - Formal, professional, German business style (Standard) - BUT write in German!\n");
+            prompt.append("  - Confident, but not arrogant\n");
+            prompt.append("  - Precise and concrete, not exaggerated\n");
+            prompt.append("  - Adapted to industry and company size:\n");
+            prompt.append("    * Public sector / NGO → more formal, mission-oriented tone\n");
+            prompt.append("    * Startup / Tech → concise, results-oriented language\n");
+            prompt.append("    * Healthcare / Education → empathetic, responsibility-oriented formulation\n");
+            prompt.append("    * Finance → precise, compliance-oriented\n\n");
+        } else if ("ru".equals(language)) {
+            prompt.append("  - Warmer, more personal tone while maintaining professionalism\n");
+            prompt.append("  - Strong emphasis on motivation and personal interest\n");
+            prompt.append("  - Balance between professionalism and personal touch\n");
+            prompt.append("  - Confident, but approachable\n");
+            prompt.append("  - Adapted to industry and company size:\n");
+            prompt.append("    * Public sector / NGO → respectful, mission-oriented tone\n");
+            prompt.append("    * Startup / Tech → dynamic, results-oriented language\n");
+            prompt.append("    * Healthcare / Education → empathetic, caring formulation\n");
+            prompt.append("    * Finance → precise, trustworthy\n\n");
+        } else { // "en"
+            prompt.append("  - Balance between professionalism and personality\n");
+            prompt.append("  - Professional yet approachable tone\n");
+            prompt.append("  - Confident, but not arrogant\n");
+            prompt.append("  - Precise and concrete, not exaggerated\n");
+            prompt.append("  - Adapted to industry and company size:\n");
+            prompt.append("    * Public sector / NGO → respectful, mission-oriented tone\n");
+            prompt.append("    * Startup / Tech → concise, results-oriented language\n");
+            prompt.append("    * Healthcare / Education → empathetic, responsibility-oriented formulation\n");
+            prompt.append("    * Finance → precise, compliance-oriented\n\n");
+        }
         
         // === STEP 6: CONSTRUCT THE FINAL GENERATION PROMPT ===
         prompt.append("STEP 6 — CONSTRUCT THE FINAL GENERATION PROMPT\n\n");
@@ -316,7 +427,13 @@ public class AnschreibenGeneratorService {
             
             prompt.append("ABSOLUTE REQUIREMENT: These user wishes have HIGHEST PRIORITY and MUST override:\n");
             prompt.append("1. Any default instructions\n");
-            prompt.append("2. Standard German business letter conventions\n");
+            if ("de".equals(language)) {
+                prompt.append("2. Standard German business letter conventions\n");
+            } else if ("ru".equals(language)) {
+                prompt.append("2. Standard Russian business letter conventions\n");
+            } else { // "en"
+                prompt.append("2. Standard British business letter conventions\n");
+            }
             prompt.append("3. Data from CANDIDATE BIOGRAPHY (if there is a conflict)\n");
             prompt.append("4. ANY information from biography that contradicts user wishes\n\n");
             prompt.append("CONFLICT RESOLUTION RULE:\n");
@@ -332,7 +449,13 @@ public class AnschreibenGeneratorService {
             prompt.append("- If user says \"Don't mention X from biography\" → Do NOT mention X, even if it's in biography\n");
             prompt.append("- If user says \"Emphasize Y instead of Z\" → Emphasize Y, even if Z is more prominent in biography\n");
             prompt.append("- Any other request about salutation, tone, structure, or content → Follow it exactly\n\n");
-            prompt.append("User wishes take precedence over standard German business letter conventions.\n");
+            if ("de".equals(language)) {
+                prompt.append("User wishes take precedence over standard German business letter conventions.\n");
+            } else if ("ru".equals(language)) {
+                prompt.append("User wishes take precedence over standard Russian business letter conventions.\n");
+            } else { // "en"
+                prompt.append("User wishes take precedence over standard British business letter conventions.\n");
+            }
             prompt.append("User wishes take precedence over CANDIDATE BIOGRAPHY data in case of conflict.\n");
             prompt.append("If there is a conflict between user wishes and ANY other source (biography, conventions, etc.), user wishes WIN.\n\n");
         }
@@ -340,25 +463,70 @@ public class AnschreibenGeneratorService {
         prompt.append("Use all previous steps to generate the cover letter.\n\n");
         
         prompt.append("Specify:\n");
-        prompt.append("- Language: GERMAN (formal business style, DIN 5008 standard) - THE FINAL LETTER MUST BE IN GERMAN!\n");
-        prompt.append("- Length: 1 page / 3-4 paragraphs (approx. 250-400 words)\n");
-        prompt.append("- Structure:\n");
-        prompt.append("  1. Introduction paragraph: Reference to position, professional intent, high fit\n");
-        prompt.append("  2. Qualification paragraph(s): Mapping job requirements → candidate qualifications with concrete examples\n");
-        prompt.append("  3. Motivation & Cultural Fit: Why the company, not just the role; connection of personal values with organizational mission\n");
-        prompt.append("  4. Closing paragraph: Readiness for interview, formal German closing etiquette\n\n");
+        
+        // Language-specific specifications
+        if ("de".equals(language)) {
+            prompt.append("- Language: GERMAN (formal business style, DIN 5008 standard) - THE FINAL LETTER MUST BE IN GERMAN!\n");
+            prompt.append("- Length: 1 page / 3-4 paragraphs (approx. 250-400 words)\n");
+            prompt.append("- Structure:\n");
+            prompt.append("  1. Betreff (Subject line): MUST include the job title \"").append(job.getPosition()).append("\"\n");
+            prompt.append("  2. Introduction paragraph: Reference to position, professional intent, high fit\n");
+            prompt.append("  3. Qualification paragraph(s): Mapping job requirements → candidate qualifications with concrete examples\n");
+            prompt.append("  4. Motivation & Cultural Fit: Why the company, not just the role; connection of personal values with organizational mission\n");
+            prompt.append("  5. Closing paragraph: Readiness for interview, formal German closing etiquette\n");
+            prompt.append("  6. Signature: \"Mit freundlichen Grüßen\" followed by candidate's name\n\n");
+            prompt.append("- Formatting: Follow DIN 5008 standard for German business letters\n");
+            prompt.append("- Style: Formal, professional, business-like throughout\n\n");
+        } else if ("ru".equals(language)) {
+            prompt.append("- Language: RUSSIAN - THE FINAL LETTER MUST BE IN RUSSIAN!\n");
+            prompt.append("- Length: 1 page / 3-4 paragraphs (approx. 300-450 words)\n");
+            prompt.append("- Structure:\n");
+            prompt.append("  1. Greeting: Appropriate Russian business greeting\n");
+            prompt.append("  2. Introduction paragraph: Reference to position, strong motivation, personal interest\n");
+            prompt.append("  3. Qualification paragraph(s): Mapping job requirements → candidate qualifications with concrete examples, emphasizing motivation\n");
+            prompt.append("  4. Motivation & Personal Fit: Strong emphasis on why the company and role, personal values alignment\n");
+            prompt.append("  5. Closing paragraph: Readiness for interview, warm but professional closing\n");
+            prompt.append("  6. Signature: Appropriate Russian closing followed by candidate's name\n\n");
+            prompt.append("- Formatting: Follow Russian business letter standards\n");
+            prompt.append("- Style: Warmer tone, strong emphasis on motivation, balance of professionalism and personal touch\n\n");
+        } else { // "en"
+            prompt.append("- Language: BRITISH ENGLISH - THE FINAL LETTER MUST BE IN BRITISH ENGLISH!\n");
+            prompt.append("- Length: 1 page / 3-4 paragraphs (approx. 300-400 words)\n");
+            prompt.append("- Structure:\n");
+            prompt.append("  1. Greeting: Appropriate British business greeting\n");
+            prompt.append("  2. Introduction paragraph: Reference to position, professional intent, balanced approach\n");
+            prompt.append("  3. Qualification paragraph(s): Mapping job requirements → candidate qualifications with concrete examples\n");
+            prompt.append("  4. Motivation & Cultural Fit: Why the company, balance of professionalism and personality\n");
+            prompt.append("  5. Closing paragraph: Readiness for interview, professional British closing\n");
+            prompt.append("  6. Signature: Appropriate British closing followed by candidate's name\n\n");
+            prompt.append("- Formatting: Follow UK business letter standards\n");
+            prompt.append("- Style: Balance between professionalism and personality, professional yet approachable\n");
+            prompt.append("- Spelling: Use British English spelling (e.g., 'organise' not 'organize', 'colour' not 'color')\n\n");
+        }
         
         prompt.append("- Usage:\n");
-        prompt.append("  * Job title: \"").append(job.getPosition()).append("\" MUST be in the subject line (Betreff)\n");
+        prompt.append("  * Job title: \"").append(job.getPosition()).append("\" MUST be mentioned in the text\n");
         prompt.append("  * Company name: \"").append(job.getCompany()).append("\" MUST be mentioned in the text\n");
         
-        // Make salutation conditional on user wishes
+        // Make salutation conditional on user wishes and language
         if (wishes != null && !wishes.trim().isEmpty()) {
             prompt.append("  * Salutation: FOLLOW USER WISHES ABOVE - if user specified a different salutation, use that instead of default\n");
         } else {
-            prompt.append("  * Salutation: \"Sehr geehrte Damen und Herren\" (Standard German greeting)\n");
+            if ("de".equals(language)) {
+                prompt.append("  * Salutation: \"Sehr geehrte Damen und Herren\" (Standard German greeting)\n");
+            } else if ("ru".equals(language)) {
+                prompt.append("  * Salutation: Appropriate Russian business greeting (e.g., \"Уважаемые господа\" or \"Здравствуйте\")\n");
+            } else { // "en"
+                prompt.append("  * Salutation: Appropriate British business greeting (e.g., \"Dear Sir/Madam\" or \"Dear Hiring Manager\")\n");
+            }
         }
-        prompt.append("  * Closing: \"Mit freundlichen Grüßen\" followed by the candidate's name\n");
+        if ("de".equals(language)) {
+            prompt.append("  * Closing: \"Mit freundlichen Grüßen\" followed by the candidate's name\n");
+        } else if ("ru".equals(language)) {
+            prompt.append("  * Closing: \"С уважением\" or appropriate Russian closing followed by the candidate's name\n");
+        } else { // "en"
+            prompt.append("  * Closing: \"Yours sincerely\" or appropriate British closing followed by the candidate's name\n");
+        }
         prompt.append("  * CRITICAL - Candidate's name (MUST be used):\n");
         prompt.append("    - The name is in the CANDIDATE BIOGRAPHY section under \"Name:\"\n");
         prompt.append("    - You MUST use this name EXACTLY and COMPLETELY in the closing at the end\n");
@@ -487,8 +655,18 @@ public class AnschreibenGeneratorService {
         prompt.append("- NO intermediate results or analyses\n\n");
         
         prompt.append("ALLOWED in the output:\n");
-        prompt.append("- ONLY the final cover letter in GERMAN language\n");
-        prompt.append("- The text starts directly with the subject line (Betreff) or salutation\n");
+        if ("ru".equals(language)) {
+            prompt.append("- ONLY the final cover letter in RUSSIAN language\n");
+        } else if ("en".equals(language)) {
+            prompt.append("- ONLY the final cover letter in BRITISH ENGLISH language\n");
+        } else {
+            prompt.append("- ONLY the final cover letter in GERMAN language\n");
+        }
+        if ("de".equals(language)) {
+            prompt.append("- The text starts directly with the subject line (Betreff) or salutation\n");
+        } else {
+            prompt.append("- The text starts directly with the salutation\n");
+        }
         prompt.append("- The text ends with THE REAL NAME from the biography after the closing\n");
         prompt.append("- The name MUST be taken from the section \"CANDIDATE BIOGRAPHY\" → \"Name:\"\n");
         prompt.append("- The text is completely ready to send\n\n");
@@ -541,27 +719,53 @@ public class AnschreibenGeneratorService {
         if (wishes != null && !wishes.trim().isEmpty()) {
             prompt.append("2a. CRITICAL: Apply user wishes/corrections from STEP 6 - they override standard conventions\n");
         }
-        prompt.append("3. Output ONLY the completed cover letter (Step 6) - IN GERMAN!\n\n");
+        if ("ru".equals(language)) {
+            prompt.append("3. Output ONLY the completed cover letter (Step 6) - IN RUSSIAN!\n\n");
+        } else if ("en".equals(language)) {
+            prompt.append("3. Output ONLY the completed cover letter (Step 6) - IN BRITISH ENGLISH!\n\n");
+        } else {
+            prompt.append("3. Output ONLY the completed cover letter (Step 6) - IN GERMAN!\n\n");
+        }
         
         prompt.append("EXAMPLE of correct output (with real name from biography):\n");
-        prompt.append("Betreff: Bewerbung als ").append(job.getPosition() != null ? job.getPosition() : "[Job Title]").append("\n\n");
         
-        // Show example that respects user wishes
-        if (wishes != null && !wishes.trim().isEmpty()) {
-            prompt.append("(IMPORTANT: If user wishes specify a different salutation, use that instead of the default below)\n");
-            String wishesLower = wishes.toLowerCase();
-            if (wishesLower.contains("hallo") || wishesLower.contains("вместо") && wishesLower.contains("hallo")) {
-                prompt.append("Hallo,\n\n");
-                prompt.append("(Example shows 'Hallo' because user requested it - follow user wishes exactly)\n\n");
+        // Language-specific example structure
+        if ("de".equals(language)) {
+            prompt.append("Betreff: Bewerbung als ").append(job.getPosition() != null ? job.getPosition() : "[Job Title]").append("\n\n");
+            
+            // Show example that respects user wishes
+            if (wishes != null && !wishes.trim().isEmpty()) {
+                prompt.append("(IMPORTANT: If user wishes specify a different salutation, use that instead of the default below)\n");
+                String wishesLower = wishes.toLowerCase();
+                if (wishesLower.contains("hallo") || wishesLower.contains("вместо") && wishesLower.contains("hallo")) {
+                    prompt.append("Hallo,\n\n");
+                    prompt.append("(Example shows 'Hallo' because user requested it - follow user wishes exactly)\n\n");
+                } else {
+                    prompt.append("Sehr geehrte Damen und Herren,\n\n");
+                    prompt.append("(Note: If user wishes specify a different salutation, use that instead)\n\n");
+                }
             } else {
                 prompt.append("Sehr geehrte Damen und Herren,\n\n");
-                prompt.append("(Note: If user wishes specify a different salutation, use that instead)\n\n");
             }
-        } else {
-            prompt.append("Sehr geehrte Damen und Herren,\n\n");
+        } else if ("ru".equals(language)) {
+            prompt.append("(Russian business greeting, e.g., \"Уважаемые господа\" or \"Здравствуйте\")\n\n");
+        } else { // "en"
+            prompt.append("(British business greeting, e.g., \"Dear Sir/Madam\" or \"Dear Hiring Manager\")\n\n");
         }
-        prompt.append("[Cover letter text here - 3-4 paragraphs, ONLY with facts from the biography, written in German]\n\n");
-        prompt.append("Mit freundlichen Grüßen\n");
+        if ("ru".equals(language)) {
+            prompt.append("[Cover letter text here - 3-4 paragraphs, ONLY with facts from the biography, written in RUSSIAN]\n\n");
+        } else if ("en".equals(language)) {
+            prompt.append("[Cover letter text here - 3-4 paragraphs, ONLY with facts from the biography, written in BRITISH ENGLISH]\n\n");
+        } else {
+            prompt.append("[Cover letter text here - 3-4 paragraphs, ONLY with facts from the biography, written in GERMAN]\n\n");
+        }
+        if ("ru".equals(language)) {
+            prompt.append("С уважением\n");
+        } else if ("en".equals(language)) {
+            prompt.append("Yours sincerely\n");
+        } else {
+            prompt.append("Mit freundlichen Grüßen\n");
+        }
         if (biography != null && biography.getName() != null && !biography.getName().isEmpty()) {
             prompt.append(biography.getName()).append("\n\n");
             prompt.append("IMPORTANT: In the above example, the name \"").append(biography.getName()).append("\" from the biography was used. ");

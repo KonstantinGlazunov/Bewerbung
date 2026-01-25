@@ -230,6 +230,24 @@
                 <a href="/reviews.html" class="inline-flex items-center justify-center rounded-xl border border-blue-600 bg-white px-5 py-2 text-sm font-semibold text-blue-700 shadow-sm transition-colors hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:border-blue-500 dark:bg-slate-900 dark:text-blue-200 dark:hover:bg-slate-800" data-i18n="submitReview">Bewertung abgeben</a>
             </div>
         </div>
+
+        <!-- Help block -->
+        <div class="mt-6 rounded-2xl border border-blue-200 bg-blue-50/60 px-6 py-5 shadow-sm dark:border-blue-800/60 dark:bg-blue-950/40">
+            <div class="flex items-start gap-3">
+                <div class="flex-shrink-0 mt-0.5">
+                    <svg class="w-5 h-5 text-blue-600 dark:text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2" data-i18n="helpTitle">Помощь</h3>
+                    <div class="text-sm text-blue-800 dark:text-blue-200 leading-relaxed space-y-2">
+                        <p data-i18n="helpDescription">Dieser Service erstellt ein maßgeschneidertes Bewerbungsanschreiben, das auf Ihr Lebenslauf und die Anforderungen der Stellenausschreibung abgestimmt ist.</p>
+                        <p data-i18n="helpLanguageText">Sie können Ihre Daten in jeder beliebigen Sprache eingeben. Das generierte Anschreiben wird automatisch in der Sprache erstellt, die Sie im Sprachauswahlmenü oben rechts ausgewählt haben (DE, RU oder EN).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
         
         <!-- Input form (IDs must stay stable for JS bindings) -->
         <form id="generateForm" class="mt-8 space-y-6">
@@ -367,6 +385,7 @@
                     appTitle: 'Bewerbunganschreiben AI',
                     themeToggle: 'Dunkelmodus',
                     themeToggleLight: 'Hellmodus',
+                    serviceDescription: 'Dieser Service erstellt ein maßgeschneidertes Bewerbungsanschreiben, das auf Ihr Lebenslauf und die Anforderungen der Stellenausschreibung abgestimmt ist.',
                     reviewPrompt: 'Ich wäre Ihnen dankbar, wenn Sie mir ein paar Zeilen mit Ihren Eindrücken zu diesem Service hinterlassen',
                     submitReview: 'Bewertung abgeben',
                     biographyLabel: 'Biography - Verfassen Sie Ihren Lebenslauf in einem freien Format: Ihre Fähigkeiten, Berufserfahrung, Ausbildung:',
@@ -394,12 +413,16 @@
                     errorApiError: 'An error occurred',
                     errorPdfGeneration: 'PDF-Generierung fehlgeschlagen',
                     errorPdfError: 'Fehler beim Generieren des PDFs: ',
-                    alertFillLetter: 'Bitte füllen Sie zuerst das Anschreiben aus.'
+                    alertFillLetter: 'Bitte füllen Sie zuerst das Anschreiben aus.',
+                    helpTitle: 'Hilfe',
+                    helpDescription: 'Dieser Service erstellt ein maßgeschneidertes Bewerbungsanschreiben, das auf Ihr Lebenslauf und die Anforderungen der Stellenausschreibung abgestimmt ist.',
+                    helpLanguageText: 'Sie können Ihre Daten in jeder beliebigen Sprache eingeben. Das generierte Anschreiben wird automatisch in der Sprache erstellt, die Sie im Sprachauswahlmenü oben rechts ausgewählt haben (DE, RU oder EN).'
                 },
                 ru: {
-                    appTitle: 'Bewerbunganschreiben AI',
+                    appTitle: 'Мотивационное письмо AI',
                     themeToggle: 'Темный режим',
                     themeToggleLight: 'Светлый режим',
+                    serviceDescription: 'Этот сервис создает мотивационное письмо, релевантное вашему резюме и требованиям вакансии.',
                     reviewPrompt: 'Буду благодарен, если вы оставите несколько строк с вашими впечатлениями об этом сервисе',
                     submitReview: 'Оставить отзыв',
                     biographyLabel: 'Биография - Составьте свое резюме в свободном формате: ваши навыки, профессиональный опыт, образование:',
@@ -427,12 +450,16 @@
                     errorApiError: 'Произошла ошибка',
                     errorPdfGeneration: 'Ошибка генерации PDF',
                     errorPdfError: 'Ошибка при генерации PDF: ',
-                    alertFillLetter: 'Пожалуйста, сначала заполните письмо.'
+                    alertFillLetter: 'Пожалуйста, сначала заполните письмо.',
+                    helpTitle: 'Помощь',
+                    helpDescription: 'Этот сервис создает мотивационное письмо, релевантное вашему резюме и требованиям вакансии.',
+                    helpLanguageText: 'Вы можете вводить данные на любом языке. Сгенерированное письмо будет автоматически создано на том языке, который вы выбрали в меню выбора языка в правом верхнем углу (DE, RU или EN).'
                 },
                 en: {
-                    appTitle: 'Bewerbunganschreiben AI',
+                    appTitle: 'Cover Letter AI',
                     themeToggle: 'Dark Mode',
                     themeToggleLight: 'Light Mode',
+                    serviceDescription: 'This service creates a tailored cover letter that is relevant to your resume and the job requirements.',
                     reviewPrompt: 'I would be grateful if you could leave a few lines with your impressions of this service',
                     submitReview: 'Submit Review',
                     biographyLabel: 'Biography - Write your resume in a free format: your skills, work experience, education:',
@@ -460,7 +487,10 @@
                     errorApiError: 'An error occurred',
                     errorPdfGeneration: 'PDF generation failed',
                     errorPdfError: 'Error generating PDF: ',
-                    alertFillLetter: 'Please fill in the cover letter first.'
+                    alertFillLetter: 'Please fill in the cover letter first.',
+                    helpTitle: 'Help',
+                    helpDescription: 'This service creates a tailored cover letter that is relevant to your resume and the job requirements.',
+                    helpLanguageText: 'You can enter data in any language. The generated cover letter will be automatically created in the language you selected in the language selector menu in the top right corner (DE, RU or EN).'
                 }
             };
 
@@ -518,11 +548,20 @@
                 const currentLang = getCurrentLanguage();
                 languageSelector.value = currentLang;
                 applyTranslations(currentLang);
+                
+                // Load sample data for current language
+                if (window.loadSampleData) {
+                    window.loadSampleData(currentLang);
+                }
 
                 languageSelector.addEventListener('change', (e) => {
                     const newLang = e.target.value;
                     safeStoreValue(LANGUAGE_STORAGE_KEY, newLang);
                     applyTranslations(newLang);
+                    // Reload sample data when language changes
+                    if (window.loadSampleData) {
+                        window.loadSampleData(newLang);
+                    }
                 });
             }
 
@@ -654,28 +693,56 @@
         // Initialize progress bar
         const progressBar = new ProgressBar();
 
-        // Load sample data from separate files
-        async function loadSampleData() {
+        // Load sample data from separate files based on language
+        async function loadSampleData(lang) {
             try {
+                // Determine file suffix based on language (default to empty for German)
+                let suffix = '';
+                if (lang === 'en') {
+                    suffix = '_en';
+                } else if (lang === 'ru') {
+                    suffix = '_ru';
+                }
+                // For German (de), use default files without suffix
+                
                 // Fetch sample biography
-                const biographyResponse = await fetch('/sample_biography.txt');
-                const sampleBiography = await biographyResponse.text();
+                const biographyResponse = await fetch(`/sample_biography${suffix}.txt`);
+                if (!biographyResponse.ok) {
+                    // Fallback to default if language-specific file doesn't exist
+                    const fallbackResponse = await fetch('/sample_biography.txt');
+                    const sampleBiography = await fallbackResponse.text();
+                    document.getElementById('biographyTextarea').value = sampleBiography.trim();
+                } else {
+                    const sampleBiography = await biographyResponse.text();
+                    document.getElementById('biographyTextarea').value = sampleBiography.trim();
+                }
                 
                 // Fetch sample job posting
-                const jobPostingResponse = await fetch('/sample_job_posting.txt');
-                const sampleJobPosting = await jobPostingResponse.text();
-                
-                // Initialize form with sample data
-                document.getElementById('biographyTextarea').value = sampleBiography.trim();
-                document.getElementById('jobPostingTextarea').value = sampleJobPosting.trim();
+                const jobPostingResponse = await fetch(`/sample_job_posting${suffix}.txt`);
+                if (!jobPostingResponse.ok) {
+                    // Fallback to default if language-specific file doesn't exist
+                    const fallbackResponse = await fetch('/sample_job_posting.txt');
+                    const sampleJobPosting = await fallbackResponse.text();
+                    document.getElementById('jobPostingTextarea').value = sampleJobPosting.trim();
+                } else {
+                    const sampleJobPosting = await jobPostingResponse.text();
+                    document.getElementById('jobPostingTextarea').value = sampleJobPosting.trim();
+                }
             } catch (error) {
                 console.error('Error loading sample data:', error);
                 // If files fail to load, leave textareas empty
             }
         }
 
-        // Load sample data when page loads
-        loadSampleData();
+        // Export loadSampleData to window for use in language system
+        window.loadSampleData = loadSampleData;
+        
+        // Load sample data when page loads (after language system is initialized)
+        // Wait a bit to ensure language system is ready
+        setTimeout(() => {
+            const currentLang = window.i18n ? window.i18n.getCurrentLanguage() : 'de';
+            loadSampleData(currentLang);
+        }, 100);
 
         // Form submission handler
         document.getElementById('generateForm').addEventListener('submit', async function(e) {
@@ -745,6 +812,10 @@
                 if (wishesText) {
                     formData.append('wishes', wishesText);
                 }
+                // Add language parameter
+                const currentLanguage = window.i18n ? window.i18n.getCurrentLanguage() : 'de';
+                formData.append('language', currentLanguage);
+                console.log('Sending language parameter:', currentLanguage);
                 
                 // Update progress: Starting generation
                 progressBar.update(50);
