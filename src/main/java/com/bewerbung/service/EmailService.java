@@ -59,7 +59,14 @@ public class EmailService {
                     "Please create one at https://myaccount.google.com/apppasswords and update EMAIL_PASSWORD in variables.env", e);
             // Не пробрасываем исключение, чтобы не прерывать сохранение отзыва
         } catch (MailException e) {
-            logger.error("Failed to send review email to {}: {}", recipientEmail, e.getMessage(), e);
+            String errorMsg = e.getMessage();
+            if (errorMsg != null && (errorMsg.contains("timeout") || errorMsg.contains("Connect timed out") || errorMsg.contains("Couldn't connect"))) {
+                logger.error("Email connection failed - cannot reach SMTP server. " +
+                        "This might be due to network restrictions on production. " +
+                        "Try using port 465 with SSL (set EMAIL_PORT=465 and EMAIL_USE_SSL=true) or check firewall settings.", e);
+            } else {
+                logger.error("Failed to send review email to {}: {}", recipientEmail, errorMsg, e);
+            }
             // Не пробрасываем исключение, чтобы не прерывать сохранение отзыва
         } catch (Exception e) {
             logger.error("Unexpected error while sending review email to {}", recipientEmail, e);
