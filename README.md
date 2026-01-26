@@ -104,22 +104,46 @@ The application can be configured via `application.properties`:
 
 #### Email Configuration (for Review Notifications)
 
-To enable email notifications for reviews, set the following environment variables:
+The application uses HTTP API for email sending (no SMTP required!). Supported providers: **Brevo** (recommended), SendGrid, Mailgun.
+
+**Brevo Setup (Recommended - Free tier: 300 emails/day):**
+1. Sign up at https://www.brevo.com/
+2. Go to Settings > SMTP & API > API Keys
+3. Create a new API key
+4. Set environment variables:
 
 ```bash
-EMAIL_USERNAME=your-email@gmail.com
-EMAIL_PASSWORD=your-app-password  # For Gmail, use Application-Specific Password
-EMAIL_PORT=587                     # or 465 for SSL
-EMAIL_USE_SSL=false                # true for port 465
-EMAIL_USE_STARTTLS=true            # true for port 587
+EMAIL_API_PROVIDER=brevo
+EMAIL_API_KEY=your-brevo-api-key
+EMAIL_FROM_ADDRESS=your-email@example.com
+EMAIL_FROM_NAME=Bewerbung AI
 REVIEW_EMAIL_RECIPIENT=recipient@example.com
 REVIEW_EMAIL_ENABLED=true
 ```
 
-**Important for Production:**
-- If SMTP ports (587, 465) are blocked by firewall, set `REVIEW_EMAIL_ENABLED=false` to disable email sending
-- Gmail requires Application-Specific Password if 2FA is enabled (create at https://myaccount.google.com/apppasswords)
-- If connection timeouts occur, try port 465 with SSL: `EMAIL_PORT=465 EMAIL_USE_SSL=true EMAIL_USE_STARTTLS=false`
+**SendGrid Setup:**
+```bash
+EMAIL_API_PROVIDER=sendgrid
+EMAIL_API_KEY=your-sendgrid-api-key
+EMAIL_FROM_ADDRESS=your-email@example.com
+REVIEW_EMAIL_RECIPIENT=recipient@example.com
+```
+
+**Mailgun Setup:**
+```bash
+EMAIL_API_PROVIDER=mailgun
+EMAIL_API_KEY=your-mailgun-api-key
+EMAIL_MAILGUN_DOMAIN=your-domain.com
+EMAIL_FROM_ADDRESS=your-email@example.com
+REVIEW_EMAIL_RECIPIENT=recipient@example.com
+```
+
+**Advantages of HTTP API over SMTP:**
+- ✅ No SMTP ports required (works behind firewalls)
+- ✅ Better reliability with automatic retries
+- ✅ Better logging and error handling
+- ✅ No authentication issues
+- ✅ Works in all production environments
 
 ### Project Structure
 
@@ -259,22 +283,46 @@ mvn spring-boot:run
 
 #### Конфигурация Email (для уведомлений об отзывах)
 
-Для включения email-уведомлений об отзывах установите следующие переменные окружения:
+Приложение использует HTTP API для отправки email (SMTP не требуется!). Поддерживаемые провайдеры: **Brevo** (рекомендуется), SendGrid, Mailgun.
+
+**Настройка Brevo (Рекомендуется - Бесплатный тариф: 300 писем/день):**
+1. Зарегистрируйтесь на https://www.brevo.com/
+2. Перейдите в Settings > SMTP & API > API Keys
+3. Создайте новый API ключ
+4. Установите переменные окружения:
 
 ```bash
-EMAIL_USERNAME=your-email@gmail.com
-EMAIL_PASSWORD=your-app-password  # Для Gmail используйте пароль приложения
-EMAIL_PORT=587                     # или 465 для SSL
-EMAIL_USE_SSL=false                # true для порта 465
-EMAIL_USE_STARTTLS=true            # true для порта 587
-REVIEW_EMAIL_RECIPIENT=recipient@example.com
+EMAIL_API_PROVIDER=brevo
+EMAIL_API_KEY=ваш-brevo-api-ключ
+EMAIL_FROM_ADDRESS=ваш-email@example.com
+EMAIL_FROM_NAME=Bewerbung AI
+REVIEW_EMAIL_RECIPIENT=получатель@example.com
 REVIEW_EMAIL_ENABLED=true
 ```
 
-**Важно для продакшена:**
-- Если SMTP порты (587, 465) заблокированы файрволом, установите `REVIEW_EMAIL_ENABLED=false` для отключения отправки email
-- Gmail требует пароль приложения, если включена двухфакторная аутентификация (создайте на https://myaccount.google.com/apppasswords)
-- При таймаутах подключения попробуйте порт 465 с SSL: `EMAIL_PORT=465 EMAIL_USE_SSL=true EMAIL_USE_STARTTLS=false`
+**Настройка SendGrid:**
+```bash
+EMAIL_API_PROVIDER=sendgrid
+EMAIL_API_KEY=ваш-sendgrid-api-ключ
+EMAIL_FROM_ADDRESS=ваш-email@example.com
+REVIEW_EMAIL_RECIPIENT=получатель@example.com
+```
+
+**Настройка Mailgun:**
+```bash
+EMAIL_API_PROVIDER=mailgun
+EMAIL_API_KEY=ваш-mailgun-api-ключ
+EMAIL_MAILGUN_DOMAIN=ваш-домен.com
+EMAIL_FROM_ADDRESS=ваш-email@example.com
+REVIEW_EMAIL_RECIPIENT=получатель@example.com
+```
+
+**Преимущества HTTP API перед SMTP:**
+- ✅ Не требуются SMTP порты (работает за файрволом)
+- ✅ Лучшая надежность с автоматическими повторами
+- ✅ Лучшее логирование и обработка ошибок
+- ✅ Нет проблем с аутентификацией
+- ✅ Работает во всех продакшен окружениях
 
 ### Структура проекта
 
