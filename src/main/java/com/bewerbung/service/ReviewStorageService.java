@@ -27,17 +27,20 @@ public class ReviewStorageService {
 
     private final Gson gson;
     private final Object fileLock = new Object();
+    private final EmailService emailService;
 
-    public ReviewStorageService() {
+    public ReviewStorageService(EmailService emailService) {
         this.gson = new GsonBuilder().setPrettyPrinting().create();
+        this.emailService = emailService;
     }
 
-    public ReviewEntry saveReview(String review) {
+    public ReviewEntry saveReview(String review, String userInfo) {
         String trimmedReview = review == null ? "" : review.trim();
         if (trimmedReview.isEmpty()) {
             throw new IllegalArgumentException("Review must not be blank");
         }
-        ReviewEntry entry = new ReviewEntry(trimmedReview, Instant.now().toString());
+        String createdAt = Instant.now().toString();
+        ReviewEntry entry = new ReviewEntry(trimmedReview, createdAt);
 
         synchronized (fileLock) {
             ensureFileExists();
@@ -45,6 +48,9 @@ public class ReviewStorageService {
             reviews.add(entry);
             writeReviewsInternal(reviews);
         }
+
+        // Асинхронная отправка email (не блокирует ответ)
+        emailService.sendReviewEmail(trimmedReview, createdAt, userInfo);
 
         return entry;
     }

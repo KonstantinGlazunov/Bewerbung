@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 public class ReviewRequestDto {
     @NotBlank(message = "Review must not be blank")
     private String review;
+    
+    private String userInfo;
 
     public ReviewRequestDto() {
     }
@@ -19,6 +21,14 @@ public class ReviewRequestDto {
 
     public void setReview(String review) {
         this.review = review;
+    }
+    
+    public String getUserInfo() {
+        return userInfo;
+    }
+    
+    public void setUserInfo(String userInfo) {
+        this.userInfo = userInfo;
     }
 }
 

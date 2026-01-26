@@ -21,7 +21,7 @@ public class ReviewController {
 
     @PostMapping
     public ResponseEntity<ReviewEntry> createReview(@Valid @RequestBody ReviewRequestDto request) {
-        ReviewEntry saved = reviewStorageService.saveReview(request.getReview());
+        ReviewEntry saved = reviewStorageService.saveReview(request.getReview(), request.getUserInfo());
         return ResponseEntity.ok(saved);
     }
 }
