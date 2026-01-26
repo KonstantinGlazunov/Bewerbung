@@ -2,14 +2,13 @@ Betreff: Bewerbung als Java Softwareentwickler
 
 Sehr geehrte Damen und Herren,
 
-mit großem Interesse habe ich Ihre Stellenausschreibung für die Position als Java Softwareentwickler bei der Finanz Informatik GmbH & Co. KG gelesen. Mit einem abgeschlossenen Bachelor in Informatik und mehr als neun Jahren Erfahrung in der Softwareentwicklung, überwiegend in der Java-basierten Webentwicklung, bin ich überzeugt, die ideale Ergänzung für Ihr Team zu sein.
+mit großem Interesse habe ich die Stellenausschreibung für die Position des Java Softwareentwicklers bei der Finanz Informatik GmbH & Co. KG gelesen. Aufgrund meiner umfangreichen Erfahrung im Bereich der Java-Entwicklung sowie meiner technischen Kompetenz bin ich überzeugt, dass ich zu Ihrem Team einen wertvollen Beitrag leisten kann.
 
-Während meiner Tätigkeit bei Tech Solutions GmbH in Berlin habe ich an der Entwicklung von maßgeschneiderten Web-Anwendungen mit Java Spring Boot gearbeitet und war verantwortlich für die Backend-Entwicklung sowie die Optimierung von Datenbanken. Durch die agile Zusammenarbeit mit verschiedenen Teams konnte ich nicht nur meine technischen Fähigkeiten, sondern auch meine Team- und Kommunikationskompetenzen erheblich ausbauen.
+Ich habe einen Bachelor of Science in Informatik von der Technischen Universität Berlin und verfüge über mehr als sechs Jahre einschlägige Berufserfahrung in der Softwareentwicklung. In meiner aktuellen Position bei Tech Solutions GmbH bin ich verantwortlich für die Backend-Entwicklung von Web-Anwendungen mit Java Spring Boot, einschließlich der API-Design und Datenbankoptimierung. Diese Erfahrungen spiegeln die Anforderungen der ausgeschriebenen Stelle wider. Zudem verfüge ich über Kenntnisse in Tools wie Git und Maven, die ebenfalls in Ihrer Anzeige gefordert werden.
 
-Besonders reizt mich an der Aufgabe, bei der Finanz Informatik in innovative Softwarelösungen für den Bankenbereich mitzuwirken und sowohl an der architektonischen Konzeption als auch an der Projektumsetzung beteiligt zu sein. Meine fundierten Kenntnisse in Java, JavaScript, sowie dem Einsatz von Tools wie Maven und Git kann ich optimal einbringen, um qualitativ hochwertige Softwarelösungen zu entwickeln und die Performance bestehender Systeme zu optimieren.
+Besonders reizt mich an der Finanz Informatik GmbH & Co. KG die Verbindung von technologischer Innovation und Finanzsektor. Ihre Rolle als Treiber der Digitalisierung innerhalb der Sparkassen-Finanzgruppe bietet spannende Möglichkeiten zur Mitgestaltung zukunftsweisender Projekte. Meine strukturierte, zielorientierte Arbeitsweise sowie meine Freude an der Zusammenarbeit im Team passen hervorragend zu den Erwartungen, die Sie an Ihre zukünftigen Mitarbeiter stellen.
 
-Ich freue mich darauf, mich bei Ihnen persönlich vorzustellen und Sie davon zu überzeugen, dass ich mit meiner Erfahrung und meinem Engagement einen wertvollen Beitrag zu Ihrem Unternehmen leisten kann. Für ein Gespräch stehe ich Ihnen jederzeit gerne zur Verfügung.
+Ich freue mich darauf, meine Fähigkeiten und Kenntnisse in Ihrem Unternehmen einzusetzen und mehr über die Herausforderungen der Position zu erfahren. Für ein persönliches Gespräch stehe ich jederzeit gerne zur Verfügung.
 
-Mit freundlichen Grüßen  
+Mit freundlichen Grüßen   
 Max Mustermann
-

@@ -1,57 +1,57 @@
-Finanz Informatik GmbH & Co. KG логотип
-Java Разработчик программного обеспечения (м/ж/д)
+Finanz Informatik GmbH & Co. KG logo
+Java Softwareentwickler (m/w/d)
 Finanz Informatik GmbH & Co. KG
-Ганновер, Мюнстер, Франкфурт-на-Майне
-Постоянная занятость
-Возможна работа из дома, Полная занятость
-Опубликовано: 3 дня назад
-€52,000 - €79,000/год (оценка для полной занятости)
-Будьте одним из первых соискателей
-Finanz Informatik GmbH & Co. KG логотип
-Java Разработчик программного обеспечения (м/ж/д)
+Hannover, Münster, Frankfurt am Main
+Feste Anstellung
+Homeoffice möglich, Vollzeit
+Erschienen: vor 3 Tagen
+52.000€ - 79.000€/Jahr (geschätzt für Vollzeit)
+Sei einer der ersten Bewerber
+Finanz Informatik GmbH & Co. KG logo
+Java Softwareentwickler (m/w/d)
 Finanz Informatik GmbH & Co. KG
-Подходит ли мне эта работа?
-Проверьте перед подачей заявки, соответствуете ли вы требованиям.
+Passt dieser Job zu mir?
+Prüfe vor deiner Bewerbung, ob du die Voraussetzungen erfüllst.
 
-Менее подходит
-Отлично подходит
-слайд номер 1
-Как один из крупнейших поставщиков банковских IT-услуг и партнеров по цифровизации в Европе, мы являемся движущей силой цифровизации в рамках Sparkassen-Finanzgruppe. С более чем 5,000 сотрудниками в 3 локациях мы делаем современный цифровой банкинг мощным и разрабатываем умные финансовые сервисы для завтрашнего дня. При этом мы предлагаем широкий спектр задач, в которых индивидуальные сильные стороны могут быть отлично применены. Будь то разработка приложений, сетевые технологии и эксплуатация серверов или консультирование, обучение и поддержка – у нас каждый найдет свое призвание! Как специалист или универсал. Все с лучшими карьерными возможностями, большим пространством для личного развития и многочисленными преимуществами.
+Passt weniger
+Passt hervorragend
+slide number 1
+Als einer der größten Banken-IT-Dienstleister und Digitalisierungspartner Europas sind wir der Treiber der Digitalisierung innerhalb der Sparkassen-Finanzgruppe. Mit über 5.000 Mitarbeitenden an 3 Standorten machen wir digitales Banking von heute leistungsfähig und entwickeln smarte Finanz-Services von morgen. Dabei bieten wir ein breites Aufgabenspektrum, in dem die individuellen Stärken hervorragend eingebracht werden können. Ob App-Entwicklung, Netzwerktechnologien und Serverbetrieb oder Beratung, Schulung und Support – bei uns findet jede:r seine bzw. ihre Berufung! Als Spezialist:in oder auch als Generalist:in. Alles mit besten Karrierechancen, viel Raum für persönliche Entfaltung und zahlreichen Benefits.
 
-Для организационного подразделения Рамковые кредиты, Авали и Консорциальные, мы ищем на ближайшую возможную дату для локации Ганновер, Мюнстер или Франкфурт-на-Майне
+Für die Organisationseinheit Rahmenkredite, Avale & Konsortial, suchen wir zum nächstmöglichen Termin für den Standort Hannover, Münster oder Frankfurt am Main einen
 
-Java Разработчика программного обеспечения (м/ж/д).
+Java Softwareentwickler (m/w/d).
 
-Примечание: Команда находится исключительно в локации Ганновер.
+Hinweis: Das Team ist ausschließlich am Standort Hannover angesiedelt.
 
-#участвовать – что вас ждет:
-Инновационная разработка программного обеспечения: Архитектурная концепция и самостоятельная новая и дальнейшая разработка бизнес-процессов, сервисов и рабочих процессов на Java и JavaScript.
-Разнообразные проекты: Принятие ответственности и участие в сложных проектах от анализа через дизайн до реализации, тестирования, документирования и внедрения.
-Координация: Технический контакт (м/ж/д) для продуктовых менеджеров и руководителей, а также управление техническими темами в команде разработчиков.
-Техническая реализация: Тесное сотрудничество с банковскими продуктовыми менеджерами и реализация технических запросов на изменения.
-Обеспечение качества и оптимизация производительности: Концепция и реализация мер по обеспечению качества и оптимизации производительности.
-Поиск решений: Принятие на себя поддержки последнего уровня для наших разработанных компонентов и управление развертыванием программ.
-#принести – что мы ожидаем:
-Образование: Завершенное высшее образование в области информатики, бизнес-информатики или сопоставимое обучение (например, IT-специалист).
-Опыт: Мин. 6 лет соответствующего профессионального опыта и солидные знания в разработке программного обеспечения с Java и JavaScript.
-Технологии: Знание инструментов, таких как IntelliJ, Subversion, Git, Maven, Harvest, Guice или JUnit.
-Разработка фронтенда: Опыт работы с React и Material UI желателен.
-Стиль работы: Структурированный, целенаправленный и самостоятельный подход к задачам.
-Любознательность: Выраженная любознательность и настойчивость в изучении новых тем.
-Командный дух: Наслаждение работой в команде, надежность и приверженность, а также готовность к периодическим поездкам.
-Ваши преимущества в Finanz Informatik:
-Вы спрашиваете себя, почему вы должны работать в Finanz Informatik? У нас есть несколько хороших причин для вас. Помимо гибкого рабочего времени, льготных проездных билетов или возможности работать мобильно, мы предлагаем вам гораздо больше:
+#mitgestalten – was dich erwartet:
+Innovative Software-Entwicklung: Architekturelle Konzeption und eigenverantwortliche Neu- und Weiterentwicklung von Geschäftsprozessen, Services und Workflows in Java und JavaScript.
+Vielfältige Projekte: Verantwortungsübernahme und Mitarbeit in komplexen Projekten von der Analyse über Design bis hin zu Implementierung, Test, Dokumentation und Einführung.
+Koordination: Technischer Ansprechpartner (m/w/d) für Produktverantwortliche und Führungskräfte, sowie Steuerung der technischen Themen im Entwicklerteam. 
+Technische Implementierung: Enge Zusammenarbeit mit bankfachlichen Produktverantwortlichen und Implementierung von technischen Änderungswünschen.
+Qualitätssicherung & Performance-Optimierung: Konzeption und Durchführung von Maßnahmen zur Qualitätssicherung und Performance-Optimierung.
+Lösungsfinder: Übernahme des Last-Level-Supports für unsere entwickelten Komponenten und Management von Programmeinsätzen.
+#mitbringen – was wir erwarten:
+Background: Abgeschlossenes Studium der Informatik, Wirtschaftsinformatik oder vergleichbare Ausbildung (z.B. Fachinformatiker).
+Erfahrung: Mind. 6 Jahre fachbezogene Berufserfahrung und fundierte Kenntnisse in der Softwareentwicklung mit Java und JavaScript.
+Technologien: Kenntnisse in Tools wie IntelliJ, Subversion, Git, Maven, Harvest, Guice oder JUnit.
+Frontend-Entwicklung: Erfahrung mit React und Material UI ist wünschenswert.
+Arbeitsweise: Strukturierte, zielorientierte und eigenverantwortliche Herangehensweise an Aufgaben.
+Neugierde: Ausgeprägte Neugier und Ausdauer für neue Themen.
+Teamgeist: Freude an der Zusammenarbeit im Team, Zuverlässigkeit und Einsatzbereitschaft sowie Bereitschaft zu gelegentlichen Reisen.
+Ihre Benefits bei der Finanz Informatik:
+Sie fragen sich, warum Sie bei der Finanz Informatik arbeiten sollten? Wir hätten da ein paar gute Gründe für Sie. Neben flexiblen Arbeitszeiten, vergünstigten Jobtickets oder der Möglichkeit, mobil zu arbeiten, bieten wir Ihnen noch viel mehr:
 
-Пенсионное обеспечение
-Безбарьерная среда
-Корпоративный спорт
-Семейный сервис
-Корпоративные мероприятия
-Гибкое рабочее время
-Мобильная работа
-Проездной билет
-Столовая
-Коллективный договор
-Дополнительное обучение
-Спортивная поддержка
-У нас вас ждет привлекательная оплата на основе вашей квалификации, а также вашего соответствующего практического опыта.
+Altersvorsorge
+Barrierefrei
+Betriebssport
+Familienservice
+Firmenevents
+Flexible Arbeitszeiten
+Mobiles Arbeiten
+Jobticket
+Kantine
+Tarifvertrag
+Weiterbildung
+Fitnessförderung
+Bei uns erwartet Sie eine attraktive Vergütung basierend auf Ihrer Qualifikation sowie Ihrer relevanten, praktischen Erfahrung.
