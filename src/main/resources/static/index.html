@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bewerbung AI - Document Generator</title>
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://bewerbung-production.up.railway.app/">
+    <meta property="og:title" content="Bewerbung AI - Сервис для создания мотивационных писем">
+    <meta property="og:description" content="Если вы активно ищете работу и откликаетесь на большое количество вакансий, вы знаете, насколько утомительно каждый раз писать отдельное мотивационное письмо. Чтобы упростить этот процесс, я хочу порекомендовать сервис, который помогает значительно ускорить подготовку мотивационных писем под разные вакансии.">
+    <meta property="og:image" content="https://bewerbung-production.up.railway.app/author-photo.jpg">
     <!-- Tailwind CSS via CDN for the full UI styling -->
     <script>
         // Tailwind config: enable class-based dark mode for theme toggle
@@ -263,7 +269,7 @@
             </div>
             
             <div class="form-group space-y-2">
-                <label for="wishesTextarea" class="block text-sm font-medium text-slate-700 dark:text-slate-200" data-i18n="wishesLabel">Wünsche und Korrekturen - schreiben Sie Ihre Wünsche oder Korrekturen, wenn Sie mit dem Ergebnis nicht einverstanden sind (optional):</label>
+                <label for="wishesTextarea" class="block text-sm font-medium text-slate-700 dark:text-slate-200" data-i18n="wishesLabel">Möchten Sie etwas ändern oder ergänzen? Schreiben Sie hier — das hilft, das Dokument genauer zu machen (optional):</label>
                 <textarea id="wishesTextarea" name="wishes" class="min-h-[150px] w-full resize-y rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-blue-400 dark:focus:ring-blue-900"></textarea>
             </div>
             
@@ -306,10 +312,42 @@
             </div>
         </div>
 
+        <!-- Share section -->
+        <div class="mt-10 border-t border-slate-200 pt-6 text-center dark:border-slate-800">
+            <p class="text-sm text-slate-600 dark:text-slate-300 mb-4" data-i18n="sharePrompt">Если вам понравилось поделитесь этим сервисом с коллегами!</p>
+            <div class="flex justify-center gap-4">
+                <a id="whatsappShareMain" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-500 text-white hover:bg-green-600 transition-colors shadow-sm" data-i18n-title="whatsappShareTitle" title="Поделиться в WhatsApp">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                    </svg>
+                </a>
+                <a id="facebookShareMain" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-sm" data-i18n-title="facebookShareTitle" title="Поделиться в Facebook">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                </a>
+                <a id="linkedinShareMain" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-700 text-white hover:bg-blue-800 transition-colors shadow-sm" data-i18n-title="linkedinShareTitle" title="Поделиться в LinkedIn">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                    </svg>
+                </a>
+                <a id="telegramShareMain" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-400 text-white hover:bg-blue-500 transition-colors shadow-sm" data-i18n-title="telegramShareTitle" title="Поделиться в Telegram">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+
         <!-- Legal footer / privacy note -->
         <footer class="mt-10 border-t border-slate-200 pt-6 text-center text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
             <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200" data-i18n="privacyTitle">Datenschutz</h3>
             <p class="mt-2 leading-relaxed" data-i18n="privacyText">Wir speichern keine personenbezogenen Daten dauerhaft. Eingegebene Inhalte werden ausschließlich zur unmittelbaren Verarbeitung verwendet und nach Beendigung der Sitzung automatisch gelöscht. Die technische Bereitstellung erfolgt über Railway, die Verarbeitung bestimmter Inhalte über die OpenAI-API – jeweils gemäß den Anforderungen der DSGVO.</p>
+            <div class="mt-4 flex flex-col sm:flex-row justify-center items-center gap-4">
+                <a href="/datenschutz.html" class="text-blue-600 dark:text-blue-400 hover:underline" data-i18n="privacyLinkFooter">Datenschutzerklärung</a>
+                <span class="hidden sm:inline">|</span>
+                <a href="/impressum.html" class="text-blue-600 dark:text-blue-400 hover:underline" data-i18n="impressumLink">Impressum</a>
+            </div>
         </footer>
     </div>
 
@@ -390,7 +428,7 @@
                     submitReview: 'Bewertung abgeben',
                     biographyLabel: 'Biography - Verfassen Sie Ihren Lebenslauf in einem freien Format: Ihre Fähigkeiten, Berufserfahrung, Ausbildung:',
                     jobPostingLabel: 'Job Posting - kopieren Sie einfach den Text der Stellenanzeige hierher.:',
-                    wishesLabel: 'Wünsche und Korrekturen - schreiben Sie Ihre Wünsche oder Korrekturen, wenn Sie mit dem Ergebnis nicht einverstanden sind (optional):',
+                    wishesLabel: 'Möchten Sie etwas ändern oder ergänzen? Schreiben Sie hier — das hilft, das Dokument genauer zu machen (optional):',
                     generateButton: 'Dokumente erstellen',
                     progressInitializing: 'Initialisiere...',
                     progressReadingBiography: 'Lese Lebenslauf',
@@ -416,7 +454,16 @@
                     alertFillLetter: 'Bitte füllen Sie zuerst das Anschreiben aus.',
                     helpTitle: 'Hilfe',
                     helpDescription: 'Dieser Service erstellt ein maßgeschneidertes Bewerbungsanschreiben, das auf Ihr Lebenslauf und die Anforderungen der Stellenausschreibung abgestimmt ist.',
-                    helpLanguageText: 'Sie können Ihre Daten in jeder beliebigen Sprache eingeben. Das generierte Anschreiben wird automatisch in der Sprache erstellt, die Sie im Sprachauswahlmenü oben rechts ausgewählt haben (DE, RU oder EN).'
+                    helpLanguageText: 'Sie können Ihre Daten in jeder beliebigen Sprache eingeben. Das generierte Anschreiben wird automatisch in der Sprache erstellt, die Sie im Sprachauswahlmenü oben rechts ausgewählt haben (DE, RU oder EN).',
+                    sharePrompt: 'Wenn es Ihnen gefallen hat, teilen Sie diesen Service mit Kollegen!',
+                    privacyLinkFooter: 'Datenschutzerklärung',
+                    whatsappShareTitle: 'In WhatsApp teilen',
+                    facebookShareTitle: 'In Facebook teilen',
+                    linkedinShareTitle: 'In LinkedIn teilen',
+                    telegramShareTitle: 'In Telegram teilen',
+                    shareTextFull: 'Wenn Sie aktiv nach Arbeit suchen und sich auf viele Stellenangebote bewerben, wissen Sie, wie mühsam es ist, jedes Mal ein separates Motivationsschreiben zu verfassen.\n\nUm diesen Prozess zu vereinfachen, möchte ich einen Service empfehlen, der die Erstellung von Motivationsschreiben für verschiedene Stellenangebote erheblich beschleunigt. Dies spart Zeit und reduziert Routineaufgaben, insbesondere bei Massenbewerbungen.\n\nService:\n{url}\n\nWird nützlich sein für diejenigen, die aktiv nach Arbeit suchen und sich auf den Inhalt konzentrieren möchten, anstatt denselben Text endlos umzuschreiben.',
+                    shareTextShort: 'Wenn Sie aktiv nach Arbeit suchen und sich auf viele Stellenangebote bewerben, wissen Sie, wie mühsam es ist, jedes Mal ein separates Motivationsschreiben zu verfassen. Um diesen Prozess zu vereinfachen, möchte ich einen Service empfehlen, der die Erstellung von Motivationsschreiben für verschiedene Stellenangebote erheblich beschleunigt.',
+                    impressumLink: 'Impressum'
                 },
                 ru: {
                     appTitle: 'Мотивационное письмо AI',
@@ -427,7 +474,7 @@
                     submitReview: 'Оставить отзыв',
                     biographyLabel: 'Биография - Составьте свое резюме в свободном формате: ваши навыки, профессиональный опыт, образование:',
                     jobPostingLabel: 'Вакансия - просто скопируйте текст объявления о вакансии сюда.:',
-                    wishesLabel: 'Пожелания и исправления - напишите ваши пожелания или исправления, если вы не согласны с результатом (необязательно):',
+                    wishesLabel: 'Хотите что-то изменить или дополнить? Напишите здесь — это поможет сделать документ точнее (необязательно):',
                     generateButton: 'Создать документы',
                     progressInitializing: 'Инициализация...',
                     progressReadingBiography: 'Чтение резюме',
@@ -453,7 +500,16 @@
                     alertFillLetter: 'Пожалуйста, сначала заполните письмо.',
                     helpTitle: 'Помощь',
                     helpDescription: 'Этот сервис создает мотивационное письмо, релевантное вашему резюме и требованиям вакансии.',
-                    helpLanguageText: 'Вы можете вводить данные на любом языке. Сгенерированное письмо будет автоматически создано на том языке, который вы выбрали в меню выбора языка в правом верхнем углу (DE, RU или EN).'
+                    helpLanguageText: 'Вы можете вводить данные на любом языке. Сгенерированное письмо будет автоматически создано на том языке, который вы выбрали в меню выбора языка в правом верхнем углу (DE, RU или EN).',
+                    sharePrompt: 'Если вам понравилось поделитесь этим сервисом с коллегами!',
+                    privacyLinkFooter: 'Политика конфиденциальности',
+                    impressumLink: 'Выходные данные',
+                    whatsappShareTitle: 'Поделиться в WhatsApp',
+                    facebookShareTitle: 'Поделиться в Facebook',
+                    linkedinShareTitle: 'Поделиться в LinkedIn',
+                    telegramShareTitle: 'Поделиться в Telegram',
+                    shareTextFull: 'Если вы активно ищете работу и откликаетесь на большое количество вакансий, вы знаете, насколько утомительно каждый раз писать отдельное мотивационное письмо.\n\nЧтобы упростить этот процесс, я хочу порекомендовать сервис, который помогает значительно ускорить подготовку мотивационных писем под разные вакансии. Это экономит время и снижает рутину, особенно при массовых откликах.\n\nСервис:\n{url}\n\nБудет полезен тем, кто находится в активном поиске работы и хочет сосредоточиться на содержании, а не на бесконечном переписывании одного и того же текста.',
+                    shareTextShort: 'Если вы активно ищете работу и откликаетесь на большое количество вакансий, вы знаете, насколько утомительно каждый раз писать отдельное мотивационное письмо. Чтобы упростить этот процесс, я хочу порекомендовать сервис, который помогает значительно ускорить подготовку мотивационных писем под разные вакансии.'
                 },
                 en: {
                     appTitle: 'Cover Letter AI',
@@ -464,7 +520,7 @@
                     submitReview: 'Submit Review',
                     biographyLabel: 'Biography - Write your resume in a free format: your skills, work experience, education:',
                     jobPostingLabel: 'Job Posting - simply copy the job posting text here.:',
-                    wishesLabel: 'Wishes and Corrections - write your wishes or corrections if you are not satisfied with the result (optional):',
+                    wishesLabel: 'Want to change or add something? Write here — this will help make the document more accurate (optional):',
                     generateButton: 'Create Documents',
                     progressInitializing: 'Initializing...',
                     progressReadingBiography: 'Reading Biography',
@@ -490,7 +546,16 @@
                     alertFillLetter: 'Please fill in the cover letter first.',
                     helpTitle: 'Help',
                     helpDescription: 'This service creates a tailored cover letter that is relevant to your resume and the job requirements.',
-                    helpLanguageText: 'You can enter data in any language. The generated cover letter will be automatically created in the language you selected in the language selector menu in the top right corner (DE, RU or EN).'
+                    helpLanguageText: 'You can enter data in any language. The generated cover letter will be automatically created in the language you selected in the language selector menu in the top right corner (DE, RU or EN).',
+                    sharePrompt: 'If you liked it, please share this service with colleagues!',
+                    privacyLinkFooter: 'Privacy Policy',
+                    impressumLink: 'Imprint',
+                    whatsappShareTitle: 'Share on WhatsApp',
+                    facebookShareTitle: 'Share on Facebook',
+                    linkedinShareTitle: 'Share on LinkedIn',
+                    telegramShareTitle: 'Share on Telegram',
+                    shareTextFull: 'If you are actively looking for work and applying to a large number of job openings, you know how tedious it is to write a separate cover letter each time.\n\nTo simplify this process, I would like to recommend a service that helps significantly speed up the preparation of cover letters for different job openings. This saves time and reduces routine, especially when applying to multiple positions.\n\nService:\n{url}\n\nWill be useful for those who are actively looking for work and want to focus on content rather than endlessly rewriting the same text.',
+                    shareTextShort: 'If you are actively looking for work and applying to a large number of job openings, you know how tedious it is to write a separate cover letter each time. To simplify this process, I would like to recommend a service that helps significantly speed up the preparation of cover letters for different job openings.'
                 }
             };
 
@@ -527,9 +592,19 @@
                     const text = translate(key, lang);
                     if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
                         element.placeholder = text;
+                    } else if (key === 'sharePrompt') {
+                        element.textContent = text;
                     } else {
                         element.textContent = text;
                     }
+                });
+                
+                // Update title attributes for share buttons
+                const titleElements = document.querySelectorAll('[data-i18n-title]');
+                titleElements.forEach(element => {
+                    const key = element.getAttribute('data-i18n-title');
+                    const text = translate(key, lang);
+                    element.title = text;
                 });
 
                 // Update theme toggle text based on current theme
@@ -558,6 +633,10 @@
                     const newLang = e.target.value;
                     safeStoreValue(LANGUAGE_STORAGE_KEY, newLang);
                     applyTranslations(newLang);
+                    // Update share links when language changes
+                    if (typeof updateShareLinksMain === 'function') {
+                        updateShareLinksMain();
+                    }
                     // Reload sample data when language changes
                     if (window.loadSampleData) {
                         window.loadSampleData(newLang);
@@ -940,6 +1019,42 @@
                 downloadButton.textContent = window.i18n ? window.i18n.translate('downloadButton') : 'Herunterladen (PDF)';
             }
         });
+
+        // Setup share links
+        (function initShareLinks() {
+            const whatsappShare = document.getElementById('whatsappShareMain');
+            const facebookShare = document.getElementById('facebookShareMain');
+            const linkedinShare = document.getElementById('linkedinShareMain');
+            const telegramShare = document.getElementById('telegramShareMain');
+
+            if (!whatsappShare || !facebookShare || !linkedinShare || !telegramShare) {
+                return;
+            }
+
+            // Function to update share links based on current language
+            function updateShareLinksMain() {
+                const currentLang = window.i18n ? window.i18n.getCurrentLanguage() : 'ru';
+                const currentUrl = 'https://bewerbung-production.up.railway.app/';
+                
+                const shareTextFullTemplate = window.i18n ? window.i18n.translate('shareTextFull') : 'Если вы активно ищете работу и откликаетесь на большое количество вакансий, вы знаете, насколько утомительно каждый раз писать отдельное мотивационное письмо.\n\nЧтобы упростить этот процесс, я хочу порекомендовать сервис, который помогает значительно ускорить подготовку мотивационных писем под разные вакансии. Это экономит время и снижает рутину, особенно при массовых откликах.\n\nСервис:\n{url}\n\nБудет полезен тем, кто находится в активном поиске работы и хочет сосредоточиться на содержании, а не на бесконечном переписывании одного и того же текста.';
+                const shareTextFull = shareTextFullTemplate.replace('{url}', currentUrl);
+                const shareText = encodeURIComponent(shareTextFull);
+                
+                const shareTextShort = encodeURIComponent(window.i18n ? window.i18n.translate('shareTextShort') : 'Если вы активно ищете работу и откликаетесь на большое количество вакансий, вы знаете, насколько утомительно каждый раз писать отдельное мотивационное письмо. Чтобы упростить этот процесс, я хочу порекомендовать сервис, который помогает значительно ускорить подготовку мотивационных писем под разные вакансии.');
+
+                // Setup share links
+                if (whatsappShare) whatsappShare.href = `https://wa.me/?text=${shareText}`;
+                if (facebookShare) facebookShare.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}&quote=${shareTextShort}`;
+                if (linkedinShare) linkedinShare.href = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentUrl)}`;
+                if (telegramShare) telegramShare.href = `https://t.me/share/url?url=${encodeURIComponent(currentUrl)}&text=${shareTextShort}`;
+            }
+
+            // Initial setup
+            updateShareLinksMain();
+            
+            // Make function available globally for language change updates
+            window.updateShareLinksMain = updateShareLinksMain;
+        })();
     </script>
 </body>
 </html>
