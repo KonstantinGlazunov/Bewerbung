@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bewertungen - Bewerbung AI</title>
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://bewerbung-production.up.railway.app/">
+    <meta property="og:title" content="Bewerbung AI - Сервис для создания мотивационных писем">
+    <meta property="og:description" content="Если вы активно ищете работу и откликаетесь на большое количество вакансий, вы знаете, насколько утомительно каждый раз писать отдельное мотивационное письмо. Чтобы упростить этот процесс, я хочу порекомендовать сервис, который помогает значительно ускорить подготовку мотивационных писем под разные вакансии.">
+    <meta property="og:image" content="https://bewerbung-production.up.railway.app/author-photo.jpg">
     <script>
         window.tailwind = window.tailwind || {};
         window.tailwind.config = Object.assign(window.tailwind.config || {}, { darkMode: 'class' });
@@ -100,8 +106,7 @@
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-800 antialiased dark:bg-slate-900 dark:text-slate-100" style="font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;">
     <div class="container mx-auto max-w-3xl rounded-2xl bg-white px-6 py-8 shadow-sm ring-1 ring-slate-200 dark:bg-slate-950 dark:ring-slate-800 sm:px-10 sm:py-10">
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <h1 class="text-center text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100 sm:text-left sm:text-3xl" data-i18n="reviewsTitle">Bewertungen</h1>
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-end">
             <div class="flex items-center gap-2">
                 <select id="languageSelector" class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 appearance-none pr-8 cursor-pointer">
                     <option value="de">DE</option>
@@ -112,18 +117,70 @@
             </div>
         </div>
 
-        <p class="mt-5 text-sm text-slate-600 dark:text-slate-300" data-i18n="reviewPrompt">Ich wäre Ihnen dankbar, wenn Sie mir ein paar Zeilen mit Ihren Eindrücken zu diesem Service hinterlassen</p>
-
-        <form id="reviewForm" class="mt-6 space-y-5" action="#" method="post" novalidate>
-            <div class="space-y-2">
-                <label for="reviewText" class="block text-sm font-medium text-slate-700 dark:text-slate-200" data-i18n="reviewLabel">Eigentliche Bewertung</label>
-                <textarea id="reviewText" name="review" required class="min-h-[180px] w-full resize-y rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-blue-400 dark:focus:ring-blue-900"></textarea>
-                <p id="reviewError" class="hidden text-sm text-red-600 dark:text-red-300" data-i18n="reviewError">Bitte schreiben Sie eine Bewertung.</p>
+        <div id="reviewSection" class="mt-6">
+            <div class="flex items-center gap-4 mb-5">
+                <img id="authorPhoto" src="/author-photo.jpg" alt="Константин" class="w-16 h-16 rounded-full object-cover border-2 border-slate-200 dark:border-slate-700" onerror="this.style.display='none'">
+                <p class="text-sm text-slate-600 dark:text-slate-300" data-i18n="reviewPrompt">Друзья, черкните мне пару строк пожалуйста )))<br>Константин</p>
             </div>
 
-            <button type="submit" class="w-full rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:bg-blue-500 dark:hover:bg-blue-600" data-i18n="submitButton">Senden</button>
-            <p id="reviewSuccess" class="hidden text-sm text-emerald-600 dark:text-emerald-300" data-i18n="reviewSuccess">Danke! Ihre Bewertung wurde gesendet.</p>
-        </form>
+            <form id="reviewForm" class="space-y-5" action="#" method="post" novalidate>
+                <div class="space-y-2">
+                    <label for="reviewText" class="block text-sm font-medium text-slate-700 dark:text-slate-200" data-i18n="reviewLabel">Eigentliche Bewertung</label>
+                    <textarea id="reviewText" name="review" required class="min-h-[180px] w-full resize-y rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-blue-400 dark:focus:ring-blue-900"></textarea>
+                    <p id="reviewError" class="hidden text-sm text-red-600 dark:text-red-300" data-i18n="reviewError">Bitte schreiben Sie eine Bewertung.</p>
+                </div>
+
+                <button type="submit" class="w-full rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:bg-blue-500 dark:hover:bg-blue-600" data-i18n="submitButton">Senden</button>
+            </form>
+            <p class="mt-4 text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                <span data-i18n="privacyNotice"></span>
+                <a href="/datenschutz.html" class="text-blue-600 dark:text-blue-400 hover:underline" data-i18n="privacyLink">Datenschutzerklärung</a>
+            </p>
+        </div>
+
+        <div id="thankYouSection" class="hidden mt-6">
+            <div class="flex items-center gap-4 mb-5">
+                <img id="authorPhotoThankYou" src="/author-photo.jpg" alt="Константин" class="w-16 h-16 rounded-full object-cover border-2 border-slate-200 dark:border-slate-700" onerror="this.style.display='none'">
+                <div class="text-left">
+                    <p class="text-lg font-medium text-slate-900 dark:text-slate-100 mb-1" data-i18n="thankYouTitle">Спасибо!</p>
+                    <p class="text-lg font-medium text-slate-900 dark:text-slate-100" data-i18n="thankYouMessage">Ваш отзыв был отправлен.</p>
+                </div>
+            </div>
+            <div class="text-center">
+                <p class="text-sm text-slate-600 dark:text-slate-300 mb-6" data-i18n="sharePrompt">Если вам понравилось поделитесь этим сервисом с коллегами!</p>
+            <div class="flex justify-center gap-4">
+                <a id="whatsappShare" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-green-500 text-white hover:bg-green-600 transition-colors shadow-sm" data-i18n-title="whatsappShareTitle" title="Поделиться в WhatsApp">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                    </svg>
+                </a>
+                <a id="facebookShare" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-sm" data-i18n-title="facebookShareTitle" title="Поделиться в Facebook">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                </a>
+                <a id="linkedinShare" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-700 text-white hover:bg-blue-800 transition-colors shadow-sm" data-i18n-title="linkedinShareTitle" title="Поделиться в LinkedIn">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                    </svg>
+                </a>
+                <a id="telegramShare" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-400 text-white hover:bg-blue-500 transition-colors shadow-sm" data-i18n-title="telegramShareTitle" title="Поделиться в Telegram">
+                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                    </svg>
+                </a>
+            </div>
+            </div>
+        </div>
+
+        <!-- Legal footer -->
+        <footer class="mt-10 border-t border-slate-200 pt-6 text-center text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+                <a href="/datenschutz.html" class="text-blue-600 dark:text-blue-400 hover:underline" data-i18n="privacyLinkFooter">Datenschutzerklärung</a>
+                <span class="hidden sm:inline">|</span>
+                <a href="/impressum.html" class="text-blue-600 dark:text-blue-400 hover:underline" data-i18n="impressumLink">Impressum</a>
+            </div>
+        </footer>
     </div>
 
     <script>
@@ -186,32 +243,81 @@
                 de: {
                     reviewsTitle: 'Bewertungen',
                     backToHome: 'Zur Startseite',
-                    reviewPrompt: 'Ich wäre Ihnen dankbar, wenn Sie mir ein paar Zeilen mit Ihren Eindrücken zu diesem Service hinterlassen',
+                    reviewPrompt: 'Freunde, schreibt mir bitte ein paar Zeilen )))<br>Konstantin',
                     reviewLabel: 'Bewertung',
                     reviewError: 'Bitte schreiben Sie eine Bewertung.',
                     submitButton: 'Senden',
                     reviewSuccess: 'Danke! Ihre Bewertung wurde gesendet.',
-                    reviewErrorSubmit: 'Senden fehlgeschlagen. Bitte versuchen Sie es erneut.'
+                    reviewErrorSubmit: 'Senden fehlgeschlagen. Bitte versuchen Sie es erneut.',
+                    thankYouTitle: 'Danke!',
+                    thankYouMessage: 'Ihre Bewertung wurde gesendet.',
+                    sharePrompt: 'Wenn es Ihnen gefallen hat, teilen Sie diesen Service mit Kollegen!',
+                    privacyNotice: 'Durch das Absenden des Formulars werden die eingegebenen Daten per E-Mail an den Betreiber der Website übermittelt. ',
+                    privacyLink: 'Datenschutzerklärung',
+                    privacyLinkFooter: 'Datenschutzerklärung',
+                    impressumLink: 'Impressum',
+                    whatsappShareTitle: 'In WhatsApp teilen',
+                    facebookShareTitle: 'In Facebook teilen',
+                    linkedinShareTitle: 'In LinkedIn teilen',
+                    telegramShareTitle: 'In Telegram teilen',
+                    shareTextFull: 'Wenn Sie aktiv nach Arbeit suchen und sich auf viele Stellenangebote bewerben, wissen Sie, wie mühsam es ist, jedes Mal ein separates Motivationsschreiben zu verfassen.\n\nUm diesen Prozess zu vereinfachen, möchte ich einen Service empfehlen, der die Erstellung von Motivationsschreiben für verschiedene Stellenangebote erheblich beschleunigt. Dies spart Zeit und reduziert Routineaufgaben, insbesondere bei Massenbewerbungen.\n\nService:\n{url}\n\nWird nützlich sein für diejenigen, die aktiv nach Arbeit suchen und sich auf den Inhalt konzentrieren möchten, anstatt denselben Text endlos umzuschreiben.',
+                    shareTextShort: 'Wenn Sie aktiv nach Arbeit suchen und sich auf viele Stellenangebote bewerben, wissen Sie, wie mühsam es ist, jedes Mal ein separates Motivationsschreiben zu verfassen. Um diesen Prozess zu vereinfachen, möchte ich einen Service empfehlen, der die Erstellung von Motivationsschreiben für verschiedene Stellenangebote erheblich beschleunigt.'
                 },
                 ru: {
                     reviewsTitle: 'Отзывы',
                     backToHome: 'На главную',
-                    reviewPrompt: 'Буду благодарен, если вы оставите несколько строк с вашими впечатлениями об этом сервисе',
+                    reviewPrompt: 'Друзья, черкните мне пару строк пожалуйста )))<br>Константин',
                     reviewLabel: 'Отзыв',
                     reviewError: 'Пожалуйста, напишите отзыв.',
                     submitButton: 'Отправить',
                     reviewSuccess: 'Спасибо! Ваш отзыв был отправлен.',
-                    reviewErrorSubmit: 'Отправка не удалась. Пожалуйста, попробуйте еще раз.'
+                    reviewErrorSubmit: 'Отправка не удалась. Пожалуйста, попробуйте еще раз.',
+                    thankYouTitle: 'Спасибо!',
+                    thankYouMessage: 'Ваш отзыв был отправлен.',
+                    sharePrompt: 'Если вам понравилось поделитесь этим сервисом с коллегами!',
+                    privacyNotice: 'При отправке формы введенные данные передаются по электронной почте владельцу веб-сайта. ',
+                    privacyLink: 'Политика конфиденциальности',
+                    privacyLinkFooter: 'Политика конфиденциальности',
+                    impressumLink: 'Выходные данные',
+                    whatsappShareTitle: 'Поделиться в WhatsApp',
+                    facebookShareTitle: 'Поделиться в Facebook',
+                    linkedinShareTitle: 'Поделиться в LinkedIn',
+                    telegramShareTitle: 'Поделиться в Telegram',
+                    shareTextFull: 'Если вы активно ищете работу и откликаетесь на большое количество вакансий, вы знаете, насколько утомительно каждый раз писать отдельное мотивационное письмо.\n\nЧтобы упростить этот процесс, я хочу порекомендовать сервис, который помогает значительно ускорить подготовку мотивационных писем под разные вакансии. Это экономит время и снижает рутину, особенно при массовых откликах.\n\nСервис:\n{url}\n\nБудет полезен тем, кто находится в активном поиске работы и хочет сосредоточиться на содержании, а не на бесконечном переписывании одного и того же текста.',
+                    shareTextShort: 'Если вы активно ищете работу и откликаетесь на большое количество вакансий, вы знаете, насколько утомительно каждый раз писать отдельное мотивационное письмо. Чтобы упростить этот процесс, я хочу порекомендовать сервис, который помогает значительно ускорить подготовку мотивационных писем под разные вакансии.'
                 },
                 en: {
                     reviewsTitle: 'Reviews',
                     backToHome: 'Back to Home',
-                    reviewPrompt: 'I would be grateful if you could leave a few lines with your impressions of this service',
+                    reviewPrompt: 'Friends, please write me a few lines )))<br>Konstantin',
                     reviewLabel: 'Review',
                     reviewError: 'Please write a review.',
                     submitButton: 'Submit',
                     reviewSuccess: 'Thank you! Your review has been sent.',
-                    reviewErrorSubmit: 'Submission failed. Please try again.'
+                    reviewErrorSubmit: 'Submission failed. Please try again.',
+                    thankYouTitle: 'Thank you!',
+                    thankYouMessage: 'Your review has been sent.',
+                    sharePrompt: 'If you liked it, please share this service with colleagues!',
+                    privacyNotice: 'By submitting the form, the entered data will be transmitted via email to the website operator. ',
+                    privacyLink: 'Privacy Policy',
+                    privacyLinkFooter: 'Privacy Policy',
+                    impressumLink: 'Imprint',
+                    whatsappShareTitle: 'Share on WhatsApp',
+                    facebookShareTitle: 'Share on Facebook',
+                    linkedinShareTitle: 'Share on LinkedIn',
+                    telegramShareTitle: 'Share on Telegram',
+                    shareTextFull: 'If you are actively looking for work and applying to a large number of job openings, you know how tedious it is to write a separate cover letter each time.\n\nTo simplify this process, I would like to recommend a service that helps significantly speed up the preparation of cover letters for different job openings. This saves time and reduces routine, especially when applying to multiple positions.\n\nService:\n{url}\n\nWill be useful for those who are actively looking for work and want to focus on content rather than endlessly rewriting the same text.',
+                    shareTextShort: 'If you are actively looking for work and applying to a large number of job openings, you know how tedious it is to write a separate cover letter each time. To simplify this process, I would like to recommend a service that helps significantly speed up the preparation of cover letters for different job openings.'
+                },
+                privacyNotice: {
+                    de: 'Durch das Absenden des Formulars werden die eingegebenen Daten per E-Mail an den Betreiber der Website übermittelt. ',
+                    ru: 'При отправке формы введенные данные передаются по электронной почте владельцу веб-сайта. ',
+                    en: 'By submitting the form, the entered data will be transmitted via email to the website operator. '
+                },
+                privacyLink: {
+                    de: 'Datenschutzerklärung',
+                    ru: 'Политика конфиденциальности',
+                    en: 'Privacy Policy'
                 }
             };
 
@@ -248,9 +354,19 @@
                     const text = translate(key, lang);
                     if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
                         element.placeholder = text;
+                    } else if (key === 'reviewPrompt' || key === 'thankYouMessage' || key === 'sharePrompt') {
+                        element.innerHTML = text;
                     } else {
                         element.textContent = text;
                     }
+                });
+                
+                // Update title attributes for share buttons
+                const titleElements = document.querySelectorAll('[data-i18n-title]');
+                titleElements.forEach(element => {
+                    const key = element.getAttribute('data-i18n-title');
+                    const text = translate(key, lang);
+                    element.title = text;
                 });
             }
 
@@ -265,6 +381,10 @@
                     const newLang = e.target.value;
                     safeStoreValue(LANGUAGE_STORAGE_KEY, newLang);
                     applyTranslations(newLang);
+                    // Update share links when language changes
+                    if (typeof updateShareLinks === 'function') {
+                        updateShareLinks();
+                    }
                 });
             }
 
@@ -278,7 +398,33 @@
         const reviewForm = document.getElementById('reviewForm');
         const reviewText = document.getElementById('reviewText');
         const reviewError = document.getElementById('reviewError');
-        const reviewSuccess = document.getElementById('reviewSuccess');
+        const reviewSection = document.getElementById('reviewSection');
+        const thankYouSection = document.getElementById('thankYouSection');
+        const whatsappShare = document.getElementById('whatsappShare');
+        const facebookShare = document.getElementById('facebookShare');
+        const linkedinShare = document.getElementById('linkedinShare');
+        const telegramShare = document.getElementById('telegramShare');
+
+        // Function to update share links based on current language
+        function updateShareLinks() {
+            const currentLang = window.i18n ? window.i18n.getCurrentLanguage() : 'ru';
+            const currentUrl = 'https://bewerbung-production.up.railway.app/';
+            
+            const shareTextFullTemplate = window.i18n ? window.i18n.translate('shareTextFull') : 'Если вы активно ищете работу и откликаетесь на большое количество вакансий, вы знаете, насколько утомительно каждый раз писать отдельное мотивационное письмо.\n\nЧтобы упростить этот процесс, я хочу порекомендовать сервис, который помогает значительно ускорить подготовку мотивационных писем под разные вакансии. Это экономит время и снижает рутину, особенно при массовых откликах.\n\nСервис:\n{url}\n\nБудет полезен тем, кто находится в активном поиске работы и хочет сосредоточиться на содержании, а не на бесконечном переписывании одного и того же текста.';
+            const shareTextFull = shareTextFullTemplate.replace('{url}', currentUrl);
+            const shareText = encodeURIComponent(shareTextFull);
+            
+            const shareTextShort = encodeURIComponent(window.i18n ? window.i18n.translate('shareTextShort') : 'Если вы активно ищете работу и откликаетесь на большое количество вакансий, вы знаете, насколько утомительно каждый раз писать отдельное мотивационное письмо. Чтобы упростить этот процесс, я хочу порекомендовать сервис, который помогает значительно ускорить подготовку мотивационных писем под разные вакансии.');
+
+            // Setup share links
+            if (whatsappShare) whatsappShare.href = `https://wa.me/?text=${shareText}`;
+            if (facebookShare) facebookShare.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}&quote=${shareTextShort}`;
+            if (linkedinShare) linkedinShare.href = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(currentUrl)}`;
+            if (telegramShare) telegramShare.href = `https://t.me/share/url?url=${encodeURIComponent(currentUrl)}&text=${shareTextShort}`;
+        }
+
+        // Initial setup
+        updateShareLinks();
 
         reviewForm.addEventListener('submit', async (event) => {
             event.preventDefault();
@@ -286,13 +432,11 @@
             if (!trimmedReview) {
                 reviewError.textContent = window.i18n ? window.i18n.translate('reviewError') : 'Bitte schreiben Sie eine Bewertung.';
                 reviewError.classList.remove('hidden');
-                reviewSuccess.classList.add('hidden');
                 reviewText.focus();
                 return;
             }
 
             reviewError.classList.add('hidden');
-            reviewSuccess.classList.add('hidden');
 
             const payload = {
                 review: trimmedReview
@@ -311,8 +455,9 @@
                     throw new Error('Request failed');
                 }
 
-                reviewSuccess.classList.remove('hidden');
-                reviewForm.reset();
+                // Hide review section and show thank you section
+                reviewSection.classList.add('hidden');
+                thankYouSection.classList.remove('hidden');
             } catch (error) {
                 reviewError.textContent = window.i18n ? window.i18n.translate('reviewErrorSubmit') : 'Senden fehlgeschlagen. Bitte versuchen Sie es erneut.';
                 reviewError.classList.remove('hidden');
