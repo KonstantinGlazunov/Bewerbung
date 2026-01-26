@@ -1,12 +1,15 @@
-Халло,
+Betreff: Bewerbung als Java Softwareentwickler
 
-Меня зовут Макс Мустерманн, и я заинтересован в позиции Java Разработчика программного обеспечения в Finanz Informatik GmbH & Co. KG. Ваше объявление привлекло мое внимание, так как я обладаю более чем 6-летним опытом разработки программного обеспечения с использованием Java и JavaScript, а также обучением в области информатики.
+Sehr geehrte Damen und Herren,
 
-На протяжении своей профессиональной карьеры я работаю над разработкой веб-приложений, используя Java и Spring Boot, в таких компаниях, как Tech Solutions GmbH и Startup Innovations AG. Я развивал бэкенд-системы, проектировал API и оптимизировал базы данных, руководствуясь принципами agile-разработки. Мой опыт работы с Java, Git и Maven соответствует требованиям вашей вакансии. Также я сертифицирован как Oracle Certified Professional, Java SE 11 Developer, что подтверждает мои навыки в области Java разработки.
+mit großem Interesse habe ich Ihre Stellenausschreibung für die Position als Java Softwareentwickler bei der Finanz Informatik GmbH & Co. KG gelesen. Mit einem abgeschlossenen Bachelor in Informatik und mehr als neun Jahren Erfahrung in der Softwareentwicklung, überwiegend in der Java-basierten Webentwicklung, bin ich überzeugt, die ideale Ergänzung für Ihr Team zu sein.
 
-Работа в вашей компании привлекает меня возможностью участвовать в инновационной разработке программного обеспечения и решать сложные задачи в кооперации с командой. Я восхищен возможностями личного и профессионального развития, которые предлагает ваша компания, и хочу внести свой вклад в ваш успешный и динамичный коллектив.
+Während meiner Tätigkeit bei Tech Solutions GmbH in Berlin habe ich an der Entwicklung von maßgeschneiderten Web-Anwendungen mit Java Spring Boot gearbeitet und war verantwortlich für die Backend-Entwicklung sowie die Optimierung von Datenbanken. Durch die agile Zusammenarbeit mit verschiedenen Teams konnte ich nicht nur meine technischen Fähigkeiten, sondern auch meine Team- und Kommunikationskompetenzen erheblich ausbauen.
 
-Я был бы рад подробнее обсудить, как могу быть полезен вашей команде. Буду признателен за возможность встречи или телефонного разговора для обсуждения моих квалификаций.
+Besonders reizt mich an der Aufgabe, bei der Finanz Informatik in innovative Softwarelösungen für den Bankenbereich mitzuwirken und sowohl an der architektonischen Konzeption als auch an der Projektumsetzung beteiligt zu sein. Meine fundierten Kenntnisse in Java, JavaScript, sowie dem Einsatz von Tools wie Maven und Git kann ich optimal einbringen, um qualitativ hochwertige Softwarelösungen zu entwickeln und die Performance bestehender Systeme zu optimieren.
 
-С уважением,  
-Макс Мустерманн
+Ich freue mich darauf, mich bei Ihnen persönlich vorzustellen und Sie davon zu überzeugen, dass ich mit meiner Erfahrung und meinem Engagement einen wertvollen Beitrag zu Ihrem Unternehmen leisten kann. Für ein Gespräch stehe ich Ihnen jederzeit gerne zur Verfügung.
+
+Mit freundlichen Grüßen  
+Max Mustermann
+

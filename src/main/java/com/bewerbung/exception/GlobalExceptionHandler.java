@@ -12,6 +12,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.multipart.MultipartException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.stream.Collectors;
 
@@ -63,6 +64,15 @@ public class GlobalExceptionHandler {
         
         ApiError apiError = new ApiError("INVALID_ARGUMENT", ex.getMessage());
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(apiError);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Void> handleNoResourceFoundException(NoResourceFoundException ex) {
+        // Ignore favicon.ico and other missing static resources - don't log as error
+        if (!ex.getResourcePath().equals("/favicon.ico")) {
+            logger.debug("Resource not found: {}", ex.getResourcePath());
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @ExceptionHandler(RuntimeException.class)

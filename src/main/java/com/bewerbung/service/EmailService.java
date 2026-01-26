@@ -1,0 +1,70 @@
+package com.bewerbung.service;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailAuthenticationException;
+import org.springframework.mail.MailException;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Service;
+
+@Service
+public class EmailService {
+    private static final Logger logger = LoggerFactory.getLogger(EmailService.class);
+    
+    @Value("${spring.mail.username:100polok2018@gmail.com}")
+    private String fromEmail;
+    
+    @Value("${review.email.recipient:kglaz@ya.ru}")
+    private String recipientEmail;
+    
+    private final JavaMailSender mailSender;
+    
+    @Autowired
+    public EmailService(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+        logger.info("EmailService initialized. From: {}, To: {}", fromEmail, recipientEmail);
+    }
+    
+    @Async("taskExecutor")
+    public void sendReviewEmail(String reviewText, String createdAt, String userInfo) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom(fromEmail);
+            message.setTo(recipientEmail);
+            message.setSubject("Новый отзыв на Bewerbung AI");
+            
+            StringBuilder emailBody = new StringBuilder();
+            emailBody.append("Получен новый отзыв:\n\n");
+            emailBody.append("Отзыв:\n");
+            emailBody.append(reviewText);
+            emailBody.append("\n\n");
+            emailBody.append("Дата создания: ").append(createdAt);
+            
+            if (userInfo != null && !userInfo.trim().isEmpty()) {
+                emailBody.append("\n\n");
+                emailBody.append("Информация о пользователе:\n");
+                emailBody.append(userInfo);
+            }
+            
+            message.setText(emailBody.toString());
+            
+            mailSender.send(message);
+            logger.info("Review email sent successfully to {}", recipientEmail);
+        } catch (MailAuthenticationException e) {
+            logger.error("Email authentication failed. Gmail requires an Application-Specific Password. " +
+                    "Please create one at https://myaccount.google.com/apppasswords and update EMAIL_PASSWORD in variables.env", e);
+            // Не пробрасываем исключение, чтобы не прерывать сохранение отзыва
+        } catch (MailException e) {
+            logger.error("Failed to send review email to {}: {}", recipientEmail, e.getMessage(), e);
+            // Не пробрасываем исключение, чтобы не прерывать сохранение отзыва
+        } catch (Exception e) {
+            logger.error("Unexpected error while sending review email to {}", recipientEmail, e);
+            // Не пробрасываем исключение, чтобы не прерывать сохранение отзыва
+        }
+    }
+}
+
