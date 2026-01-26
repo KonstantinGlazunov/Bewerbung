@@ -102,6 +102,25 @@ The application can be configured via `application.properties`:
 - `openai.model.heavy`: Model for document generation (default: `gpt-4o`)
 - `server.port`: Server port (default: 8080)
 
+#### Email Configuration (for Review Notifications)
+
+To enable email notifications for reviews, set the following environment variables:
+
+```bash
+EMAIL_USERNAME=your-email@gmail.com
+EMAIL_PASSWORD=your-app-password  # For Gmail, use Application-Specific Password
+EMAIL_PORT=587                     # or 465 for SSL
+EMAIL_USE_SSL=false                # true for port 465
+EMAIL_USE_STARTTLS=true            # true for port 587
+REVIEW_EMAIL_RECIPIENT=recipient@example.com
+REVIEW_EMAIL_ENABLED=true
+```
+
+**Important for Production:**
+- If SMTP ports (587, 465) are blocked by firewall, set `REVIEW_EMAIL_ENABLED=false` to disable email sending
+- Gmail requires Application-Specific Password if 2FA is enabled (create at https://myaccount.google.com/apppasswords)
+- If connection timeouts occur, try port 465 with SSL: `EMAIL_PORT=465 EMAIL_USE_SSL=true EMAIL_USE_STARTTLS=false`
+
 ### Project Structure
 
 ```
@@ -237,6 +256,25 @@ mvn spring-boot:run
 - `openai.model.light`: Модель для задач анализа (по умолчанию: `gpt-4o-mini`)
 - `openai.model.heavy`: Модель для генерации документов (по умолчанию: `gpt-4o`)
 - `server.port`: Порт сервера (по умолчанию: 8080)
+
+#### Конфигурация Email (для уведомлений об отзывах)
+
+Для включения email-уведомлений об отзывах установите следующие переменные окружения:
+
+```bash
+EMAIL_USERNAME=your-email@gmail.com
+EMAIL_PASSWORD=your-app-password  # Для Gmail используйте пароль приложения
+EMAIL_PORT=587                     # или 465 для SSL
+EMAIL_USE_SSL=false                # true для порта 465
+EMAIL_USE_STARTTLS=true            # true для порта 587
+REVIEW_EMAIL_RECIPIENT=recipient@example.com
+REVIEW_EMAIL_ENABLED=true
+```
+
+**Важно для продакшена:**
+- Если SMTP порты (587, 465) заблокированы файрволом, установите `REVIEW_EMAIL_ENABLED=false` для отключения отправки email
+- Gmail требует пароль приложения, если включена двухфакторная аутентификация (создайте на https://myaccount.google.com/apppasswords)
+- При таймаутах подключения попробуйте порт 465 с SSL: `EMAIL_PORT=465 EMAIL_USE_SSL=true EMAIL_USE_STARTTLS=false`
 
 ### Структура проекта
 

@@ -21,16 +21,36 @@ public class EmailService {
     @Value("${review.email.recipient:kglaz@ya.ru}")
     private String recipientEmail;
     
+    @Value("${review.email.enabled:true}")
+    private boolean emailEnabled;
+    
     private final JavaMailSender mailSender;
     
     @Autowired
     public EmailService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
-        logger.info("EmailService initialized. From: {}, To: {}", fromEmail, recipientEmail);
+        if (fromEmail == null || recipientEmail == null) {
+            logger.warn("Email configuration incomplete! From: {}, To: {}. " +
+                    "Set EMAIL_USERNAME and review.email.recipient environment variables. " +
+                    "Email sending will be disabled.", fromEmail, recipientEmail);
+            this.emailEnabled = false;
+        } else {
+            logger.info("EmailService initialized. From: {}, To: {}, Enabled: {}", fromEmail, recipientEmail, emailEnabled);
+        }
     }
     
     @Async("taskExecutor")
     public void sendReviewEmail(String reviewText, String createdAt, String userInfo) {
+        if (!emailEnabled) {
+            logger.debug("Email sending is disabled. Skipping email notification.");
+            return;
+        }
+        
+        if (fromEmail == null || recipientEmail == null) {
+            logger.warn("Cannot send email - email configuration is incomplete. From: {}, To: {}", fromEmail, recipientEmail);
+            return;
+        }
+        
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromEmail);
