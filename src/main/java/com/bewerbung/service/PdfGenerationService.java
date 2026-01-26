@@ -37,7 +37,7 @@ public class PdfGenerationService {
     private static final float LINE_HEIGHT = 13.5f; // Single line spacing (1.15 * font size)
     
     /**
-     * Gets a font that supports UTF-8 characters (German umlauts)
+     * Gets a font that supports UTF-8 characters (German umlauts, Cyrillic, etc.)
      * Falls back to Helvetica if no UTF-8 font is available
      */
     private static PDFont getUtf8Font(PDDocument document) throws IOException {
@@ -48,6 +48,8 @@ public class PdfGenerationService {
                 "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
                 "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
                 "/usr/share/fonts/truetype/arial.ttf",
+                "/usr/share/fonts/TTF/DejaVuSans.ttf",
+                "/usr/share/fonts/TTF/LiberationSans-Regular.ttf",
                 "/System/Library/Fonts/Helvetica.ttc",
                 "C:/Windows/Fonts/arial.ttf"
             };
@@ -55,32 +57,46 @@ public class PdfGenerationService {
             for (String fontPath : fontPaths) {
                 try {
                     java.io.File fontFile = new java.io.File(fontPath);
-                    if (fontFile.exists()) {
+                    if (fontFile.exists() && fontFile.canRead()) {
                         logger.info("Loading UTF-8 font from: {}", fontPath);
-                        return PDType0Font.load(document, fontFile);
+                        PDFont font = PDType0Font.load(document, fontFile);
+                        // Test if font can handle a test character
+                        try {
+                            font.getStringWidth("Test äöü");
+                            logger.info("UTF-8 font loaded successfully from: {}", fontPath);
+                            return font;
+                        } catch (Exception e) {
+                            logger.warn("Font from {} doesn't support UTF-8, trying next", fontPath);
+                            continue;
+                        }
                     }
                 } catch (Exception e) {
                     // Try next font
+                    logger.debug("Could not load font from {}: {}", fontPath, e.getMessage());
                     continue;
                 }
             }
             
             // Fallback: Use built-in font and handle encoding manually
-            logger.warn("No UTF-8 font found, using Helvetica with character replacement");
+            logger.warn("No UTF-8 font found in system paths, using Helvetica with character replacement");
+            logger.warn("All non-ASCII characters (German umlauts, Cyrillic, etc.) will be replaced");
             return new PDType1Font(Standard14Fonts.FontName.HELVETICA);
         } catch (Exception e) {
-            logger.warn("Error loading UTF-8 font, falling back to Helvetica", e);
+            logger.warn("Error loading UTF-8 font, falling back to Helvetica: {}", e.getMessage());
             return new PDType1Font(Standard14Fonts.FontName.HELVETICA);
         }
     }
     
     /**
-     * Encodes text to handle German umlauts for Type1 fonts
-     * Replaces unsupported characters with ASCII equivalents
+     * Encodes text to handle special characters for Type1 fonts
+     * Replaces unsupported characters (German umlauts, Cyrillic, etc.) with ASCII equivalents
      */
     private static String encodeTextForType1Font(String text) {
         if (text == null) return "";
-        return text
+        String result = text;
+        
+        // German umlauts
+        result = result
             .replace("ä", "ae")
             .replace("ö", "oe")
             .replace("ü", "ue")
@@ -89,6 +105,40 @@ public class PdfGenerationService {
             .replace("Ü", "Ue")
             .replace("ß", "ss")
             .replace("ẞ", "SS");
+        
+        // Remove or replace Cyrillic and other non-ASCII characters
+        // Replace with question marks or remove them
+        StringBuilder sb = new StringBuilder();
+        for (char c : result.toCharArray()) {
+            if (c <= 127) { // ASCII range
+                sb.append(c);
+            } else {
+                // Replace non-ASCII with '?' or remove
+                sb.append('?');
+            }
+        }
+        
+        return sb.toString();
+    }
+    
+    /**
+     * Safely gets string width, handling encoding errors
+     */
+    private static float getStringWidthSafe(PDFont font, String text, boolean isUtf8Font) throws IOException {
+        try {
+            String displayText = isUtf8Font ? text : encodeTextForType1Font(text);
+            return font.getStringWidth(displayText) / 1000f;
+        } catch (IllegalArgumentException e) {
+            // If UTF-8 font fails, try with encoded text
+            String encodedText = encodeTextForType1Font(text);
+            try {
+                return font.getStringWidth(encodedText) / 1000f;
+            } catch (IllegalArgumentException e2) {
+                // Last resort: estimate width based on character count
+                logger.warn("Could not calculate string width for text, using estimation: {}", e2.getMessage());
+                return encodedText.length() * 6f; // Rough estimate: ~6 points per character
+            }
+        }
     }
 
     /**
@@ -113,6 +163,11 @@ public class PdfGenerationService {
             PDFont font = getUtf8Font(document);
             boolean isUtf8Font = font instanceof PDType0Font;
             
+            // If no UTF-8 font found, force encoding for all text
+            if (!isUtf8Font) {
+                logger.info("No UTF-8 font available, will encode all text for Type1 font compatibility");
+            }
+            
             try (PDPageContentStream contentStream = new PDPageContentStream(document, page)) {
                 float yPosition = pageHeight - MARGIN_TOP;
                 
@@ -129,7 +184,7 @@ public class PdfGenerationService {
                 // Draw date (right aligned)
                 String date = LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
                 String dateText = isUtf8Font ? date : encodeTextForType1Font(date);
-                float dateWidth = font.getStringWidth(dateText) / 1000f * FONT_SIZE;
+                float dateWidth = getStringWidthSafe(font, date, isUtf8Font) * FONT_SIZE;
                 try {
                     contentStream.beginText();
                     contentStream.setFont(font, FONT_SIZE);
@@ -246,7 +301,7 @@ public class PdfGenerationService {
             if (line.trim().isEmpty()) continue;
             
             String text = isUtf8Font ? line.trim() : encodeTextForType1Font(line.trim());
-            float textWidth = font.getStringWidth(text) / 1000f * FONT_SIZE;
+            float textWidth = getStringWidthSafe(font, line.trim(), isUtf8Font) * FONT_SIZE;
             try {
                 contentStream.beginText();
                 contentStream.setFont(font, FONT_SIZE);
@@ -333,8 +388,7 @@ public class PdfGenerationService {
         
         for (String word : words) {
             String testLine = currentLine.length() == 0 ? word : currentLine + " " + word;
-            String testText = isUtf8Font ? testLine : encodeTextForType1Font(testLine);
-            float width = font.getStringWidth(testText) / 1000f * fontSize;
+            float width = getStringWidthSafe(font, testLine, isUtf8Font) * fontSize;
             
             if (width > maxWidth && currentLine.length() > 0) {
                 lines.add(currentLine.toString());
