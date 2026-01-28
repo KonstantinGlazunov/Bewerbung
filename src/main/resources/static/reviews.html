@@ -464,7 +464,7 @@
         updateShareLinks();
 
         // Function to detect source from URL parameters
-        function detectSource() {
+        function detectSourceFromUrl() {
             const urlParams = new URLSearchParams(window.location.search);
             
             // Facebook
@@ -507,6 +507,40 @@
             return null;
         }
 
+        // Save source to sessionStorage on page load
+        (function saveSourceOnLoad() {
+            const sourceFromUrl = detectSourceFromUrl();
+            if (sourceFromUrl) {
+                try {
+                    sessionStorage.setItem('bewerbung-ai-source', sourceFromUrl);
+                } catch (e) {
+                    // Ignore storage errors
+                }
+            }
+        })();
+
+        // Function to get source (from URL or sessionStorage)
+        function getSource() {
+            // First try to get from current URL
+            const sourceFromUrl = detectSourceFromUrl();
+            if (sourceFromUrl) {
+                // Save it for future use
+                try {
+                    sessionStorage.setItem('bewerbung-ai-source', sourceFromUrl);
+                } catch (e) {
+                    // Ignore storage errors
+                }
+                return sourceFromUrl;
+            }
+            
+            // If not in URL, try to get from sessionStorage
+            try {
+                return sessionStorage.getItem('bewerbung-ai-source');
+            } catch (e) {
+                return null;
+            }
+        }
+
         reviewForm.addEventListener('submit', async (event) => {
             event.preventDefault();
             const trimmedReview = reviewText.value.trim();
@@ -519,7 +553,7 @@
 
             reviewError.classList.add('hidden');
 
-            const source = detectSource();
+            const source = getSource();
             const payload = {
                 review: trimmedReview,
                 source: source
