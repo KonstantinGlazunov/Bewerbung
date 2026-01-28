@@ -463,6 +463,50 @@
         // Initial setup
         updateShareLinks();
 
+        // Function to detect source from URL parameters
+        function detectSource() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            // Facebook
+            if (urlParams.has('fbclid')) {
+                return 'Facebook';
+            }
+            
+            // LinkedIn
+            if (urlParams.has('li_fat_id') || urlParams.get('utm_source') === 'linkedin') {
+                return 'LinkedIn';
+            }
+            
+            // Twitter/X
+            if (urlParams.get('utm_source') === 'twitter' || urlParams.get('utm_source') === 'x') {
+                return 'Twitter';
+            }
+            
+            // Instagram
+            if (urlParams.get('utm_source') === 'instagram') {
+                return 'Instagram';
+            }
+            
+            // WhatsApp
+            if (urlParams.get('utm_source') === 'whatsapp') {
+                return 'WhatsApp';
+            }
+            
+            // Telegram
+            if (urlParams.get('utm_source') === 'telegram') {
+                return 'Telegram';
+            }
+            
+            // Generic utm_source
+            const utmSource = urlParams.get('utm_source');
+            if (utmSource) {
+                // Capitalize first letter
+                return utmSource.charAt(0).toUpperCase() + utmSource.slice(1);
+            }
+            
+            return null;
+        }
+
         reviewForm.addEventListener('submit', async (event) => {
             event.preventDefault();
             const trimmedReview = reviewText.value.trim();
@@ -475,8 +519,10 @@
 
             reviewError.classList.add('hidden');
 
+            const source = detectSource();
             const payload = {
-                review: trimmedReview
+                review: trimmedReview,
+                source: source
             };
 
             try {

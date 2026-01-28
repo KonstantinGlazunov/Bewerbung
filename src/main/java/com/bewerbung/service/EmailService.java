@@ -66,6 +66,11 @@ public class EmailService {
     
     @Async("taskExecutor")
     public void sendReviewEmail(String reviewText, String createdAt, String userInfo) {
+        sendReviewEmail(reviewText, createdAt, userInfo, null);
+    }
+
+    @Async("taskExecutor")
+    public void sendReviewEmail(String reviewText, String createdAt, String userInfo, String source) {
         if (!emailEnabled) {
             logger.debug("Email sending is disabled. Skipping email notification.");
             return;
@@ -82,7 +87,7 @@ public class EmailService {
         }
         
         try {
-            String emailBody = buildEmailBody(reviewText, createdAt, userInfo);
+            String emailBody = buildEmailBody(reviewText, createdAt, userInfo, source);
             
             switch (emailProvider.toLowerCase()) {
                 case "brevo":
@@ -103,13 +108,18 @@ public class EmailService {
         }
     }
     
-    private String buildEmailBody(String reviewText, String createdAt, String userInfo) {
+    private String buildEmailBody(String reviewText, String createdAt, String userInfo, String source) {
         StringBuilder emailBody = new StringBuilder();
         emailBody.append("Получен новый отзыв:\n\n");
         emailBody.append("Отзыв:\n");
         emailBody.append(reviewText);
         emailBody.append("\n\n");
         emailBody.append("Дата создания: ").append(createdAt);
+        
+        if (source != null && !source.trim().isEmpty()) {
+            emailBody.append("\n\n");
+            emailBody.append("Источник: ").append(source);
+        }
         
         if (userInfo != null && !userInfo.trim().isEmpty()) {
             emailBody.append("\n\n");
