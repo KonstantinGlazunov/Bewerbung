@@ -136,6 +136,9 @@
                 <span data-i18n="privacyNotice"></span>
                 <a href="/datenschutz.html" class="text-blue-600 dark:text-blue-400 hover:underline" data-i18n="privacyLink">Datenschutzerklärung</a>
             </p>
+            <p class="mt-3 text-xs text-slate-600 dark:text-slate-400 leading-relaxed" data-i18n="voluntaryDataNotice">
+                Die Angabe personenbezogener Daten im Feedback erfolgt freiwillig.<br>Bitte teilen Sie nur solche Informationen mit, die Sie bewusst übermitteln möchten.
+            </p>
         </div>
 
         <div id="thankYouSection" class="hidden mt-6">
@@ -261,6 +264,7 @@
                     privacyLink: 'Datenschutzerklärung',
                     privacyLinkFooter: 'Datenschutzerklärung',
                     impressumLink: 'Impressum',
+                    voluntaryDataNotice: 'Die Angabe personenbezogener Daten im Feedback erfolgt freiwillig.<br>Bitte teilen Sie nur solche Informationen mit, die Sie bewusst übermitteln möchten.',
                     whatsappShareTitle: 'In WhatsApp teilen',
                     facebookShareTitle: 'In Facebook teilen',
                     linkedinShareTitle: 'In LinkedIn teilen',
@@ -285,6 +289,7 @@
                     privacyLink: 'Политика конфиденциальности',
                     privacyLinkFooter: 'Политика конфиденциальности',
                     impressumLink: 'Выходные данные',
+                    voluntaryDataNotice: 'Указание персональных данных в отзыве является добровольным.<br>Пожалуйста, делитесь только той информацией, которую вы сознательно хотите передать.',
                     whatsappShareTitle: 'Поделиться в WhatsApp',
                     facebookShareTitle: 'Поделиться в Facebook',
                     linkedinShareTitle: 'Поделиться в LinkedIn',
@@ -309,6 +314,7 @@
                     privacyLink: 'Privacy Policy',
                     privacyLinkFooter: 'Privacy Policy',
                     impressumLink: 'Imprint',
+                    voluntaryDataNotice: 'The provision of personal data in feedback is voluntary.<br>Please only share information that you consciously wish to transmit.',
                     whatsappShareTitle: 'Share on WhatsApp',
                     facebookShareTitle: 'Share on Facebook',
                     linkedinShareTitle: 'Share on LinkedIn',
@@ -362,7 +368,7 @@
                     const text = translate(key, lang);
                     if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
                         element.placeholder = text;
-                    } else if (key === 'reviewPrompt' || key === 'thankYouMessage' || key === 'sharePrompt') {
+                    } else if (key === 'reviewPrompt' || key === 'thankYouMessage' || key === 'sharePrompt' || key === 'voluntaryDataNotice') {
                         element.innerHTML = text;
                     } else {
                         element.textContent = text;
