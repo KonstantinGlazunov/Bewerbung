@@ -35,12 +35,16 @@ public class ReviewStorageService {
     }
 
     public ReviewEntry saveReview(String review, String userInfo) {
+        return saveReview(review, userInfo, null);
+    }
+
+    public ReviewEntry saveReview(String review, String userInfo, String source) {
         String trimmedReview = review == null ? "" : review.trim();
         if (trimmedReview.isEmpty()) {
             throw new IllegalArgumentException("Review must not be blank");
         }
         String createdAt = Instant.now().toString();
-        ReviewEntry entry = new ReviewEntry(trimmedReview, createdAt);
+        ReviewEntry entry = new ReviewEntry(trimmedReview, createdAt, source);
 
         synchronized (fileLock) {
             ensureFileExists();
@@ -50,7 +54,7 @@ public class ReviewStorageService {
         }
 
         // Асинхронная отправка email (не блокирует ответ)
-        emailService.sendReviewEmail(trimmedReview, createdAt, userInfo);
+        emailService.sendReviewEmail(trimmedReview, createdAt, userInfo, source);
 
         return entry;
     }

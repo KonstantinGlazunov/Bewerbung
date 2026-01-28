@@ -7,6 +7,8 @@ public class ReviewRequestDto {
     private String review;
     
     private String userInfo;
+    
+    private String source;
 
     public ReviewRequestDto() {
     }
@@ -29,6 +31,14 @@ public class ReviewRequestDto {
     
     public void setUserInfo(String userInfo) {
         this.userInfo = userInfo;
+    }
+    
+    public String getSource() {
+        return source;
+    }
+    
+    public void setSource(String source) {
+        this.source = source;
     }
 }
 
