@@ -173,6 +173,70 @@
         body.dark #scrollToTop:hover svg {
             color: #60a5fa;
         }
+
+        /* Toast notification */
+        #toastNotification {
+            position: fixed;
+            bottom: 5rem;
+            right: 2rem;
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.75rem;
+            padding: 1rem 1.25rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            display: none;
+            align-items: center;
+            gap: 0.75rem;
+            z-index: 10000;
+            max-width: 20rem;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        #toastNotification.show {
+            display: flex;
+        }
+
+        html.dark #toastNotification,
+        body.dark #toastNotification {
+            background-color: #1e293b;
+            border-color: #334155;
+            color: #e2e8f0;
+        }
+
+        #toastNotification svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            flex-shrink: 0;
+            color: #2563eb;
+        }
+
+        html.dark #toastNotification svg,
+        body.dark #toastNotification svg {
+            color: #60a5fa;
+        }
+
+        #toastNotification p {
+            margin: 0;
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            color: #475569;
+        }
+
+        html.dark #toastNotification p,
+        body.dark #toastNotification p {
+            color: #cbd5e1;
+        }
     </style>
     <script>
         (function initThemeFromStorage() {
@@ -385,6 +449,7 @@
                     linkedinShareTitle: 'In LinkedIn teilen',
                     telegramShareTitle: 'In Telegram teilen',
                     instagramShareTitle: 'In Instagram teilen',
+                    instagramToastMessage: 'Link wurde kopiert, füge ihn in einen neuen Post ein.',
                     shareTextFull: 'Wenn Sie aktiv nach Arbeit suchen und sich auf viele Stellenangebote bewerben, wissen Sie, wie mühsam es ist, jedes Mal ein separates Motivationsschreiben zu verfassen.\n\nUm diesen Prozess zu vereinfachen, möchte ich einen Service empfehlen, der die Erstellung von Motivationsschreiben für verschiedene Stellenangebote erheblich beschleunigt. Dies spart Zeit und reduziert Routineaufgaben, insbesondere bei Massenbewerbungen.\n\nService:\n{url}\n\nWird nützlich sein für diejenigen, die aktiv nach Arbeit suchen und sich auf den Inhalt konzentrieren möchten, anstatt denselben Text endlos umzuschreiben.',
                     shareTextShort: 'Wenn Sie aktiv nach Arbeit suchen und sich auf viele Stellenangebote bewerben, wissen Sie, wie mühsam es ist, jedes Mal ein separates Motivationsschreiben zu verfassen. Um diesen Prozess zu vereinfachen, möchte ich einen Service empfehlen, der die Erstellung von Motivationsschreiben für verschiedene Stellenangebote erheblich beschleunigt.'
                 },
@@ -411,6 +476,7 @@
                     linkedinShareTitle: 'Поделиться в LinkedIn',
                     telegramShareTitle: 'Поделиться в Telegram',
                     instagramShareTitle: 'Поделиться в Instagram',
+                    instagramToastMessage: 'Ссылка скопирована, вставь её в новый пост.',
                     shareTextFull: 'Если вы активно ищете работу и откликаетесь на большое количество вакансий, вы знаете, насколько утомительно каждый раз писать отдельное мотивационное письмо.\n\nЧтобы упростить этот процесс, я хочу порекомендовать сервис, который помогает значительно ускорить подготовку мотивационных писем под разные вакансии. Это экономит время и снижает рутину, особенно при массовых откликах.\n\nСервис:\n{url}\n\nБудет полезен тем, кто находится в активном поиске работы и хочет сосредоточиться на содержании, а не на бесконечном переписывании одного и того же текста.',
                     shareTextShort: 'Если вы активно ищете работу и откликаетесь на большое количество вакансий, вы знаете, насколько утомительно каждый раз писать отдельное мотивационное письмо. Чтобы упростить этот процесс, я хочу порекомендовать сервис, который помогает значительно ускорить подготовку мотивационных писем под разные вакансии.'
                 },
@@ -437,6 +503,7 @@
                     linkedinShareTitle: 'Share on LinkedIn',
                     telegramShareTitle: 'Share on Telegram',
                     instagramShareTitle: 'Share on Instagram',
+                    instagramToastMessage: 'Link copied, paste it into a new post.',
                     shareTextFull: 'If you are actively looking for work and applying to a large number of job openings, you know how tedious it is to write a separate cover letter each time.\n\nTo simplify this process, I would like to recommend a service that helps significantly speed up the preparation of cover letters for different job openings. This saves time and reduces routine, especially when applying to multiple positions.\n\nService:\n{url}\n\nWill be useful for those who are actively looking for work and want to focus on content rather than endlessly rewriting the same text.',
                     shareTextShort: 'If you are actively looking for work and applying to a large number of job openings, you know how tedious it is to write a separate cover letter each time. To simplify this process, I would like to recommend a service that helps significantly speed up the preparation of cover letters for different job openings.'
                 },
@@ -560,19 +627,52 @@
         if (instagramShare) {
             instagramShare.addEventListener('click', function(e) {
                 e.preventDefault();
-                const currentUrl = 'https://bewerbung-production.up.railway.app/';
-                // Try to copy URL to clipboard and open Instagram
+                const shortUrl = 'https://bit.ly/4t7TusE';
+                
+                // Function to show toast notification
+                function showToast(message) {
+                    const toast = document.getElementById('toastNotification');
+                    if (toast) {
+                        const toastText = toast.querySelector('p');
+                        if (toastText) {
+                            toastText.textContent = message;
+                        }
+                        toast.classList.add('show');
+                        
+                        // Hide toast after 4 seconds
+                        setTimeout(() => {
+                            toast.classList.remove('show');
+                        }, 4000);
+                    }
+                }
+                
+                // Try to copy URL to clipboard
                 if (navigator.clipboard && navigator.clipboard.writeText) {
-                    navigator.clipboard.writeText(currentUrl).then(() => {
-                        // Open Instagram
-                        window.open('https://www.instagram.com/', '_blank');
+                    navigator.clipboard.writeText(shortUrl).then(() => {
+                        // Show toast notification
+                        const message = window.i18n ? window.i18n.translate('instagramToastMessage') : 'Ссылка скопирована, вставь её в новый пост.';
+                        showToast(message);
+                        // Open Instagram after 2 seconds delay
+                        setTimeout(() => {
+                            window.open('https://www.instagram.com/', '_blank');
+                        }, 2000);
                     }).catch(() => {
-                        // Fallback: just open Instagram
-                        window.open('https://www.instagram.com/', '_blank');
+                        // Fallback: show message even if clipboard fails
+                        const message = window.i18n ? window.i18n.translate('instagramToastMessage') : 'Ссылка скопирована, вставь её в новый пост.';
+                        showToast(message);
+                        // Open Instagram after 2 seconds delay
+                        setTimeout(() => {
+                            window.open('https://www.instagram.com/', '_blank');
+                        }, 2000);
                     });
                 } else {
-                    // Fallback: just open Instagram if clipboard API is not available
-                    window.open('https://www.instagram.com/', '_blank');
+                    // Fallback: show message if clipboard API is not available
+                    const message = window.i18n ? window.i18n.translate('instagramToastMessage') : 'Instagram не позволяет автоматически создавать посты. Ссылка скопирована — вставь её в новый пост.';
+                    showToast(message);
+                    // Open Instagram after 1 second delay
+                    setTimeout(() => {
+                        window.open('https://www.instagram.com/', '_blank');
+                    }, 1000);
                 }
             });
         }
@@ -699,6 +799,14 @@
         });
 
     </script>
+
+    <!-- Toast notification -->
+    <div id="toastNotification" role="alert">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <p></p>
+    </div>
 
     <!-- Scroll to top button -->
     <button id="scrollToTop" type="button" aria-label="Scroll to top" title="Nach oben">
