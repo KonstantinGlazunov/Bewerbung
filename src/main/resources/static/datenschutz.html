@@ -45,6 +45,69 @@
             background-position: right 0.5rem center;
             padding-right: 2rem;
         }
+
+        /* Scroll to top button */
+        #scrollToTop {
+            position: fixed !important;
+            bottom: 2rem !important;
+            right: 2rem !important;
+            width: 3rem !important;
+            height: 3rem !important;
+            background-color: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 0.75rem !important;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 9999 !important;
+        }
+
+        #scrollToTop:hover {
+            background-color: #f8fafc;
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transform: translateY(-2px);
+        }
+
+        #scrollToTop:active {
+            transform: translateY(0);
+        }
+
+        html.dark #scrollToTop,
+        body.dark #scrollToTop {
+            background-color: #0f172a;
+            border-color: #334155;
+        }
+
+        html.dark #scrollToTop:hover,
+        body.dark #scrollToTop:hover {
+            background-color: #1e293b;
+            border-color: #475569;
+        }
+
+        #scrollToTop svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            color: #475569;
+            transition: color 0.3s ease;
+        }
+
+        html.dark #scrollToTop svg,
+        body.dark #scrollToTop svg {
+            color: #94a3b8;
+        }
+
+        #scrollToTop:hover svg {
+            color: #2563eb;
+        }
+
+        html.dark #scrollToTop:hover svg,
+        body.dark #scrollToTop:hover svg {
+            color: #60a5fa;
+        }
     </style>
     <script>
         (function initThemeFromStorage() {
@@ -446,6 +509,47 @@
                     applyTranslations(newLang);
                 });
             }
+        })();
+
+    </script>
+
+    <!-- Scroll to top button -->
+    <button id="scrollToTop" type="button" aria-label="Scroll to top" title="Nach oben">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+        </svg>
+    </button>
+
+    <script>
+        // Scroll to top button - must be after the button element in DOM
+        (function initScrollToTop() {
+            const scrollToTopButton = document.getElementById('scrollToTop');
+            
+            if (!scrollToTopButton) {
+                console.error('Scroll to top button not found');
+                return;
+            }
+
+            function toggleScrollButton() {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+                if (scrollTop > 100) {
+                    scrollToTopButton.style.display = 'flex';
+                } else {
+                    scrollToTopButton.style.display = 'none';
+                }
+            }
+
+            function scrollToTop() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }
+
+            window.addEventListener('scroll', toggleScrollButton, { passive: true });
+            window.addEventListener('resize', toggleScrollButton);
+            scrollToTopButton.addEventListener('click', scrollToTop);
+            toggleScrollButton();
         })();
     </script>
 </body>

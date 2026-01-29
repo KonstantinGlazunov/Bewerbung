@@ -3,27 +3,89 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bewerbung AI - Document Generator</title>
+    <title>Bewerbung AI - KI-generierte Bewerbungsschreiben | Anschreiben Generator</title>
+    <meta name="description" content="Erstellen Sie maßgeschneiderte Bewerbungsschreiben mit KI. Unser Service analysiert Ihre Biografie und Stellenausschreibungen, um personalisierte Anschreiben nach DIN 5008 zu generieren. Schnell, einfach und kostenlos.">
+    <meta name="keywords" content="Bewerbung, Anschreiben, KI, AI, Bewerbungsschreiben, Lebenslauf, Stellenausschreibung, DIN 5008, Bewerbung Generator">
+    <meta name="author" content="Bewerbung AI">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://bewerbung-production.up.railway.app/">
+    
+    <!-- Hreflang для мультиязычности -->
+    <link rel="alternate" hreflang="de" href="https://bewerbung-production.up.railway.app/">
+    <link rel="alternate" hreflang="ru" href="https://bewerbung-production.up.railway.app/">
+    <link rel="alternate" hreflang="en" href="https://bewerbung-production.up.railway.app/">
+    <link rel="alternate" hreflang="x-default" href="https://bewerbung-production.up.railway.app/">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/bewerbug.png">
+    <link rel="apple-touch-icon" href="/bewerbug.png">
+    
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Bewerbung AI",
+      "alternateName": "Bewerbung Anschreiben Generator",
+      "description": "KI-gestützter Service zur automatischen Generierung von Bewerbungsschreiben nach deutschen DIN 5008 Standards",
+      "url": "https://bewerbung-production.up.railway.app/",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "EUR"
+      },
+      "creator": {
+        "@type": "Organization",
+        "name": "Bewerbung AI"
+      },
+      "inLanguage": ["de", "ru", "en"],
+      "featureList": [
+        "Automatische Analyse von Stellenausschreibungen",
+        "Personalisierte Bewerbungsschreiben",
+        "DIN 5008 konform",
+        "Mehrsprachig (DE, RU, EN)"
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Bewerbung AI",
+      "url": "https://bewerbung-production.up.railway.app/",
+      "logo": "https://bewerbung-production.up.railway.app/bewerbug.png",
+      "sameAs": []
+    }
+    </script>
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://bewerbung-production.up.railway.app/">
-    <meta property="og:title" content="Bewerbung AI - Сервис для создания мотивационных писем">
-    <meta property="og:description" content="Если вы активно ищете работу и откликаетесь на большое количество вакансий, вы знаете, насколько утомительно каждый раз писать отдельное мотивационное письмо. Чтобы упростить этот процесс, я хочу порекомендовать сервис, который помогает значительно ускорить подготовку мотивационных писем под разные вакансии.">
+    <meta property="og:title" content="Bewerbung AI - KI-generierte Bewerbungsschreiben | Anschreiben Generator">
+    <meta property="og:description" content="Erstellen Sie maßgeschneiderte Bewerbungsschreiben mit KI. Unser Service analysiert Ihre Biografie und Stellenausschreibungen, um personalisierte Anschreiben nach DIN 5008 zu generieren. Schnell, einfach und kostenlos.">
     <meta property="og:image" content="https://bewerbung-production.up.railway.app/bewerbug.png">
     <meta property="og:image:secure_url" content="https://bewerbung-production.up.railway.app/bewerbug.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:type" content="image/png">
-    <meta property="og:image:alt" content="Bewerbung AI - Генератор мотивационных писем">
+    <meta property="og:image:alt" content="Bewerbung AI - KI-generierte Bewerbungsschreiben Generator">
     <meta property="og:site_name" content="Bewerbung AI">
     <meta property="og:locale" content="de_DE">
+    <meta property="og:locale:alternate" content="ru_RU">
+    <meta property="og:locale:alternate" content="en_US">
+    <meta property="article:author" content="Bewerbung AI">
+    <meta property="og:updated_time" content="2025-01-27T00:00:00+00:00">
     
     <!-- Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Bewerbung AI - Сервис для создания мотивационных писем">
-    <meta name="twitter:description" content="Если вы активно ищете работу и откликаетесь на большое количество вакансий, вы знаете, насколько утомительно каждый раз писать отдельное мотивационное письмо. Чтобы упростить этот процесс, я хочу порекомендовать сервис, который помогает значительно ускорить подготовку мотивационных писем под разные вакансии.">
+    <meta name="twitter:title" content="Bewerbung AI - KI-generierte Bewerbungsschreiben">
+    <meta name="twitter:description" content="Erstellen Sie maßgeschneiderte Bewerbungsschreiben mit KI. Personalisierte Anschreiben nach DIN 5008 Standards. Schnell, einfach und kostenlos.">
     <meta name="twitter:image" content="https://bewerbung-production.up.railway.app/bewerbug.png">
+    <meta name="twitter:image:alt" content="Bewerbung AI - KI-generierte Bewerbungsschreiben Generator">
+    <meta name="twitter:site" content="@bewerbungai">
+    <meta name="twitter:creator" content="@bewerbungai">
     <!-- Tailwind CSS via CDN for the full UI styling -->
     <script>
         // Tailwind config: enable class-based dark mode for theme toggle
@@ -222,28 +284,94 @@
             background-position: right 0.5rem center;
             padding-right: 2rem;
         }
+
+        /* Scroll to top button */
+        #scrollToTop {
+            position: fixed !important;
+            bottom: 2rem !important;
+            right: 2rem !important;
+            width: 3rem !important;
+            height: 3rem !important;
+            background-color: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 0.75rem !important;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+            display: none;
+            align-items: center !important;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 9999 !important;
+        }
+
+        #scrollToTop:hover {
+            background-color: #f8fafc;
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transform: translateY(-2px);
+        }
+
+        #scrollToTop:active {
+            transform: translateY(0);
+        }
+
+        html.dark #scrollToTop,
+        body.dark #scrollToTop {
+            background-color: #0f172a;
+            border-color: #334155;
+        }
+
+        html.dark #scrollToTop:hover,
+        body.dark #scrollToTop:hover {
+            background-color: #1e293b;
+            border-color: #475569;
+        }
+
+        #scrollToTop svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            color: #475569;
+            transition: color 0.3s ease;
+        }
+
+        html.dark #scrollToTop svg,
+        body.dark #scrollToTop svg {
+            color: #94a3b8;
+        }
+
+        #scrollToTop:hover svg {
+            color: #2563eb;
+        }
+
+        html.dark #scrollToTop:hover svg,
+        body.dark #scrollToTop:hover svg {
+            color: #60a5fa;
+        }
     </style>
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-800 antialiased dark:bg-slate-900 dark:text-slate-100 dark" style="font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;">
     <!-- Page container (single column layout: form -> result) -->
     <div class="container mx-auto max-w-5xl rounded-2xl bg-white px-6 py-8 shadow-sm ring-1 ring-slate-200 dark:bg-slate-950 dark:ring-slate-800 sm:px-10 sm:py-10">
         <!-- Header: title and theme toggle -->
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <h1 class="app-title text-center text-2xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-left sm:text-3xl" data-i18n="appTitle">Bewerbunganschreiben AI</h1>
-            <div class="flex items-center gap-2">
-                <!-- Language selector -->
-                <div class="relative inline-block">
-                    <select id="languageSelector" class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 appearance-none pr-8 cursor-pointer">
-                        <option value="de">DE</option>
-                        <option value="ru">RU</option>
-                        <option value="en">EN</option>
-                    </select>
+        <header>
+            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <h1 class="app-title text-center text-2xl font-semibold tracking-tight text-slate-900 dark:text-white sm:text-left sm:text-3xl" data-i18n="appTitle">Bewerbunganschreiben AI</h1>
+                <div class="flex items-center gap-2">
+                    <!-- Language selector -->
+                    <div class="relative inline-block">
+                        <select id="languageSelector" class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 appearance-none pr-8 cursor-pointer">
+                            <option value="de">DE</option>
+                            <option value="ru">RU</option>
+                            <option value="en">EN</option>
+                        </select>
+                    </div>
+                    <!-- Theme toggle (pure frontend; no backend interaction) -->
+                    <button type="button" id="themeToggle" class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800" data-i18n="themeToggle">Dunkelmodus</button>
                 </div>
-                <!-- Theme toggle (pure frontend; no backend interaction) -->
-                <button type="button" id="themeToggle" class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800" data-i18n="themeToggle">Dunkelmodus</button>
             </div>
-        </div>
+        </header>
 
+        <main>
         <div class="mt-6 rounded-2xl border border-slate-200 bg-slate-50/60 px-6 py-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/60">
             <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <p class="text-sm text-slate-600 dark:text-slate-300" data-i18n="reviewPrompt">Ich wäre Ihnen dankbar, wenn Sie mir ein paar Zeilen mit Ihren Eindrücken zu diesem Service hinterlassen</p>
@@ -284,7 +412,7 @@
             </div>
             
             <div class="form-group space-y-2">
-                <label for="wishesTextarea" class="block text-sm font-medium text-slate-700 dark:text-slate-200" data-i18n="wishesLabel">Möchten Sie etwas ändern oder ergänzen? Schreiben Sie hier — das hilft, das Dokument genauer zu machen (optional):</label>
+                <label for="wishesTextarea" class="block text-sm font-medium text-slate-700 dark:text-slate-200" data-i18n="wishesLabel">Hier können Sie einen zusätzlichen Prompt (Anweisung für die KI) oder Informationen über Sie hinzufügen, die nicht in den Lebenslauf aufgenommen wurden (optional):</label>
                 <textarea id="wishesTextarea" name="wishes" class="min-h-[150px] w-full resize-y rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-blue-400 dark:focus:ring-blue-900"></textarea>
             </div>
             
@@ -359,6 +487,8 @@
             </div>
         </div>
 
+        </main>
+
         <!-- Legal footer / privacy note -->
         <footer class="mt-10 border-t border-slate-200 pt-6 text-center text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
             <h3 class="text-sm font-semibold text-slate-700 dark:text-slate-200" data-i18n="privacyTitle">Datenschutz</h3>
@@ -367,6 +497,8 @@
                 <a href="/datenschutz.html" class="text-blue-600 dark:text-blue-400 hover:underline" data-i18n="privacyLinkFooter">Datenschutzerklärung</a>
                 <span class="hidden sm:inline">|</span>
                 <a href="/impressum.html" class="text-blue-600 dark:text-blue-400 hover:underline" data-i18n="impressumLink">Impressum</a>
+                <span class="hidden sm:inline">|</span>
+                <a href="/faq.html" class="text-blue-600 dark:text-blue-400 hover:underline" data-i18n="faqLink">Häufig gestellte Fragen (FAQ)</a>
             </div>
         </footer>
     </div>
@@ -503,7 +635,7 @@
                     submitReview: 'Bewertung abgeben',
                     biographyLabel: 'Biography - Verfassen Sie Ihren Lebenslauf in einem freien Format: Ihre Fähigkeiten, Berufserfahrung, Ausbildung:',
                     jobPostingLabel: 'Job Posting - kopieren Sie einfach den Text der Stellenanzeige hierher.:',
-                    wishesLabel: 'Möchten Sie etwas ändern oder ergänzen? Schreiben Sie hier — das hilft, das Dokument genauer zu machen (optional):',
+                    wishesLabel: 'Hier können Sie einen zusätzlichen Prompt (Anweisung für die KI) oder Informationen über Sie hinzufügen, die nicht in den Lebenslauf aufgenommen wurden (optional):',
                     generateButton: 'Dokumente erstellen',
                     progressInitializing: 'Initialisiere...',
                     progressReadingBiography: 'Lese Lebenslauf',
@@ -540,7 +672,18 @@
                     instagramShareTitle: 'In Instagram teilen',
                     shareTextFull: 'Wenn Sie aktiv nach Arbeit suchen und sich auf viele Stellenangebote bewerben, wissen Sie, wie mühsam es ist, jedes Mal ein separates Motivationsschreiben zu verfassen.\n\nUm diesen Prozess zu vereinfachen, möchte ich einen Service empfehlen, der die Erstellung von Motivationsschreiben für verschiedene Stellenangebote erheblich beschleunigt. Dies spart Zeit und reduziert Routineaufgaben, insbesondere bei Massenbewerbungen.\n\nService:\n{url}\n\nWird nützlich sein für diejenigen, die aktiv nach Arbeit suchen und sich auf den Inhalt konzentrieren möchten, anstatt denselben Text endlos umzuschreiben.',
                     shareTextShort: 'Wenn Sie aktiv nach Arbeit suchen und sich auf viele Stellenangebote bewerben, wissen Sie, wie mühsam es ist, jedes Mal ein separates Motivationsschreiben zu verfassen. Um diesen Prozess zu vereinfachen, möchte ich einen Service empfehlen, der die Erstellung von Motivationsschreiben für verschiedene Stellenangebote erheblich beschleunigt.',
-                    impressumLink: 'Impressum'
+                    impressumLink: 'Impressum',
+                    faqLink: 'Häufig gestellte Fragen (FAQ)',
+                    faqQ1: 'Wie funktioniert der Bewerbung AI Service?',
+                    faqA1: 'Unser Service verwendet künstliche Intelligenz (KI), um Ihre Biografie und die Stellenausschreibung zu analysieren. Basierend auf dieser Analyse generiert er ein maßgeschneidertes Bewerbungsschreiben, das auf die spezifischen Anforderungen der Position zugeschnitten ist und den deutschen DIN 5008 Standards entspricht.',
+                    faqQ2: 'In welchen Sprachen kann ich den Service nutzen?',
+                    faqA2: 'Sie können Ihre Daten in jeder beliebigen Sprache eingeben. Das generierte Bewerbungsschreiben wird automatisch in der Sprache erstellt, die Sie im Sprachauswahlmenü ausgewählt haben - Deutsch (DE), Russisch (RU) oder Englisch (EN).',
+                    faqQ3: 'Werden meine Daten gespeichert?',
+                    faqA3: 'Nein, wir speichern keine personenbezogenen Daten dauerhaft. Alle eingegebenen Inhalte werden ausschließlich zur unmittelbaren Verarbeitung verwendet und nach Beendigung der Sitzung automatisch gelöscht. Der Service ist vollständig DSGVO-konform.',
+                    faqQ4: 'Ist der Service kostenlos?',
+                    faqA4: 'Ja, der Service ist vollständig kostenlos. Sie können so viele Bewerbungsschreiben generieren, wie Sie benötigen, ohne Gebühren oder Registrierung.',
+                    faqQ5: 'Kann ich das generierte Anschreiben bearbeiten?',
+                    faqA5: 'Ja, nach der Generierung können Sie das Anschreiben direkt im Textfeld bearbeiten, bevor Sie es als PDF herunterladen. So können Sie persönliche Anpassungen vornehmen.'
                 },
                 ru: {
                     appTitle: 'Мотивационное письмо AI',
@@ -551,7 +694,7 @@
                     submitReview: 'Оставить отзыв',
                     biographyLabel: 'Биография - Составьте свое резюме в свободном формате: ваши навыки, профессиональный опыт, образование:',
                     jobPostingLabel: 'Вакансия - просто скопируйте текст объявления о вакансии сюда.:',
-                    wishesLabel: 'Хотите что-то изменить или дополнить? Напишите здесь — это поможет сделать документ точнее (необязательно):',
+                    wishesLabel: 'Здесь вы можете добавить дополнительный промпт (указание для ИИ) или сведения о вас, которые не вошли в резюме (необязательно):',
                     generateButton: 'Создать документы',
                     progressInitializing: 'Инициализация...',
                     progressReadingBiography: 'Чтение резюме',
@@ -588,7 +731,18 @@
                     telegramShareTitle: 'Поделиться в Telegram',
                     instagramShareTitle: 'Поделиться в Instagram',
                     shareTextFull: 'Если вы активно ищете работу и откликаетесь на большое количество вакансий, вы знаете, насколько утомительно каждый раз писать отдельное мотивационное письмо.\n\nЧтобы упростить этот процесс, я хочу порекомендовать сервис, который помогает значительно ускорить подготовку мотивационных писем под разные вакансии. Это экономит время и снижает рутину, особенно при массовых откликах.\n\nСервис:\n{url}\n\nБудет полезен тем, кто находится в активном поиске работы и хочет сосредоточиться на содержании, а не на бесконечном переписывании одного и того же текста.',
-                    shareTextShort: 'Если вы активно ищете работу и откликаетесь на большое количество вакансий, вы знаете, насколько утомительно каждый раз писать отдельное мотивационное письмо. Чтобы упростить этот процесс, я хочу порекомендовать сервис, который помогает значительно ускорить подготовку мотивационных писем под разные вакансии.'
+                    shareTextShort: 'Если вы активно ищете работу и откликаетесь на большое количество вакансий, вы знаете, насколько утомительно каждый раз писать отдельное мотивационное письмо. Чтобы упростить этот процесс, я хочу порекомендовать сервис, который помогает значительно ускорить подготовку мотивационных писем под разные вакансии.',
+                    faqLink: 'Часто задаваемые вопросы (FAQ)',
+                    faqQ1: 'Как работает сервис Bewerbung AI?',
+                    faqA1: 'Наш сервис использует искусственный интеллект (ИИ) для анализа вашей биографии и вакансии. На основе этого анализа он генерирует персонализированное мотивационное письмо, адаптированное под конкретные требования позиции и соответствующее немецким стандартам DIN 5008.',
+                    faqQ2: 'На каких языках я могу использовать сервис?',
+                    faqA2: 'Вы можете вводить данные на любом языке. Сгенерированное мотивационное письмо будет автоматически создано на том языке, который вы выбрали в меню выбора языка - Немецкий (DE), Русский (RU) или Английский (EN).',
+                    faqQ3: 'Сохраняются ли мои данные?',
+                    faqA3: 'Нет, мы не храним персональные данные постоянно. Весь введенный контент используется исключительно для немедленной обработки и автоматически удаляется после завершения сессии. Сервис полностью соответствует GDPR.',
+                    faqQ4: 'Бесплатен ли сервис?',
+                    faqA4: 'Да, сервис полностью бесплатный. Вы можете генерировать столько мотивационных писем, сколько вам нужно, без оплаты или регистрации.',
+                    faqQ5: 'Могу ли я редактировать сгенерированное письмо?',
+                    faqA5: 'Да, после генерации вы можете редактировать письмо прямо в текстовом поле перед загрузкой в формате PDF. Таким образом, вы можете внести личные корректировки.'
                 },
                 en: {
                     appTitle: 'Cover Letter AI',
@@ -599,7 +753,7 @@
                     submitReview: 'Submit Review',
                     biographyLabel: 'Biography - Write your resume in a free format: your skills, work experience, education:',
                     jobPostingLabel: 'Job Posting - simply copy the job posting text here.:',
-                    wishesLabel: 'Want to change or add something? Write here — this will help make the document more accurate (optional):',
+                    wishesLabel: 'Here you can add an additional prompt (instruction for AI) or information about you that was not included in the resume (optional):',
                     generateButton: 'Create Documents',
                     progressInitializing: 'Initializing...',
                     progressReadingBiography: 'Reading Biography',
@@ -636,7 +790,18 @@
                     telegramShareTitle: 'Share on Telegram',
                     instagramShareTitle: 'Share on Instagram',
                     shareTextFull: 'If you are actively looking for work and applying to a large number of job openings, you know how tedious it is to write a separate cover letter each time.\n\nTo simplify this process, I would like to recommend a service that helps significantly speed up the preparation of cover letters for different job openings. This saves time and reduces routine, especially when applying to multiple positions.\n\nService:\n{url}\n\nWill be useful for those who are actively looking for work and want to focus on content rather than endlessly rewriting the same text.',
-                    shareTextShort: 'If you are actively looking for work and applying to a large number of job openings, you know how tedious it is to write a separate cover letter each time. To simplify this process, I would like to recommend a service that helps significantly speed up the preparation of cover letters for different job openings.'
+                    shareTextShort: 'If you are actively looking for work and applying to a large number of job openings, you know how tedious it is to write a separate cover letter each time. To simplify this process, I would like to recommend a service that helps significantly speed up the preparation of cover letters for different job openings.',
+                    faqLink: 'Frequently Asked Questions (FAQ)',
+                    faqQ1: 'How does the Bewerbung AI service work?',
+                    faqA1: 'Our service uses artificial intelligence (AI) to analyze your biography and the job posting. Based on this analysis, it generates a tailored cover letter that is customized to the specific requirements of the position and complies with German DIN 5008 standards.',
+                    faqQ2: 'In which languages can I use the service?',
+                    faqA2: 'You can enter your data in any language. The generated cover letter will be automatically created in the language you selected in the language selector menu - German (DE), Russian (RU), or English (EN).',
+                    faqQ3: 'Is my data stored?',
+                    faqA3: 'No, we do not store personal data permanently. All entered content is used exclusively for immediate processing and is automatically deleted after the session ends. The service is fully GDPR compliant.',
+                    faqQ4: 'Is the service free?',
+                    faqA4: 'Yes, the service is completely free. You can generate as many cover letters as you need without fees or registration.',
+                    faqQ5: 'Can I edit the generated cover letter?',
+                    faqA5: 'Yes, after generation, you can edit the cover letter directly in the text field before downloading it as a PDF. This allows you to make personal adjustments.'
                 }
             };
 
@@ -1293,6 +1458,51 @@
             
             // Make function available globally for language change updates
             window.updateShareLinksMain = updateShareLinksMain;
+        })();
+    </script>
+
+    <!-- Scroll to top button -->
+    <button id="scrollToTop" type="button" aria-label="Scroll to top" title="Nach oben">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+        </svg>
+    </button>
+
+    <script>
+        // Scroll to top button - must be after the button element in DOM
+        (function initScrollToTop() {
+            const scrollToTopButton = document.getElementById('scrollToTop');
+            
+            if (!scrollToTopButton) {
+                console.error('Scroll to top button not found');
+                return;
+            }
+
+            // Show/hide button based on scroll position
+            function toggleScrollButton() {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+                if (scrollTop > 100) {
+                    scrollToTopButton.style.display = 'flex';
+                } else {
+                    scrollToTopButton.style.display = 'none';
+                }
+            }
+
+            // Scroll to top function
+            function scrollToTop() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }
+
+            // Event listeners
+            window.addEventListener('scroll', toggleScrollButton, { passive: true });
+            window.addEventListener('resize', toggleScrollButton);
+            scrollToTopButton.addEventListener('click', scrollToTop);
+
+            // Initial check
+            toggleScrollButton();
         })();
     </script>
 </body>

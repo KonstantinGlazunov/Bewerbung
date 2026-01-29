@@ -1,4 +1,8 @@
 # Bewerbung AI
+Share:
+https://bit.ly/4t7TusE   -  instagram 
+https://bit.ly/3MeXt6d   - youtube
+
 
 **English** | [Русский](#русский)
 
