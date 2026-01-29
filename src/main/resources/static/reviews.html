@@ -3,13 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bewertungen - Bewerbung AI</title>
+    <title>Bewertungen - Bewerbung AI | Feedback & Reviews</title>
+    <meta name="description" content="Teilen Sie Ihre Erfahrungen mit Bewerbung AI. Ihr Feedback hilft uns, den Service zu verbessern. Bewertungen und Erfahrungsberichte von Nutzern.">
+    <meta name="keywords" content="Bewerbung AI Bewertungen, Feedback, Reviews, Erfahrungen, Nutzerbewertungen">
+    <meta name="author" content="Bewerbung AI">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://bewerbung-production.up.railway.app/reviews.html">
+    
+    <!-- Hreflang для мультиязычности -->
+    <link rel="alternate" hreflang="de" href="https://bewerbung-production.up.railway.app/reviews.html">
+    <link rel="alternate" hreflang="ru" href="https://bewerbung-production.up.railway.app/reviews.html">
+    <link rel="alternate" hreflang="en" href="https://bewerbung-production.up.railway.app/reviews.html">
+    <link rel="alternate" hreflang="x-default" href="https://bewerbung-production.up.railway.app/reviews.html">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/bewerbug.png">
+    <link rel="apple-touch-icon" href="/bewerbug.png">
+    
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "Bewertungen - Bewerbung AI",
+      "description": "Bewertungen und Feedback von Nutzern des Bewerbung AI Services",
+      "url": "https://bewerbung-production.up.railway.app/reviews.html",
+      "inLanguage": ["de", "ru", "en"],
+      "isPartOf": {
+        "@type": "WebSite",
+        "name": "Bewerbung AI",
+        "url": "https://bewerbung-production.up.railway.app/"
+      }
+    }
+    </script>
+    
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://bewerbung-production.up.railway.app/">
-    <meta property="og:title" content="Bewerbung AI - Сервис для создания мотивационных писем">
-    <meta property="og:description" content="Если вы активно ищете работу и откликаетесь на большое количество вакансий, вы знаете, насколько утомительно каждый раз писать отдельное мотивационное письмо. Чтобы упростить этот процесс, я хочу порекомендовать сервис, который помогает значительно ускорить подготовку мотивационных писем под разные вакансии.">
+    <meta property="og:url" content="https://bewerbung-production.up.railway.app/reviews.html">
+    <meta property="og:title" content="Bewertungen - Bewerbung AI | Feedback & Reviews">
+    <meta property="og:description" content="Teilen Sie Ihre Erfahrungen mit Bewerbung AI. Ihr Feedback hilft uns, den Service zu verbessern.">
     <meta property="og:image" content="https://bewerbung-production.up.railway.app/author-photo.jpg">
+    <meta property="og:image:secure_url" content="https://bewerbung-production.up.railway.app/author-photo.jpg">
+    <meta property="og:site_name" content="Bewerbung AI">
+    <meta property="og:locale" content="de_DE">
+    <meta property="og:locale:alternate" content="ru_RU">
+    <meta property="og:locale:alternate" content="en_US">
+    
+    <!-- Twitter Cards -->
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:title" content="Bewertungen - Bewerbung AI">
+    <meta name="twitter:description" content="Teilen Sie Ihre Erfahrungen mit Bewerbung AI. Ihr Feedback hilft uns, den Service zu verbessern.">
+    <meta name="twitter:image" content="https://bewerbung-production.up.railway.app/author-photo.jpg">
     <script>
         window.tailwind = window.tailwind || {};
         window.tailwind.config = Object.assign(window.tailwind.config || {}, { darkMode: 'class' });
@@ -66,6 +110,69 @@
             background-position: right 0.5rem center;
             padding-right: 2rem;
         }
+
+        /* Scroll to top button */
+        #scrollToTop {
+            position: fixed !important;
+            bottom: 2rem !important;
+            right: 2rem !important;
+            width: 3rem !important;
+            height: 3rem !important;
+            background-color: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 0.75rem !important;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 9999 !important;
+        }
+
+        #scrollToTop:hover {
+            background-color: #f8fafc;
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transform: translateY(-2px);
+        }
+
+        #scrollToTop:active {
+            transform: translateY(0);
+        }
+
+        html.dark #scrollToTop,
+        body.dark #scrollToTop {
+            background-color: #0f172a;
+            border-color: #334155;
+        }
+
+        html.dark #scrollToTop:hover,
+        body.dark #scrollToTop:hover {
+            background-color: #1e293b;
+            border-color: #475569;
+        }
+
+        #scrollToTop svg {
+            width: 1.25rem;
+            height: 1.25rem;
+            color: #475569;
+            transition: color 0.3s ease;
+        }
+
+        html.dark #scrollToTop svg,
+        body.dark #scrollToTop svg {
+            color: #94a3b8;
+        }
+
+        #scrollToTop:hover svg {
+            color: #2563eb;
+        }
+
+        html.dark #scrollToTop:hover svg,
+        body.dark #scrollToTop:hover svg {
+            color: #60a5fa;
+        }
     </style>
     <script>
         (function initThemeFromStorage() {
@@ -106,6 +213,7 @@
 </head>
 <body class="min-h-screen bg-slate-50 text-slate-800 antialiased dark:bg-slate-900 dark:text-slate-100" style="font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;">
     <div class="container mx-auto max-w-3xl rounded-2xl bg-white px-6 py-8 shadow-sm ring-1 ring-slate-200 dark:bg-slate-950 dark:ring-slate-800 sm:px-10 sm:py-10">
+        <header>
         <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-end">
             <div class="flex items-center gap-2">
                 <select id="languageSelector" class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 appearance-none pr-8 cursor-pointer">
@@ -115,11 +223,12 @@
                 </select>
                 <a href="/" class="inline-flex items-center justify-center rounded-xl border border-slate-200 bg-white px-4 py-2 text-xs font-semibold text-slate-700 shadow-sm transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800" data-i18n="backToHome">Zur Startseite</a>
             </div>
-        </div>
+        </header>
 
+        <main>
         <div id="reviewSection" class="mt-6">
             <div class="flex items-center gap-4 mb-5">
-                <img id="authorPhoto" src="/author-photo.jpg" alt="Константин" class="w-16 h-16 rounded-full object-cover border-2 border-slate-200 dark:border-slate-700" onerror="this.style.display='none'">
+                <img id="authorPhoto" src="/author-photo.jpg" alt="Konstantin - Bewerbung AI Autor" class="w-16 h-16 rounded-full object-cover border-2 border-slate-200 dark:border-slate-700" onerror="this.style.display='none'">
                 <p class="text-sm text-slate-600 dark:text-slate-300" data-i18n="reviewPrompt">Друзья, черкните мне пару строк пожалуйста )))<br>Константин</p>
             </div>
 
@@ -143,7 +252,7 @@
 
         <div id="thankYouSection" class="hidden mt-6">
             <div class="flex items-center gap-4 mb-5">
-                <img id="authorPhotoThankYou" src="/author-photo.jpg" alt="Константин" class="w-16 h-16 rounded-full object-cover border-2 border-slate-200 dark:border-slate-700" onerror="this.style.display='none'">
+                <img id="authorPhotoThankYou" src="/author-photo.jpg" alt="Konstantin - Bewerbung AI Autor" class="w-16 h-16 rounded-full object-cover border-2 border-slate-200 dark:border-slate-700" onerror="this.style.display='none'">
                 <div class="text-left">
                     <p class="text-lg font-medium text-slate-900 dark:text-slate-100 mb-1" data-i18n="thankYouTitle">Спасибо!</p>
                     <p class="text-lg font-medium text-slate-900 dark:text-slate-100" data-i18n="thankYouMessage">Ваш отзыв был отправлен.</p>
@@ -181,13 +290,18 @@
             </div>
         </div>
 
+        </main>
+
         <!-- Legal footer -->
         <footer class="mt-10 border-t border-slate-200 pt-6 text-center text-xs text-slate-500 dark:border-slate-800 dark:text-slate-400">
             <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
                 <a href="/datenschutz.html" class="text-blue-600 dark:text-blue-400 hover:underline" data-i18n="privacyLinkFooter">Datenschutzerklärung</a>
                 <span class="hidden sm:inline">|</span>
                 <a href="/impressum.html" class="text-blue-600 dark:text-blue-400 hover:underline" data-i18n="impressumLink">Impressum</a>
+                <span class="hidden sm:inline">|</span>
+                <a href="/faq.html" class="text-blue-600 dark:text-blue-400 hover:underline" data-i18n="faqLink">Häufig gestellte Fragen (FAQ)</a>
             </div>
+            <p class="mt-4 text-xs text-slate-400 dark:text-slate-500">© 2024 Bewerbung AI. Alle Rechte vorbehalten.</p>
         </footer>
     </div>
 
@@ -264,6 +378,7 @@
                     privacyLink: 'Datenschutzerklärung',
                     privacyLinkFooter: 'Datenschutzerklärung',
                     impressumLink: 'Impressum',
+                    faqLink: 'Häufig gestellte Fragen (FAQ)',
                     voluntaryDataNotice: 'Die Angabe personenbezogener Daten im Feedback erfolgt freiwillig.<br>Bitte teilen Sie nur solche Informationen mit, die Sie bewusst übermitteln möchten.',
                     whatsappShareTitle: 'In WhatsApp teilen',
                     facebookShareTitle: 'In Facebook teilen',
@@ -289,6 +404,7 @@
                     privacyLink: 'Политика конфиденциальности',
                     privacyLinkFooter: 'Политика конфиденциальности',
                     impressumLink: 'Выходные данные',
+                    faqLink: 'Часто задаваемые вопросы (FAQ)',
                     voluntaryDataNotice: 'Указание персональных данных в отзыве является добровольным.<br>Пожалуйста, делитесь только той информацией, которую вы сознательно хотите передать.',
                     whatsappShareTitle: 'Поделиться в WhatsApp',
                     facebookShareTitle: 'Поделиться в Facebook',
@@ -314,6 +430,7 @@
                     privacyLink: 'Privacy Policy',
                     privacyLinkFooter: 'Privacy Policy',
                     impressumLink: 'Imprint',
+                    faqLink: 'Frequently Asked Questions (FAQ)',
                     voluntaryDataNotice: 'The provision of personal data in feedback is voluntary.<br>Please only share information that you consciously wish to transmit.',
                     whatsappShareTitle: 'Share on WhatsApp',
                     facebookShareTitle: 'Share on Facebook',
@@ -580,6 +697,47 @@
                 reviewError.classList.remove('hidden');
             }
         });
+
+    </script>
+
+    <!-- Scroll to top button -->
+    <button id="scrollToTop" type="button" aria-label="Scroll to top" title="Nach oben">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+        </svg>
+    </button>
+
+    <script>
+        // Scroll to top button - must be after the button element in DOM
+        (function initScrollToTop() {
+            const scrollToTopButton = document.getElementById('scrollToTop');
+            
+            if (!scrollToTopButton) {
+                console.error('Scroll to top button not found');
+                return;
+            }
+
+            function toggleScrollButton() {
+                const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+                if (scrollTop > 100) {
+                    scrollToTopButton.style.display = 'flex';
+                } else {
+                    scrollToTopButton.style.display = 'none';
+                }
+            }
+
+            function scrollToTop() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            }
+
+            window.addEventListener('scroll', toggleScrollButton, { passive: true });
+            window.addEventListener('resize', toggleScrollButton);
+            scrollToTopButton.addEventListener('click', scrollToTop);
+            toggleScrollButton();
+        })();
     </script>
 </body>
 </html>
