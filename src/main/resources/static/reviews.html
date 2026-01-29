@@ -668,27 +668,27 @@
                         // Show toast notification
                         const message = window.i18n ? window.i18n.translate('instagramToastMessage') : 'Ссылка скопирована, вставь её в новый пост.';
                         showToast(message);
-                        // Open Instagram after 2 seconds delay
+                        // Open Instagram after 3 seconds delay
                         setTimeout(() => {
                             window.open('https://www.instagram.com/', '_blank');
-                        }, 2000);
+                        }, 3000);
                     }).catch(() => {
                         // Fallback: show message even if clipboard fails
                         const message = window.i18n ? window.i18n.translate('instagramToastMessage') : 'Ссылка скопирована, вставь её в новый пост.';
                         showToast(message);
-                        // Open Instagram after 2 seconds delay
+                        // Open Instagram after 3 seconds delay
                         setTimeout(() => {
                             window.open('https://www.instagram.com/', '_blank');
-                        }, 2000);
+                        }, 3000);
                     });
                 } else {
                     // Fallback: show message if clipboard API is not available
                     const message = window.i18n ? window.i18n.translate('instagramToastMessage') : 'Instagram не позволяет автоматически создавать посты. Ссылка скопирована — вставь её в новый пост.';
                     showToast(message);
-                    // Open Instagram after 1 second delay
+                    // Open Instagram after 3 seconds delay
                     setTimeout(() => {
                         window.open('https://www.instagram.com/', '_blank');
-                    }, 1000);
+                    }, 3000);
                 }
             });
         }
