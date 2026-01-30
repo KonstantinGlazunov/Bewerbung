@@ -427,6 +427,19 @@
         body.dark #toastNotification p {
             color: #cbd5e1;
         }
+
+        /* SEO Details blocks styling */
+        details summary::-webkit-details-marker {
+            display: none;
+        }
+
+        details summary {
+            list-style: none;
+        }
+
+        details[open] summary svg {
+            transform: rotate(180deg);
+        }
     </style>
     <meta name="google-site-verification" content="PftA0fFd4ZVXys4GbFRN09Wb1_cnJrhGb35qOgGs0-Y" />
 </head>
@@ -566,6 +579,100 @@
                     </svg>
                 </a>
             </div>
+        </div>
+
+        <!-- SEO Content Blocks (Collapsible) -->
+        <div class="mt-10 space-y-4">
+            <!-- SEO Block 1: Поиск работы в Германии -->
+            <details class="group rounded-xl border border-slate-200 bg-slate-50/60 px-6 py-4 shadow-sm dark:border-slate-700 dark:bg-slate-900/60">
+                <summary class="cursor-pointer list-none text-sm font-semibold text-slate-900 dark:text-slate-100 hover:text-blue-600 dark:hover:text-blue-400">
+                    <span class="flex items-center justify-between">
+                        <span>Поиск работы в Германии</span>
+                        <svg class="w-5 h-5 transform transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </span>
+                </summary>
+                <div class="mt-4 text-sm text-slate-600 dark:text-slate-300 leading-relaxed space-y-2">
+                    <p>Поиск работы в Германии (Jobsuche in Deutschland) начинается не с собеседования, а с безупречно оформленной папки документов. Немецкие HR-менеджеры и автоматизированные системы подбора (ATS) тратят в среднем всего 6 секунд на первичный просмотр вашей заявки. Если ваше Bewerbung на немецком не соответствует стандартам DIN 5008, шансы на приглашение резко снижаются.</p>
+                    <p>Наш сервис разработан специально для того, чтобы помочь вам подготовить профессиональное резюме (Lebenslauf) и сопроводительное письмо (Anschreiben) онлайн. Мы учитываем специфику немецкого рынка труда, помогая вам выделиться среди сотен других кандидатов.</p>
+                </div>
+            </details>
+
+            <!-- SEO Block 2: Bewerbung и резюме на немецком языке -->
+            <details class="group rounded-xl border border-slate-200 bg-slate-50/60 px-6 py-4 shadow-sm dark:border-slate-700 dark:bg-slate-900/60">
+                <summary class="cursor-pointer list-none text-sm font-semibold text-slate-900 dark:text-slate-100 hover:text-blue-600 dark:hover:text-blue-400">
+                    <span class="flex items-center justify-between">
+                        <span>Bewerbung и резюме на немецком языке</span>
+                        <svg class="w-5 h-5 transform transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </span>
+                </summary>
+                <div class="mt-4 text-sm text-slate-600 dark:text-slate-300 leading-relaxed space-y-2">
+                    <p>Успешный поиск работы в Германии требует понимания местной бизнес-культуры. В отличие от многих других стран, здесь до сих пор ценится формализм и структурированность.</p>
+                    <ul class="list-disc list-inside space-y-1 ml-4">
+                        <li>Четкая структура: Ваши документы должны быть логичными и легко читаемыми.</li>
+                        <li>Акцент на квалификацию: В Германии важно подтверждать каждый навык опытом или сертификатом.</li>
+                        <li>Индивидуальный подход: «Массовая рассылка» одинаковых писем не работает. Каждое Bewerbung должно быть адаптировано под конкретную вакансию.</li>
+                    </ul>
+                </div>
+            </details>
+
+            <!-- SEO Block 3: Создать резюме для работы в Германии онлайн -->
+            <details class="group rounded-xl border border-slate-200 bg-slate-50/60 px-6 py-4 shadow-sm dark:border-slate-700 dark:bg-slate-900/60">
+                <summary class="cursor-pointer list-none text-sm font-semibold text-slate-900 dark:text-slate-100 hover:text-blue-600 dark:hover:text-blue-400">
+                    <span class="flex items-center justify-between">
+                        <span>Создать резюме для работы в Германии онлайн</span>
+                        <svg class="w-5 h-5 transform transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </span>
+                </summary>
+                <div class="mt-4 text-sm text-slate-600 dark:text-slate-300 leading-relaxed space-y-2">
+                    <p>Bewerbung на немецком языке — это комплексный пакет документов. Главная ошибка русскоязычных соискателей — прямой перевод своего резюме с русского языка.</p>
+                    <ol class="list-decimal list-inside space-y-2 ml-4">
+                        <li><strong>Lebenslauf (Резюме):</strong> В Германии принято использовать хронологический порядок (от последнего места работы к первому). Фотография, дата рождения и семейное положение здесь все еще приветствуются, в отличие от США или Великобритании.</li>
+                        <li><strong>Anschreiben (Сопроводительное письмо):</strong> Это ваша единственная возможность объяснить, почему именно вы подходите компании. Оно должно занимать строго одну страницу А4.</li>
+                    </ol>
+                </div>
+            </details>
+
+            <!-- SEO Block 4: Онлайн-генератор Bewerbung -->
+            <details class="group rounded-xl border border-slate-200 bg-slate-50/60 px-6 py-4 shadow-sm dark:border-slate-700 dark:bg-slate-900/60">
+                <summary class="cursor-pointer list-none text-sm font-semibold text-slate-900 dark:text-slate-100 hover:text-blue-600 dark:hover:text-blue-400">
+                    <span class="flex items-center justify-between">
+                        <span>Онлайн-генератор Bewerbung: создайте документы за 10 минут</span>
+                        <svg class="w-5 h-5 transform transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </span>
+                </summary>
+                <div class="mt-4 text-sm text-slate-600 dark:text-slate-300 leading-relaxed space-y-2">
+                    <p>Забудьте о сложных шаблонах в Word, которые «едут» при сохранении. Наш онлайн-генератор мотивационного письма для работы в Германии позволяет:</p>
+                    <ul class="list-disc list-inside space-y-1 ml-4">
+                        <li>Выбрать проверенный немецкий формат.</li>
+                        <li>Использовать правильные профессиональные термины на немецком.</li>
+                        <li>Скачать готовый результат в PDF, готовый к отправке работодателю.</li>
+                    </ul>
+                    <p>Это идеальное решение для тех, кто хочет сэкономить время и быть уверенным в корректности оформления своего Bewerbung онлайн.</p>
+                </div>
+            </details>
+
+            <!-- SEO Block 5: Для иностранных соискателей в Германии -->
+            <details class="group rounded-xl border border-slate-200 bg-slate-50/60 px-6 py-4 shadow-sm dark:border-slate-700 dark:bg-slate-900/60">
+                <summary class="cursor-pointer list-none text-sm font-semibold text-slate-900 dark:text-slate-100 hover:text-blue-600 dark:hover:text-blue-400">
+                    <span class="flex items-center justify-between">
+                        <span>Для иностранных соискателей в Германии</span>
+                        <svg class="w-5 h-5 transform transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </span>
+                </summary>
+                <div class="mt-4 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                    <p>Мы понимаем боли соискателей из зарубежа. Переезд по Blue Card, поиск работы с параграфом 24 или поиск первой работы после обучения в Германии (Ausbildung) — каждый кейс требует своего подхода. Наш сервис помогает адаптировать ваш прошлый опыт под ожидания немецких работодателей, сглаживая культурный и языковой барьер.</p>
+                </div>
+            </details>
         </div>
 
         </main>
