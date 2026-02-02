@@ -1,57 +1,37 @@
-Finanz Informatik GmbH & Co. KG logo
-Java Softwareentwickler (m/w/d)
-Finanz Informatik GmbH & Co. KG
-Hannover, Münster, Frankfurt am Main
-Feste Anstellung
-Homeoffice möglich, Vollzeit
-Erschienen: vor 3 Tagen
-52.000€ - 79.000€/Jahr (geschätzt für Vollzeit)
-Sei einer der ersten Bewerber
-Finanz Informatik GmbH & Co. KG logo
-Java Softwareentwickler (m/w/d)
-Finanz Informatik GmbH & Co. KG
-Passt dieser Job zu mir?
-Prüfe vor deiner Bewerbung, ob du die Voraussetzungen erfüllst.
+Mitarbeitender Montage (m/w/d)
+Vollzeit, Standort: Wetzlar - Steindorf
 
-Passt weniger
-Passt hervorragend
-slide number 1
-Als einer der größten Banken-IT-Dienstleister und Digitalisierungspartner Europas sind wir der Treiber der Digitalisierung innerhalb der Sparkassen-Finanzgruppe. Mit über 5.000 Mitarbeitenden an 3 Standorten machen wir digitales Banking von heute leistungsfähig und entwickeln smarte Finanz-Services von morgen. Dabei bieten wir ein breites Aufgabenspektrum, in dem die individuellen Stärken hervorragend eingebracht werden können. Ob App-Entwicklung, Netzwerktechnologien und Serverbetrieb oder Beratung, Schulung und Support – bei uns findet jede:r seine bzw. ihre Berufung! Als Spezialist:in oder auch als Generalist:in. Alles mit besten Karrierechancen, viel Raum für persönliche Entfaltung und zahlreichen Benefits.
+Diese Aufgaben warten auf Dich:
 
-Für die Organisationseinheit Rahmenkredite, Avale & Konsortial, suchen wir zum nächstmöglichen Termin für den Standort Hannover, Münster oder Frankfurt am Main einen
+• Endmontage unserer hochpräzisen feinmechanischen Produkte
+• termingerechte Bearbeitung von kundenspezifischen Montageaufträgen
+• Verkabelung von Mikropositioniersystemen
 
-Java Softwareentwickler (m/w/d).
+Folgende Qualifikationen solltest Du mitbringen:
 
-Hinweis: Das Team ist ausschließlich am Standort Hannover angesiedelt.
+• abgeschlossene Berufsausbildung zum Feinmechaniker, Mechaniker, Elektroniker oder einer anderen vergleichbaren Tätigkeit
+• mehrjährige Berufserfahrung in entsprechender Position
+• selbständige und sorgfältige Arbeitsweise, sowie hohes Verantwortungsbewusstsein
 
-#mitgestalten – was dich erwartet:
-Innovative Software-Entwicklung: Architekturelle Konzeption und eigenverantwortliche Neu- und Weiterentwicklung von Geschäftsprozessen, Services und Workflows in Java und JavaScript.
-Vielfältige Projekte: Verantwortungsübernahme und Mitarbeit in komplexen Projekten von der Analyse über Design bis hin zu Implementierung, Test, Dokumentation und Einführung.
-Koordination: Technischer Ansprechpartner (m/w/d) für Produktverantwortliche und Führungskräfte, sowie Steuerung der technischen Themen im Entwicklerteam. 
-Technische Implementierung: Enge Zusammenarbeit mit bankfachlichen Produktverantwortlichen und Implementierung von technischen Änderungswünschen.
-Qualitätssicherung & Performance-Optimierung: Konzeption und Durchführung von Maßnahmen zur Qualitätssicherung und Performance-Optimierung.
-Lösungsfinder: Übernahme des Last-Level-Supports für unsere entwickelten Komponenten und Management von Programmeinsätzen.
-#mitbringen – was wir erwarten:
-Background: Abgeschlossenes Studium der Informatik, Wirtschaftsinformatik oder vergleichbare Ausbildung (z.B. Fachinformatiker).
-Erfahrung: Mind. 6 Jahre fachbezogene Berufserfahrung und fundierte Kenntnisse in der Softwareentwicklung mit Java und JavaScript.
-Technologien: Kenntnisse in Tools wie IntelliJ, Subversion, Git, Maven, Harvest, Guice oder JUnit.
-Frontend-Entwicklung: Erfahrung mit React und Material UI ist wünschenswert.
-Arbeitsweise: Strukturierte, zielorientierte und eigenverantwortliche Herangehensweise an Aufgaben.
-Neugierde: Ausgeprägte Neugier und Ausdauer für neue Themen.
-Teamgeist: Freude an der Zusammenarbeit im Team, Zuverlässigkeit und Einsatzbereitschaft sowie Bereitschaft zu gelegentlichen Reisen.
-Ihre Benefits bei der Finanz Informatik:
-Sie fragen sich, warum Sie bei der Finanz Informatik arbeiten sollten? Wir hätten da ein paar gute Gründe für Sie. Neben flexiblen Arbeitszeiten, vergünstigten Jobtickets oder der Möglichkeit, mobil zu arbeiten, bieten wir Ihnen noch viel mehr:
+Wir bieten:
 
-Altersvorsorge
-Barrierefrei
-Betriebssport
-Familienservice
-Firmenevents
-Flexible Arbeitszeiten
-Mobiles Arbeiten
-Jobticket
-Kantine
-Tarifvertrag
-Weiterbildung
-Fitnessförderung
-Bei uns erwartet Sie eine attraktive Vergütung basierend auf Ihrer Qualifikation sowie Ihrer relevanten, praktischen Erfahrung.
+Herausforderung und Kontinuität: Kreative Aufgaben in einem stetig wachsenden Unternehmen innerhalb einer zukunftsträchtigen Branche.
+Familiäres Arbeitsumfeld: Flache Hierarchien, offene Kommunikation, Teamwork und kurze Entscheidungswege 
+Faire Work-Life-Balance: Flexible Arbeitszeiten
+Attraktive Vergütung: Attraktives Gehalt und umfangreiche freiwillige Sozialleistungen
+Optional: JobRad
+ 
+
+Du hast Interesse, Dich mit deinem Engagement in den Ausbau unseres Unternehmens zu integrieren und in enger Zusammenarbeit mit der Geschäftsführung neue Impulse zu setzen? Dann sollten wir uns kennenlernen. Wenn wir Dein Interesse geweckt haben, freuen wir uns auf Deine Bewerbung mit Angabe Deiner Gehaltsvorstellung und des frühestmöglichen Eintrittstermins, gerne auch per E-Mail. personal(at)marzhauser.com
+
+ 
+
+Über uns:
+
+Seit 79 Jahren schreibt die Märzhäuser GmbH & Co. KG ihre Erfolgsgeschichte. Durch harte Arbeit und Innovationsbewusstsein wurde das Familienunternehmen zur führenden Adresse für den Mikroskopiebedarf. Als weltweit marktführender Erstausrüster manueller, motorischer und automatisierter Mikropositioniersysteme sowie Steuerungen und Zubehör unterstützen wir mit der Entwicklung maßgeschneiderter und innovativer Systeme die führenden Mikroskophersteller, Universitäten und Forschungsinstitute, die den Anwendern eine präzise und ergonomische Arbeitsweise ermöglichen.
+
+Der Schlüssel zu unserem hohen Standard sind unsere fast 240 Mitarbeiter. Durch ihre gewissenhafte Arbeit wird Märzhäusers Qualität zum Erfolg. Als Familienunternehmen sind wir besonders stolz auf den enormen Erfahrungsschatz, auf den wir jeden Tag zurückgreifen und der es uns ermöglicht, neue Maßstäbe für zukünftige Technologien zu setzen. Mit einem starken Fokus auf Forschung und Entwicklung sind wir stets auf der Suche nach neuen Lösungen und Trends, um unsere Produkte und Dienstleistungen zu verbessern und unseren Kunden einen echten Mehrwert zu bieten.
+
+Ob in Forschung und Entwicklung, Materialprüfung oder im Bereich Life-Science:
+
+Mit Märzhäuser-Mikropositioniersystemen wird Präzision auf den Punkt gebracht!
