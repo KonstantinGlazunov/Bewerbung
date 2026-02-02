@@ -144,14 +144,72 @@ public class GenerateController {
 
         // Generate cover letter (Anschreiben) - only if vacancy, CV, or wishes changed
         if (changeResult.isVacancyChanged() || changeResult.isCvChanged() || changeResult.isWishesChanged()) {
-            if (jobRequirements == null) {
-                // Need to analyze even if vacancy didn't change, for anschreiben generation
-                logger.info("Job requirements null, analyzing vacancy for anschreiben generation");
-                jobRequirements = vacancyAnalyzerService.analyzeVacancy(request.getJobPosting());
+            String coverLetter;
+            
+            // Special case: if only wishes changed (not vacancy or CV), check if we can apply corrections
+            if (changeResult.isWishesChanged() && !changeResult.isVacancyChanged() && !changeResult.isCvChanged()) {
+                // Check if wishes contain FACT_EXCLUSION (deletions) - if yes, need full regeneration
+                boolean hasFactExclusion = anschreibenGeneratorService.containsFactExclusion(request.getWishes());
+                
+                if (hasFactExclusion) {
+                    logger.info("Wishes contain FACT_EXCLUSION (deletions) - must regenerate letter from scratch using all fields");
+                    // Need full generation when deletions are present
+                    if (jobRequirements == null) {
+                        logger.info("Job requirements null, analyzing vacancy for anschreiben generation");
+                        jobRequirements = vacancyAnalyzerService.analyzeVacancy(request.getJobPosting());
+                    }
+                    coverLetter = anschreibenGeneratorService.generateAnschreiben(
+                            jobRequirements, biography, request.getJobPosting(), request.getWishes());
+                } else {
+                    logger.info("Only wishes changed (no deletions) - attempting to apply corrections to existing anschreiben...");
+                    
+                    // Try to load existing anschreiben
+                    String savedAnschreibenPath = changeDetectionService.getSavedAnschreibenPath();
+                    String existingAnschreiben = null;
+                    
+                    if (savedAnschreibenPath != null && !savedAnschreibenPath.isEmpty()) {
+                        existingAnschreiben = fileOutputService.readAnschreiben(savedAnschreibenPath);
+                    }
+                    
+                    // Also try to read from default output location
+                    if (existingAnschreiben == null || existingAnschreiben.trim().isEmpty()) {
+                        existingAnschreiben = fileOutputService.readAnschreiben("output/anschreiben.md");
+                    }
+                    
+                    if (existingAnschreiben != null && !existingAnschreiben.trim().isEmpty()) {
+                        logger.info("Found existing anschreiben (length: {} chars), applying corrections...", existingAnschreiben.length());
+                        // Default to German if language not specified
+                        String language = request.getLanguage();
+                        if (language == null || language.trim().isEmpty()) {
+                            language = "de";
+                        }
+                        coverLetter = anschreibenGeneratorService.applyCorrectionsToAnschreiben(
+                                existingAnschreiben, request.getWishes(), language);
+                        logger.info("Corrections applied successfully (length: {} chars)", coverLetter.length());
+                    } else {
+                        logger.warn("No existing anschreiben found, falling back to full generation");
+                        // Fallback to full generation if no existing letter found
+                        if (jobRequirements == null) {
+                            logger.info("Job requirements null, analyzing vacancy for anschreiben generation");
+                            jobRequirements = vacancyAnalyzerService.analyzeVacancy(request.getJobPosting());
+                        }
+                        coverLetter = anschreibenGeneratorService.generateAnschreiben(
+                                jobRequirements, biography, request.getJobPosting(), request.getWishes());
+                    }
+                }
+            } else {
+                // Full generation needed (vacancy or CV changed, or wishes changed but no existing letter)
+                if (jobRequirements == null) {
+                    // Need to analyze even if vacancy didn't change, for anschreiben generation
+                    logger.info("Job requirements null, analyzing vacancy for anschreiben generation");
+                    jobRequirements = vacancyAnalyzerService.analyzeVacancy(request.getJobPosting());
+                }
+                logger.info("Generating anschreiben from scratch...");
+                coverLetter = anschreibenGeneratorService.generateAnschreiben(
+                        jobRequirements, biography, request.getJobPosting(), request.getWishes());
             }
-            logger.info("Generating anschreiben...");
-            String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography, request.getJobPosting(), request.getWishes());
-            logger.info("Anschreiben generated (length: {} chars), writing to file...", coverLetter.length());
+            
+            logger.info("Anschreiben ready (length: {} chars), writing to file...", coverLetter.length());
             
             // Save to both output directory and data directory
             fileOutputService.writeAnschreiben(coverLetter);
@@ -229,7 +287,56 @@ public class GenerateController {
         }
 
         // Generate cover letter (Anschreiben) - use the same language from request
-        String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography, request.getJobPosting(), request.getWishes(), language);
+        String coverLetter;
+        
+        // Special case: if only wishes changed (not vacancy, CV, or language), check if we can apply corrections
+        // IMPORTANT: If language changed, we must regenerate completely even if only wishes changed
+        if (changeResult.isWishesChanged() && !changeResult.isVacancyChanged() && !changeResult.isCvChanged() && !changeResult.isLanguageChanged()) {
+            // Check if wishes contain FACT_EXCLUSION (deletions) - if yes, need full regeneration
+            boolean hasFactExclusion = anschreibenGeneratorService.containsFactExclusion(request.getWishes());
+            
+            if (hasFactExclusion) {
+                logger.info("Wishes contain FACT_EXCLUSION (deletions) - must regenerate letter from scratch using all fields");
+                // Need full generation when deletions are present
+                coverLetter = anschreibenGeneratorService.generateAnschreiben(
+                        jobRequirements, biography, request.getJobPosting(), request.getWishes(), language);
+            } else {
+                logger.info("Only wishes changed (no deletions, language unchanged) - attempting to apply corrections to existing anschreiben...");
+                
+                // Try to load existing anschreiben
+                String savedAnschreibenPath = changeDetectionService.getSavedAnschreibenPath();
+                String existingAnschreiben = null;
+                
+                if (savedAnschreibenPath != null && !savedAnschreibenPath.isEmpty()) {
+                    existingAnschreiben = fileOutputService.readAnschreiben(savedAnschreibenPath);
+                }
+                
+                // Also try to read from default output location
+                if (existingAnschreiben == null || existingAnschreiben.trim().isEmpty()) {
+                    existingAnschreiben = fileOutputService.readAnschreiben("output/anschreiben.md");
+                }
+                
+                if (existingAnschreiben != null && !existingAnschreiben.trim().isEmpty()) {
+                    logger.info("Found existing anschreiben (length: {} chars), applying corrections...", existingAnschreiben.length());
+                    coverLetter = anschreibenGeneratorService.applyCorrectionsToAnschreiben(
+                            existingAnschreiben, request.getWishes(), language);
+                    logger.info("Corrections applied successfully (length: {} chars)", coverLetter.length());
+                } else {
+                    logger.warn("No existing anschreiben found, falling back to full generation");
+                    // Fallback to full generation if no existing letter found
+                    coverLetter = anschreibenGeneratorService.generateAnschreiben(
+                            jobRequirements, biography, request.getJobPosting(), request.getWishes(), language);
+                }
+            }
+        } else {
+            // Full generation needed (vacancy, CV, or language changed, or wishes changed but no existing letter)
+            if (changeResult.isLanguageChanged()) {
+                logger.info("Language changed - must regenerate cover letter completely");
+            }
+            logger.info("Generating anschreiben from scratch...");
+            coverLetter = anschreibenGeneratorService.generateAnschreiben(
+                    jobRequirements, biography, request.getJobPosting(), request.getWishes(), language);
+        }
         
         // Save to both output directory and data directory
         fileOutputService.writeAnschreiben(coverLetter);
@@ -367,7 +474,56 @@ public class GenerateController {
         logger.info("Generating cover letter in language: {}", languageForGeneration);
 
         // Generate cover letter (Anschreiben) - pass full biography for experience/education reference
-        String coverLetter = anschreibenGeneratorService.generateAnschreiben(jobRequirements, biography, jobPosting, wishes, languageForGeneration);
+        String coverLetter;
+        
+        // Special case: if only wishes changed (not vacancy, CV, or language), check if we can apply corrections
+        // IMPORTANT: If language changed, we must regenerate completely even if only wishes changed
+        if (changeResult.isWishesChanged() && !changeResult.isVacancyChanged() && !changeResult.isCvChanged() && !changeResult.isLanguageChanged()) {
+            // Check if wishes contain FACT_EXCLUSION (deletions) - if yes, need full regeneration
+            boolean hasFactExclusion = anschreibenGeneratorService.containsFactExclusion(wishes);
+            
+            if (hasFactExclusion) {
+                logger.info("Wishes contain FACT_EXCLUSION (deletions) - must regenerate letter from scratch using all fields");
+                // Need full generation when deletions are present
+                coverLetter = anschreibenGeneratorService.generateAnschreiben(
+                        jobRequirements, biography, jobPosting, wishes, languageForGeneration);
+            } else {
+                logger.info("Only wishes changed (no deletions, language unchanged) - attempting to apply corrections to existing anschreiben...");
+                
+                // Try to load existing anschreiben
+                String savedAnschreibenPath = changeDetectionService.getSavedAnschreibenPath();
+                String existingAnschreiben = null;
+                
+                if (savedAnschreibenPath != null && !savedAnschreibenPath.isEmpty()) {
+                    existingAnschreiben = fileOutputService.readAnschreiben(savedAnschreibenPath);
+                }
+                
+                // Also try to read from default output location
+                if (existingAnschreiben == null || existingAnschreiben.trim().isEmpty()) {
+                    existingAnschreiben = fileOutputService.readAnschreiben("output/anschreiben.md");
+                }
+                
+                if (existingAnschreiben != null && !existingAnschreiben.trim().isEmpty()) {
+                    logger.info("Found existing anschreiben (length: {} chars), applying corrections...", existingAnschreiben.length());
+                    coverLetter = anschreibenGeneratorService.applyCorrectionsToAnschreiben(
+                            existingAnschreiben, wishes, languageForGeneration);
+                    logger.info("Corrections applied successfully (length: {} chars)", coverLetter.length());
+                } else {
+                    logger.warn("No existing anschreiben found, falling back to full generation");
+                    // Fallback to full generation if no existing letter found
+                    coverLetter = anschreibenGeneratorService.generateAnschreiben(
+                            jobRequirements, biography, jobPosting, wishes, languageForGeneration);
+                }
+            }
+        } else {
+            // Full generation needed (vacancy, CV, or language changed, or wishes changed but no existing letter)
+            if (changeResult.isLanguageChanged()) {
+                logger.info("Language changed - must regenerate cover letter completely");
+            }
+            logger.info("Generating anschreiben from scratch...");
+            coverLetter = anschreibenGeneratorService.generateAnschreiben(
+                    jobRequirements, biography, jobPosting, wishes, languageForGeneration);
+        }
         
         // Save to both output directory and data directory
         fileOutputService.writeAnschreiben(coverLetter);
