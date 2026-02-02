@@ -1300,4 +1300,293 @@ public class AnschreibenGeneratorService {
         // Default to STYLE_INSTRUCTION for everything else
         return new WishCategory("STYLE_INSTRUCTION", trimmed);
     }
+    
+    /**
+     * Checks if wishes contain any FACT_EXCLUSION (deletions/exclusions).
+     * If wishes contain exclusions, full regeneration is needed instead of corrections.
+     * 
+     * @param wishes User wishes/corrections to check
+     * @return true if wishes contain FACT_EXCLUSION, false otherwise
+     */
+    public boolean containsFactExclusion(String wishes) {
+        if (wishes == null || wishes.trim().isEmpty()) {
+            return false;
+        }
+        
+        String[] wishLines = wishes.split("\n");
+        StringBuilder currentWish = new StringBuilder();
+        
+        for (String line : wishLines) {
+            String trimmed = line.trim();
+            if (trimmed.isEmpty()) {
+                if (currentWish.length() > 0) {
+                    WishCategory category = categorizeWish(currentWish.toString());
+                    if ("FACT_EXCLUSION".equals(category.category)) {
+                        return true;
+                    }
+                    currentWish.setLength(0);
+                }
+            } else {
+                String lower = trimmed.toLowerCase();
+                // Check for explicit markers
+                if (lower.startsWith("fact_exclusion:") || lower.startsWith("fact exclusion:")) {
+                    return true;
+                }
+                // Accumulate for later categorization
+                if (currentWish.length() > 0) {
+                    currentWish.append(" ");
+                }
+                currentWish.append(trimmed);
+            }
+        }
+        
+        // Check remaining accumulated wish
+        if (currentWish.length() > 0) {
+            WishCategory category = categorizeWish(currentWish.toString());
+            if ("FACT_EXCLUSION".equals(category.category)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Applies corrections to an existing cover letter based on user wishes.
+     * This method is used when only wishes have changed, avoiding full regeneration.
+     * 
+     * @param existingAnschreiben The previously generated cover letter
+     * @param wishes User wishes/corrections to apply
+     * @param language Target language ("de", "ru", or "en")
+     * @return The corrected cover letter
+     */
+    public String applyCorrectionsToAnschreiben(String existingAnschreiben, String wishes, String language) {
+        if (existingAnschreiben == null || existingAnschreiben.trim().isEmpty()) {
+            logger.error("Existing anschreiben is null or empty!");
+            throw new IllegalArgumentException("Existing anschreiben cannot be null or empty");
+        }
+        
+        if (wishes == null || wishes.trim().isEmpty()) {
+            logger.warn("Wishes are empty, returning original anschreiben");
+            return existingAnschreiben;
+        }
+        
+        // Default to German if language not specified
+        if (language == null || language.trim().isEmpty()) {
+            language = "de";
+        }
+        language = language.trim().toLowerCase();
+        logger.info("Applying corrections to existing anschreiben (language: {}, wishes length: {} chars)", 
+                language, wishes.length());
+        
+        String prompt = buildCorrectionPrompt(existingAnschreiben, wishes, language);
+        logger.debug("Generated correction prompt (length: {} chars, language: {})", prompt.length(), language);
+        
+        // Use HEAVY model for final document generation (higher quality)
+        String correctedAnschreiben = openAiService.generateTextWithHeavyModel(prompt);
+        
+        logger.info("Successfully applied corrections to anschreiben (length: {} characters)", 
+                correctedAnschreiben.length());
+        
+        return correctedAnschreiben;
+    }
+    
+    /**
+     * Builds a prompt for correcting an existing cover letter based on user wishes.
+     */
+    private String buildCorrectionPrompt(String existingAnschreiben, String wishes, String language) {
+        StringBuilder prompt = new StringBuilder();
+        
+        // Default to German if invalid language
+        if (language == null || (!language.equals("de") && !language.equals("ru") && !language.equals("en"))) {
+            logger.warn("Invalid language '{}' provided, defaulting to 'de'", language);
+            language = "de";
+        }
+        logger.info("Building correction prompt with language: {}", language);
+        
+        prompt.append("MISSION\n\n");
+        
+        // CRITICAL: Language specification at the very beginning
+        if ("ru".equals(language)) {
+            prompt.append("⚠️⚠️⚠️ CRITICAL LANGUAGE REQUIREMENT: YOU MUST WRITE THE ENTIRE COVER LETTER IN RUSSIAN LANGUAGE! ⚠️⚠️⚠️\n");
+            prompt.append("The output language is RUSSIAN. Every word, every sentence, every paragraph MUST be in RUSSIAN.\n");
+            prompt.append("Do NOT write in German. Do NOT write in English. Write ONLY in RUSSIAN.\n\n");
+        } else if ("en".equals(language)) {
+            prompt.append("⚠️⚠️⚠️ CRITICAL LANGUAGE REQUIREMENT: YOU MUST WRITE THE ENTIRE COVER LETTER IN BRITISH ENGLISH! ⚠️⚠️⚠️\n");
+            prompt.append("The output language is BRITISH ENGLISH. Every word, every sentence, every paragraph MUST be in BRITISH ENGLISH.\n");
+            prompt.append("Do NOT write in German. Do NOT write in American English. Write ONLY in BRITISH ENGLISH.\n\n");
+        } else {
+            prompt.append("⚠️⚠️⚠️ CRITICAL LANGUAGE REQUIREMENT: YOU MUST WRITE THE ENTIRE COVER LETTER IN GERMAN LANGUAGE! ⚠️⚠️⚠️\n");
+            prompt.append("The output language is GERMAN. Every word, every sentence, every paragraph MUST be in GERMAN.\n\n");
+        }
+        
+        // Language-specific mission statement
+        if ("de".equals(language)) {
+            prompt.append("You are a professional German job application consultant. ");
+            prompt.append("Your task is to modify an EXISTING cover letter (Motivationsschreiben / Anschreiben) ");
+            prompt.append("based on user corrections and wishes.\n\n");
+        } else if ("ru".equals(language)) {
+            prompt.append("You are a professional Russian job application consultant. ");
+            prompt.append("Your task is to modify an EXISTING cover letter (мотивационное письмо / сопроводительное письмо) ");
+            prompt.append("based on user corrections and wishes.\n\n");
+        } else { // "en"
+            prompt.append("You are a professional British job application consultant. ");
+            prompt.append("Your task is to modify an EXISTING cover letter ");
+            prompt.append("based on user corrections and wishes.\n\n");
+        }
+        
+        prompt.append("IMPORTANT: You are NOT generating a new cover letter from scratch. ");
+        prompt.append("You are MODIFYING an existing cover letter according to user wishes.\n\n");
+        
+        prompt.append("=== EXISTING COVER LETTER ===\n");
+        prompt.append(existingAnschreiben).append("\n\n");
+        prompt.append("=== END OF EXISTING COVER LETTER ===\n\n");
+        
+        prompt.append("=== USER WISHES / CORRECTIONS ===\n");
+        prompt.append(wishes).append("\n\n");
+        prompt.append("=== END OF USER WISHES ===\n\n");
+        
+        // Categorize wishes
+        String[] wishLines = wishes.split("\n");
+        java.util.List<WishCategory> categorizedWishes = new java.util.ArrayList<>();
+        
+        StringBuilder currentWish = new StringBuilder();
+        for (String line : wishLines) {
+            String trimmed = line.trim();
+            if (trimmed.isEmpty()) {
+                if (currentWish.length() > 0) {
+                    categorizedWishes.add(categorizeWish(currentWish.toString()));
+                    currentWish.setLength(0);
+                }
+            } else {
+                String lower = trimmed.toLowerCase();
+                if (lower.startsWith("factual_correction:") || lower.startsWith("factual correction:")) {
+                    if (currentWish.length() > 0) {
+                        categorizedWishes.add(categorizeWish(currentWish.toString()));
+                        currentWish.setLength(0);
+                    }
+                    String text = trimmed.substring(trimmed.indexOf(':') + 1).trim();
+                    if (!text.isEmpty()) {
+                        categorizedWishes.add(new WishCategory("FACTUAL_CORRECTION", text));
+                    }
+                } else if (lower.startsWith("fact_exclusion:") || lower.startsWith("fact exclusion:")) {
+                    if (currentWish.length() > 0) {
+                        categorizedWishes.add(categorizeWish(currentWish.toString()));
+                        currentWish.setLength(0);
+                    }
+                    String text = trimmed.substring(trimmed.indexOf(':') + 1).trim();
+                    if (!text.isEmpty()) {
+                        categorizedWishes.add(new WishCategory("FACT_EXCLUSION", text));
+                    }
+                } else if (lower.startsWith("style_instruction:") || lower.startsWith("style instruction:")) {
+                    if (currentWish.length() > 0) {
+                        categorizedWishes.add(categorizeWish(currentWish.toString()));
+                        currentWish.setLength(0);
+                    }
+                    String text = trimmed.substring(trimmed.indexOf(':') + 1).trim();
+                    if (!text.isEmpty()) {
+                        categorizedWishes.add(new WishCategory("STYLE_INSTRUCTION", text));
+                    }
+                } else {
+                    if (currentWish.length() > 0) {
+                        currentWish.append(" ");
+                    }
+                    currentWish.append(trimmed);
+                }
+            }
+        }
+        if (currentWish.length() > 0) {
+            categorizedWishes.add(categorizeWish(currentWish.toString()));
+        }
+        
+        if (categorizedWishes.isEmpty()) {
+            categorizedWishes.add(categorizeWish(wishes.trim()));
+        }
+        
+        // Display categorized wishes
+        prompt.append("CATEGORIZED USER WISHES:\n\n");
+        
+        java.util.List<String> factualCorrections = new java.util.ArrayList<>();
+        java.util.List<String> factExclusions = new java.util.ArrayList<>();
+        java.util.List<String> styleInstructions = new java.util.ArrayList<>();
+        
+        for (WishCategory cat : categorizedWishes) {
+            if ("FACTUAL_CORRECTION".equals(cat.category)) {
+                factualCorrections.add(cat.text);
+            } else if ("FACT_EXCLUSION".equals(cat.category)) {
+                factExclusions.add(cat.text);
+            } else {
+                styleInstructions.add(cat.text);
+            }
+        }
+        
+        if (!factualCorrections.isEmpty()) {
+            prompt.append("FACTUAL_CORRECTION:\n");
+            for (String correction : factualCorrections) {
+                prompt.append("  - ").append(correction).append("\n");
+            }
+            prompt.append("\n");
+        }
+        
+        if (!factExclusions.isEmpty()) {
+            prompt.append("FACT_EXCLUSION:\n");
+            for (String exclusion : factExclusions) {
+                prompt.append("  - ").append(exclusion).append("\n");
+            }
+            prompt.append("\n");
+        }
+        
+        if (!styleInstructions.isEmpty()) {
+            prompt.append("STYLE_INSTRUCTION:\n");
+            for (String instruction : styleInstructions) {
+                prompt.append("  - ").append(instruction).append("\n");
+            }
+            prompt.append("\n");
+        }
+        
+        prompt.append("INSTRUCTIONS:\n\n");
+        prompt.append("1. Read the EXISTING COVER LETTER carefully.\n");
+        prompt.append("2. Understand the USER WISHES / CORRECTIONS.\n");
+        prompt.append("3. Apply the corrections to the existing letter:\n");
+        prompt.append("   - For FACTUAL_CORRECTION: Replace incorrect facts with corrected ones\n");
+        prompt.append("   - For FACT_EXCLUSION: Remove or exclude mentioned information\n");
+        prompt.append("   - For STYLE_INSTRUCTION: Modify style, tone, structure, or presentation as requested\n");
+        prompt.append("4. Preserve the overall structure and quality of the original letter\n");
+        prompt.append("5. Make ONLY the changes requested by the user\n");
+        prompt.append("6. Do NOT rewrite the entire letter - only modify what needs to be changed\n");
+        prompt.append("7. Maintain the same language as the original letter (");
+        if ("ru".equals(language)) {
+            prompt.append("RUSSIAN");
+        } else if ("en".equals(language)) {
+            prompt.append("BRITISH ENGLISH");
+        } else {
+            prompt.append("GERMAN");
+        }
+        prompt.append(")\n\n");
+        
+        prompt.append("CRITICAL RULES:\n");
+        prompt.append("- Keep the same format and structure unless explicitly requested to change\n");
+        prompt.append("- Keep the same salutation and closing unless explicitly requested to change\n");
+        prompt.append("- Keep the same name at the end unless explicitly requested to change\n");
+        prompt.append("- Preserve all parts of the letter that are NOT mentioned in the wishes\n");
+        prompt.append("- Make changes naturally and seamlessly - the result should read as a coherent letter\n");
+        prompt.append("- Do NOT add new information that was not in the original letter unless explicitly requested\n");
+        prompt.append("- Do NOT remove information unless explicitly requested in FACT_EXCLUSION\n\n");
+        
+        prompt.append("OUTPUT:\n\n");
+        prompt.append("Output ONLY the corrected cover letter, without any explanations or meta-commentary.\n");
+        prompt.append("The output must be a complete, ready-to-send cover letter in ");
+        if ("ru".equals(language)) {
+            prompt.append("RUSSIAN");
+        } else if ("en".equals(language)) {
+            prompt.append("BRITISH ENGLISH");
+        } else {
+            prompt.append("GERMAN");
+        }
+        prompt.append(" language.\n");
+        prompt.append("Start directly with the subject line (if present) or salutation.\n");
+        prompt.append("End with the closing and name.\n\n");
+        
+        return prompt.toString();
+    }
 }
