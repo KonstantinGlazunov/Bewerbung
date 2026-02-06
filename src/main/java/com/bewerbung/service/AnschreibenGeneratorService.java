@@ -1358,9 +1358,13 @@ public class AnschreibenGeneratorService {
      * @param existingAnschreiben The previously generated cover letter
      * @param wishes User wishes/corrections to apply
      * @param language Target language ("de", "ru", or "en")
+     * @param job Job requirements from vacancy (for reference when wishes mention job requirements)
+     * @param biography Candidate biography (for reference when wishes mention experience/skills)
+     * @param vacancyFullText Full vacancy text (for reference when wishes mention job description)
      * @return The corrected cover letter
      */
-    public String applyCorrectionsToAnschreiben(String existingAnschreiben, String wishes, String language) {
+    public String applyCorrectionsToAnschreiben(String existingAnschreiben, String wishes, String language, 
+                                                  JobRequirements job, Biography biography, String vacancyFullText) {
         if (existingAnschreiben == null || existingAnschreiben.trim().isEmpty()) {
             logger.error("Existing anschreiben is null or empty!");
             throw new IllegalArgumentException("Existing anschreiben cannot be null or empty");
@@ -1379,7 +1383,7 @@ public class AnschreibenGeneratorService {
         logger.info("Applying corrections to existing anschreiben (language: {}, wishes length: {} chars)", 
                 language, wishes.length());
         
-        String prompt = buildCorrectionPrompt(existingAnschreiben, wishes, language);
+        String prompt = buildCorrectionPrompt(existingAnschreiben, wishes, language, job, biography, vacancyFullText);
         logger.debug("Generated correction prompt (length: {} chars, language: {})", prompt.length(), language);
         
         // Use HEAVY model for final document generation (higher quality)
@@ -1393,8 +1397,11 @@ public class AnschreibenGeneratorService {
     
     /**
      * Builds a prompt for correcting an existing cover letter based on user wishes.
+     * Includes biography and vacancy data so that when wishes reference experience, skills, or job requirements,
+     * the model can use the actual data from these sources.
      */
-    private String buildCorrectionPrompt(String existingAnschreiben, String wishes, String language) {
+    private String buildCorrectionPrompt(String existingAnschreiben, String wishes, String language, 
+                                         JobRequirements job, Biography biography, String vacancyFullText) {
         StringBuilder prompt = new StringBuilder();
         
         // Default to German if invalid language
@@ -1445,6 +1452,32 @@ public class AnschreibenGeneratorService {
         prompt.append("=== USER WISHES / CORRECTIONS ===\n");
         prompt.append(wishes).append("\n\n");
         prompt.append("=== END OF USER WISHES ===\n\n");
+        
+        // Add reference data (biography and vacancy) so that when wishes reference experience, skills, or job requirements,
+        // the model can use the actual data from these sources
+        prompt.append("=== REFERENCE DATA (for use when wishes mention experience, skills, or job requirements) ===\n\n");
+        
+        if (vacancyFullText != null && !vacancyFullText.trim().isEmpty()) {
+            prompt.append("=== FULL JOB POSTING TEXT ===\n");
+            prompt.append(vacancyFullText).append("\n\n");
+        }
+        
+        if (job != null) {
+            prompt.append("=== STRUCTURED JOB POSTING ===\n");
+            appendJobPosting(prompt, job);
+            prompt.append("\n");
+        }
+        
+        if (biography != null) {
+            prompt.append("=== CANDIDATE BIOGRAPHY ===\n");
+            appendBiography(prompt, biography);
+            prompt.append("\n");
+        }
+        
+        prompt.append("=== END OF REFERENCE DATA ===\n\n");
+        prompt.append("IMPORTANT: If user wishes reference experience, skills, education, work history, job requirements, ");
+        prompt.append("or company information, you MUST use the actual data from the REFERENCE DATA sections above, ");
+        prompt.append("NOT invent or assume information. The REFERENCE DATA is the source of truth.\n\n");
         
         // Categorize wishes
         String[] wishLines = wishes.split("\n");
@@ -1547,14 +1580,20 @@ public class AnschreibenGeneratorService {
         prompt.append("INSTRUCTIONS:\n\n");
         prompt.append("1. Read the EXISTING COVER LETTER carefully.\n");
         prompt.append("2. Understand the USER WISHES / CORRECTIONS.\n");
-        prompt.append("3. Apply the corrections to the existing letter:\n");
-        prompt.append("   - For FACTUAL_CORRECTION: Replace incorrect facts with corrected ones\n");
+        prompt.append("3. If user wishes reference experience, skills, education, work history, job requirements, ");
+        prompt.append("or company information, you MUST use the actual data from the REFERENCE DATA sections above.\n");
+        prompt.append("   - Example: If user says \"emphasize my Java experience\", check the CANDIDATE BIOGRAPHY for actual Java experience\n");
+        prompt.append("   - Example: If user says \"mention the company's focus on innovation\", check the FULL JOB POSTING TEXT for this information\n");
+        prompt.append("   - Example: If user says \"highlight my 5 years of experience\", verify this in the CANDIDATE BIOGRAPHY\n");
+        prompt.append("   - NEVER invent or assume information - use ONLY what is in REFERENCE DATA\n");
+        prompt.append("4. Apply the corrections to the existing letter:\n");
+        prompt.append("   - For FACTUAL_CORRECTION: Replace incorrect facts with corrected ones (use REFERENCE DATA if needed)\n");
         prompt.append("   - For FACT_EXCLUSION: Remove or exclude mentioned information\n");
         prompt.append("   - For STYLE_INSTRUCTION: Modify style, tone, structure, or presentation as requested\n");
-        prompt.append("4. Preserve the overall structure and quality of the original letter\n");
-        prompt.append("5. Make ONLY the changes requested by the user\n");
-        prompt.append("6. Do NOT rewrite the entire letter - only modify what needs to be changed\n");
-        prompt.append("7. Maintain the same language as the original letter (");
+        prompt.append("5. Preserve the overall structure and quality of the original letter\n");
+        prompt.append("6. Make ONLY the changes requested by the user\n");
+        prompt.append("7. Do NOT rewrite the entire letter - only modify what needs to be changed\n");
+        prompt.append("8. Maintain the same language as the original letter (");
         if ("ru".equals(language)) {
             prompt.append("RUSSIAN");
         } else if ("en".equals(language)) {
