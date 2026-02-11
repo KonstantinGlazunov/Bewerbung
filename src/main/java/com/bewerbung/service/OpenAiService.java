@@ -7,8 +7,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import org.springframework.lang.NonNull;
+
+import java.util.Objects;
 
 @Service
 public class OpenAiService {
@@ -17,7 +21,7 @@ public class OpenAiService {
     
     private final WebClient webClient;
     private final String apiKey;
-    private final String apiUrl;
+    private final @NonNull String apiUrl;
     private final String lightModel;
     private final String heavyModel;
     private final Gson gson;
@@ -54,31 +58,16 @@ public class OpenAiService {
         }
         
         // Trim whitespace and newlines that might be in the .env file
-        String originalLength = String.valueOf(apiKeyValue.length());
         apiKeyValue = apiKeyValue.trim();
-        String trimmedLength = String.valueOf(apiKeyValue.length());
-        
-        if (!originalLength.equals(trimmedLength)) {
-            logger.info("API key was trimmed from {} to {} characters (removed whitespace/newlines)", 
-                    originalLength, trimmedLength);
-        }
-        
-        // Validate API key format (should start with "sk-")
-        if (!apiKeyValue.startsWith("sk-")) {
-            logger.error("API key does not start with 'sk-' - this might indicate an invalid key format. Key starts with: {}", 
-                    apiKeyValue.length() > 10 ? apiKeyValue.substring(0, 10) : apiKeyValue);
-            logger.error("NOTE: OpenAI API keys should start with 'sk-', not 'sk-proj-'. Please verify your API key is correct.");
-        }
         
         this.apiKey = apiKeyValue;
-        logger.info("GPT_API_KEY loaded successfully from {} (length: {} characters, starts with: {})", 
-                source, apiKey.length(), apiKey.substring(0, Math.min(10, apiKey.length())));
-        this.apiUrl = apiUrl;
+        logger.info("GPT_API_KEY loaded successfully from {}", source);
+        this.apiUrl = Objects.requireNonNull(apiUrl, "openai.api.url must not be null");
         this.lightModel = lightModel;
         this.heavyModel = heavyModel;
         this.gson = new Gson();
         this.webClient = WebClient.builder()
-                .baseUrl(apiUrl)
+                .baseUrl(this.apiUrl)
                 .build();
         
         logger.info("OpenAI Service initialized - Light model: {}, Heavy model: {}", lightModel, heavyModel);
@@ -112,16 +101,14 @@ public class OpenAiService {
     private String generateText(String prompt, String model) {
         try {
             JsonObject requestBody = buildRequestBody(prompt, model);
-            String requestBodyJson = gson.toJson(requestBody);
+            String requestBodyJson = Objects.requireNonNull(gson.toJson(requestBody), "requestBodyJson must not be null");
             
-            logger.debug("Sending request to OpenAI API: {} with model: {}", apiUrl, model);
-            logger.debug("Using API key with length: {} characters, prefix: {}", 
-                    apiKey.length(), apiKey.substring(0, Math.min(10, apiKey.length())));
+            logger.debug("Sending request to OpenAI API: {} with model: {}", this.apiUrl, model);
             
             String responseJson = webClient.post()
                     .header("Authorization", "Bearer " + apiKey)
                     .header("Content-Type", "application/json")
-                    .bodyValue(requestBodyJson)
+                    .body(BodyInserters.fromValue(Objects.requireNonNull(requestBodyJson, "requestBodyJson must not be null")))
                     .retrieve()
                     .bodyToMono(String.class)
                     .block();

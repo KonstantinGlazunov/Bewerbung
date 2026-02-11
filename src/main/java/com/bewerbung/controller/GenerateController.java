@@ -183,8 +183,14 @@ public class GenerateController {
                         if (language == null || language.trim().isEmpty()) {
                             language = "de";
                         }
+                        // Ensure we have job requirements for reference
+                        if (jobRequirements == null) {
+                            logger.info("Job requirements null, analyzing vacancy for reference data");
+                            jobRequirements = vacancyAnalyzerService.analyzeVacancy(request.getJobPosting());
+                        }
                         coverLetter = anschreibenGeneratorService.applyCorrectionsToAnschreiben(
-                                existingAnschreiben, request.getWishes(), language);
+                                existingAnschreiben, request.getWishes(), language, 
+                                jobRequirements, biography, request.getJobPosting());
                         logger.info("Corrections applied successfully (length: {} chars)", coverLetter.length());
                     } else {
                         logger.warn("No existing anschreiben found, falling back to full generation");
@@ -319,7 +325,8 @@ public class GenerateController {
                 if (existingAnschreiben != null && !existingAnschreiben.trim().isEmpty()) {
                     logger.info("Found existing anschreiben (length: {} chars), applying corrections...", existingAnschreiben.length());
                     coverLetter = anschreibenGeneratorService.applyCorrectionsToAnschreiben(
-                            existingAnschreiben, request.getWishes(), language);
+                            existingAnschreiben, request.getWishes(), language, 
+                            jobRequirements, biography, request.getJobPosting());
                     logger.info("Corrections applied successfully (length: {} chars)", coverLetter.length());
                 } else {
                     logger.warn("No existing anschreiben found, falling back to full generation");
@@ -506,7 +513,8 @@ public class GenerateController {
                 if (existingAnschreiben != null && !existingAnschreiben.trim().isEmpty()) {
                     logger.info("Found existing anschreiben (length: {} chars), applying corrections...", existingAnschreiben.length());
                     coverLetter = anschreibenGeneratorService.applyCorrectionsToAnschreiben(
-                            existingAnschreiben, wishes, languageForGeneration);
+                            existingAnschreiben, wishes, languageForGeneration, 
+                            jobRequirements, biography, jobPosting);
                     logger.info("Corrections applied successfully (length: {} chars)", coverLetter.length());
                 } else {
                     logger.warn("No existing anschreiben found, falling back to full generation");

@@ -15,11 +15,28 @@ import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.stream.Collectors;
+import java.util.regex.Pattern;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final Pattern SECRET_LIKE_PATTERN = Pattern.compile(
+            "(?i)(sk-[a-z0-9\\-_]{8,}|xkeysib-[a-z0-9\\-_]{8,}|bearer\\s+[a-z0-9\\-_\\.]{8,}|api[-_ ]?key\\s*[:=]\\s*[^\\s]+)"
+    );
+
+    private static String safeClientMessage(String message) {
+        if (message == null || message.isBlank()) {
+            return "An unexpected error occurred";
+        }
+        if (message.contains("GPT_API_KEY") || message.contains("EMAIL_API_KEY")) {
+            return "Configuration error. Please contact support.";
+        }
+        if (SECRET_LIKE_PATTERN.matcher(message).find()) {
+            return "An unexpected error occurred";
+        }
+        return message;
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiError> handleValidationException(MethodArgumentNotValidException ex) {
@@ -80,10 +97,7 @@ public class GlobalExceptionHandler {
         logger.error("Unhandled runtime exception: {}", ex.getMessage(), ex);
         
         // Include the actual error message for better debugging
-        String errorMessage = ex.getMessage();
-        if (errorMessage == null || errorMessage.isEmpty()) {
-            errorMessage = "An unexpected error occurred";
-        }
+        String errorMessage = safeClientMessage(ex.getMessage());
         
         ApiError apiError = new ApiError("INTERNAL_ERROR", errorMessage);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiError);
@@ -93,10 +107,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> handleException(Exception ex) {
         logger.error("Unhandled exception: {}", ex.getMessage(), ex);
         
-        String errorMessage = ex.getMessage();
-        if (errorMessage == null || errorMessage.isEmpty()) {
-            errorMessage = "An unexpected error occurred";
-        }
+        String errorMessage = safeClientMessage(ex.getMessage());
         
         ApiError apiError = new ApiError("INTERNAL_ERROR", errorMessage);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiError);

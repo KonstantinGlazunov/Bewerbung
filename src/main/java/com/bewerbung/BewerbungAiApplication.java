@@ -1,11 +1,15 @@
 package com.bewerbung;
 
 import io.github.cdimascio.dotenv.Dotenv;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class BewerbungAiApplication {
+
+    private static final Logger logger = LoggerFactory.getLogger(BewerbungAiApplication.class);
 
     public static void main(String[] args) {
         // Load environment variables from variables.env file before Spring Boot starts
@@ -27,13 +31,10 @@ public class BewerbungAiApplication {
                 }
             }
             
-            System.out.println("✓ Loaded " + loadedCount + " environment variables from variables.env");
+            logger.info("Loaded {} environment variables from variables.env (only those not already set in OS env)", loadedCount);
         } catch (Exception e) {
-            System.out.println("⚠ Warning: Could not load variables.env file");
-            System.out.println("   Current working directory: " + System.getProperty("user.dir"));
-            System.out.println("   Error: " + e.getMessage());
-            System.out.println("   Using system environment variables instead.");
-            System.out.println("   Make sure variables.env exists in the project root directory.");
+            logger.info("Could not load variables.env; falling back to OS environment variables. Reason: {}", e.getMessage());
+            logger.debug("variables.env load failure details", e);
         }
         
         SpringApplication.run(BewerbungAiApplication.class, args);
