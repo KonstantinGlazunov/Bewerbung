@@ -1,2 +1,11 @@
 /target/
 *.env
+variables.env
+.env.*
+*.env.*
+*.local.env
+*.secret.env
+!variables.env.example
+
+# IDE / OS
+.DS_Store
