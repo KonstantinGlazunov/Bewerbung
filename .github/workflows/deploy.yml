@@ -3,7 +3,7 @@ name: Auto Deploy
 on:
   push:
     branches:
-      - main   # Запускается после мерджа в main через PR
+      - main   # Запускается после merge в main
 
 jobs:
   deploy:
@@ -13,18 +13,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Copy SSH key
+      - name: Setup SSH key
         run: |
           mkdir -p ~/.ssh
-          tee ~/.ssh/id_ed25519 > /dev/null << 'EOF'
-${{ secrets.VM_SSH_KEY }}
-EOF
+          printf "%s" "${{ secrets.VM_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H ${{ secrets.VM_HOST }} >> ~/.ssh/known_hosts
 
       - name: Test SSH connection
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} "echo 'SSH OK'"
-
-      - name: Deploy to VM
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} 'bash /home/opc/deploy.sh'
+          ssh -i ~/.ssh/id_ed25519 \
