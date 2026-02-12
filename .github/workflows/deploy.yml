@@ -16,9 +16,10 @@ jobs:
       - name: Copy SSH key
         run: |
           mkdir -p ~/.ssh
-          echo "${{ secrets.VM_SSH_KEY }}" | tee ~/.ssh/id_ed25519 > /dev/null
+          tee ~/.ssh/id_ed25519 > /dev/null << 'EOF'
+${{ secrets.VM_SSH_KEY }}
+EOF
           chmod 600 ~/.ssh/id_ed25519
-      
 
       - name: Test SSH connection
         run: |
