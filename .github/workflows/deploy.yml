@@ -3,7 +3,7 @@ name: Auto Deploy
 on:
   push:
     branches:
-      - main  # ветка для деплоя
+      - main   # Запускается после мерджа в main через PR
 
 jobs:
   deploy:

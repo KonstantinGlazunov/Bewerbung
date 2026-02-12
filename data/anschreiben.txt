@@ -1,22 +1,14 @@
-Уважаемые господа,
+Betreff: Bewerbung als Java Softwareentwickler
 
-Меня зовут Константин Глазунов, и я хотел бы выразить свою заинтересованность в позиции "Mitarbeitender Montage" в компании Märzhäuser GmbH & Co. KG. Меня привлекает возможность работать в динамично развивающейся компании, которая является лидером в области микроскопического оборудования.
+Sehr geehrte Damen und Herren,
 
-Я обладаю многолетним опытом в технической сфере, что подтверждают мои профессиональные достижения в различных областях, таких как разработка ПО и техническое обслуживание. Моя карьера началась с работы техническим сотрудником, где я занимался систематическим осмотром и проверкой автомобилей. Также я работал продажным менеджером, что позволило развить мои навыки коммуникации и управления проектами.
+mit großem Interesse habe ich Ihre Stellenausschreibung für die Position Java Softwareentwickler bei der Finanz Informatik GmbH & Co. KG gelesen. Mit einem Bachelor-Abschluss in Informatik von der Technischen Universität Berlin und mehr als sechs Jahren Berufserfahrung in der Softwareentwicklung bringe ich umfassende Kenntnisse in Java und JavaScript mit, die den Anforderungen Ihrer Position entsprechen.
 
-Особое внимание я уделяю самоорганизации и личной эффективности, что, на мой взгляд, идеально соответствует философии вашей компании. Я имею опыт планирования маршрутов, оптимизации пространства, умею работать с дедлайнами и самостоятельно форсировать процесс. Навыки структурирования больших задач на подзадачи и соблюдение порядка помогут мне эффективно участвовать в завершении монтажных задач, требующих внимания к деталям и ответственности.
+In meiner aktuellen Rolle als Softwareentwickler bei der Tech Solutions GmbH in Berlin war ich verantwortlich für die Entwicklung von Web-Anwendungen mit Java Spring Boot. Meine Expertise umfasst die Backend-Entwicklung, das API-Design sowie die Optimierung von Datenbanken. Diese Aufgaben führten zu deutlichen Verbesserungen in der Effizienz unserer Systeme. Ich bin routiniert im Umgang mit Technologien wie Git, Maven und Docker und habe durch meine Arbeit im agilen Team ein hohes Maß an Teamgeist und Eigenverantwortung entwickelt. 
 
-Также хочу отметить свой интерес к решению проблем и аналитическому подходу, в частности, поиск причин неисправностей и их устранение, оптимизацию процессов и экономию ресурсов. Я обладаю способностью сравнивать варианты и принимать решения на основе анализа. 
+Die Möglichkeit, bei der Finanz Informatik Teil komplexer Projekte zu sein und innovative Lösungen zu entwickeln, reizt mich sehr. Besonderes Interesse wecken bei mir die Aspekte der Qualitätssicherung und Performance-Optimierung, die ich bereits erfolgreich in meiner bisherigen Tätigkeit umsetzen konnte. Zudem fasziniert mich die Möglichkeit, innerhalb der Sparkassen-Finanzgruppe einen direkten Einfluss auf die Digitalisierung und Modernisierung der Finanzdienstleistungen zu haben.
 
-Важным аспектом моей работы является коммуникация и помощь другим, включая объяснение технических моментов и обучение другим навыкам. Часто консультирую по практическим вопросам, даже неофициально.
+Ich freue mich darauf, die Zukunft der Finanzinformatik aktiv mitgestalten zu dürfen und stehe Ihnen jederzeit für ein persönliches Gespräch zur Verfügung, um Ihre Anforderungen und meine Qualifikationen näher zu besprechen.
 
-Моя творческая сторона и адаптивность проявляются в восстановлении или переделке вещей, что демонстрирует креативность и умение находить нестандартные решения. Я занимаюсь настройкой проектов под личные цели и экспериментированием с техникой.
-
-Техническая грамотность включает в себя навык самостоятельного изучения новых технологий, опыт работы с различными устройствами и понимание их принципов работы без официального опыта работы.
-
-Мои личностные качества включают в себя любовь к порядку, аккуратность, внимательность к деталям, терпение, умение доводить сложные задачи до конца, любопытство и стремление к новым знаниям. Это идеально подходит для требований вашей компании и может существенно способствовать успешной работе вашей команды.
-
-Буду рад возможности обсудить свои навыки и опыт более подробно и надеюсь на продуктивное сотрудничество с вами. Благодарю за внимание и рассматриваю возможность личной встречи в удобное для вас время.
-
-С уважением,  
-Константин Глазунов
+Mit freundlichen Grüßen  
+Max Mustermann
