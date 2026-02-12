@@ -1,57 +1,39 @@
-Konstantin Glazunov
+Name: Max Mustermann
+Email: max.mustermann@email.de
+Phone: +49 30 12345678
+Address: Musterstraße 123, 12345 Berlin, Deutschland
+Date of Birth: 1990-05-15
+Nationality: Deutsch
 
+=== EDUCATION ===
+Degree: Bachelor of Science - Informatik
+Institution: Technische Universität Berlin
+Location: Berlin
+Start Date: 2010-10
+End Date: 2014-09
+Description: Schwerpunkt: Softwareentwicklung und Datenbanken
 
-35619, Braunfels, Hessen
-glazunov.const@gmail.com
-linkedin.com/in/konstantin-glazunov/
-github.com/KonstantinGlazunov
-@Kglaz
-Softwareentwickler
-Backend-Entwicklung Java Stack
-Frontend-Entwicklung (React) 
-QA-Grundlagen
-Datenbanken (PostgreSQL, H2, MongoDB)
-Projektmanagement-Werkzeuge (Jira)
-Deutsch - B2 Beruf
-Englisch - flie
-Russisch - Muttersprache
-Kompetenzen
-Technisch orientierter Quereinsteiger in der Softwareentwicklung mit Schwerpunkt Backend und Fullstack (Java, Spring).
-Grundkenntnisse in Softwaretests und QA-Prozessen aus Kursen und Projektarbeit. Motiviert, mich im Bereich Softwaretests und industrieller Automatisierung weiterzuentwickeln.
-Profile
-Berufserfahrung
-Bildung
-Perm State Technical University
-2000-2003
-Bachelor in Betriebswirtschaft
-skillfactory Bootcamp
-2020
-Produktmanager
-Perm Military Institute of Strategic Missile Forces
-1996-2000
-Elektrotechniker
-Pilteh · Full-time
-Product Marketing Manager
-CRM Integration · Facebook Marketing · Video Production · YouTube · Website Administration · Google Adwords
-Er leitete ein Team von Verkaufsleitern. Bewirbt das Produkt im Internet.  Die Anzahl der abgeschlossenen Verträge sicherte den einjährigen Betrieb des Werks für die Herstellung von Geräten.
-Energotechstroy · Full-time
-Sales Manager
-Telemarketing · Direct Sales · 1s
-Von Null zum Spitzenverkäufer.
-Ait TR GMBH · Berufspraxis
-Backend DEVELOPER
-Java · Spring · GitHub · Jira · SQL
-Entwicklung einer Webanwendung zur Bewertung der Kompetenzen von Stellenbewerbern. Verwendete Java, Spring Framework und SQL. Arbeitete mit JIRA und nahm erfolgreich an einem agilen Team teil.
-AIT TR
-2023
-Fullstack-Entwickler
-Final project:  dog-app-iw6ow.ondigitalocean.app
-FixAuto Weilburg
-Technische Mitarbeit / Werkstatt
-Technische Durchsicht und systematische Prüfung von Fahrzeugen
- Erkennen und Dokumentieren technischer Abweichungen
- Sorgfältige und zuverlässige Arbeitsweise auch unter Zeitdruck
-Praktischer Umgang mit mechanischen und elektrischen Komponenten
-Sprachkurse und berufliche Orientierung
-Deutschkurs von null bis Niveau B2  
-Vorbereitung auf den Einstieg in den deutschen Arbeitsmarkt
+=== WORK EXPERIENCE ===
+Position: Softwareentwickler
+Company: Tech Solutions GmbH
+Location: Berlin
+Start Date: 2018-03
+End Date: 2024-12
+Responsibilities: Entwicklung von Web-Anwendungen mit Java Spring Boot. Verantwortlich für Backend-Entwicklung, API-Design und Datenbankoptimierung. Zusammenarbeit in agilen Teams. Technologien: Java, Spring Boot, MySQL, REST APIs, Git, Docker
+
+Position: Junior Softwareentwickler
+Company: Startup Innovations AG
+Location: Berlin
+Start Date: 2015-01
+End Date: 2018-02
+Responsibilities: Entwicklung von Java-Anwendungen. Unterstützung bei der Implementierung neuer Features und Bug-Fixes. Technologien: Java, Spring Framework, PostgreSQL, Maven
+
+=== TECHNICAL SKILLS ===
+Java, Python, JavaScript, Spring Boot, Spring Framework, React, MySQL, PostgreSQL, MongoDB, Git, Docker, Jenkins, Maven, Gradle
+
+=== LANGUAGES ===
+Deutsch: Muttersprache
+Englisch: Fließend (C1)
+
+=== CERTIFICATIONS ===
+Oracle Certified Professional, Java SE 11 Developer (Oracle, 2021-06)
