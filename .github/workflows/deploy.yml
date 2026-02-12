@@ -19,6 +19,10 @@ jobs:
           echo "${{ secrets.VM_SSH_KEY }}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
 
+      - name: Test SSH connection
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} "echo 'SSH OK'"
+
       - name: Deploy to VM
         run: |
-         ssh -o StrictHostKeyChecking=no ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} 'bash /home/opc/deploy.sh'
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} 'bash /home/opc/deploy.sh'
