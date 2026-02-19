@@ -24,10 +24,20 @@ jobs:
       - name: Stop application and free memory
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'ENDSSH'
-            # Stop application
+            # Stop old systemd service if exists
+            sudo systemctl stop bewerbung-ai.service 2>/dev/null || true
+            sudo systemctl disable bewerbung-ai.service 2>/dev/null || true
+            
+            # Stop all bewerbung processes (old and new locations)
             pkill -9 -f "bewerbung-ai-1.0.0.jar" || true
             pkill -9 -f "java.*bewerbung" || true
+            pkill -9 -f "/opt/bewerbung-ai" || true
+            pkill -9 -f "/home/opc/bewerbung-ai" || true
             sleep 2
+            
+            # Free port 8080 if needed
+            sudo fuser -k 8080/tcp 2>/dev/null || true
+            sleep 1
             
             # Free memory
             sync
