@@ -7,5 +7,14 @@ variables.env
 *.secret.env
 !variables.env.example
 
+# Logs and runtime files
+*.log
+*.pid
+app.log
+build.log
+
 # IDE / OS
 .DS_Store
+.idea/
+.vscode/
+*.iml

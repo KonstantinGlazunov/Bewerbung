@@ -1,57 +1,14 @@
-Finanz Informatik GmbH & Co. KG logo
-Java Softwareentwickler (m/w/d)
-Finanz Informatik GmbH & Co. KG
-Hannover, Münster, Frankfurt am Main
-Feste Anstellung
-Homeoffice möglich, Vollzeit
-Erschienen: vor 3 Tagen
-52.000€ - 79.000€/Jahr (geschätzt für Vollzeit)
-Sei einer der ersten Bewerber
-Finanz Informatik GmbH & Co. KG logo
-Java Softwareentwickler (m/w/d)
-Finanz Informatik GmbH & Co. KG
-Passt dieser Job zu mir?
-Prüfe vor deiner Bewerbung, ob du die Voraussetzungen erfüllst.
+Monteur-Techniker (m/w/d)
+Für Montage-, Reparatur- und Kundendienstarbeiten
 
-Passt weniger
-Passt hervorragend
-slide number 1
-Als einer der größten Banken-IT-Dienstleister und Digitalisierungspartner Europas sind wir der Treiber der Digitalisierung innerhalb der Sparkassen-Finanzgruppe. Mit über 5.000 Mitarbeitenden an 3 Standorten machen wir digitales Banking von heute leistungsfähig und entwickeln smarte Finanz-Services von morgen. Dabei bieten wir ein breites Aufgabenspektrum, in dem die individuellen Stärken hervorragend eingebracht werden können. Ob App-Entwicklung, Netzwerktechnologien und Serverbetrieb oder Beratung, Schulung und Support – bei uns findet jede:r seine bzw. ihre Berufung! Als Spezialist:in oder auch als Generalist:in. Alles mit besten Karrierechancen, viel Raum für persönliche Entfaltung und zahlreichen Benefits.
+Ihr Profil:
 
-Für die Organisationseinheit Rahmenkredite, Avale & Konsortial, suchen wir zum nächstmöglichen Termin für den Standort Hannover, Münster oder Frankfurt am Main einen
+Abgeschlossene Berufsausbildung im Metallhandwerk
+Ausgeprägte Service- und Kundenorientierung
+Teamfähigkeit und sicheres Auftreten
+Gute Kenntnisse in Mechanik und Elektrik wünschenswert
+Führerscheinklasse B zwingend erforderlich, BE oder C1 wünschenswert
+Ihre Aufgaben:
 
-Java Softwareentwickler (m/w/d).
-
-Hinweis: Das Team ist ausschließlich am Standort Hannover angesiedelt.
-
-#mitgestalten – was dich erwartet:
-Innovative Software-Entwicklung: Architekturelle Konzeption und eigenverantwortliche Neu- und Weiterentwicklung von Geschäftsprozessen, Services und Workflows in Java und JavaScript.
-Vielfältige Projekte: Verantwortungsübernahme und Mitarbeit in komplexen Projekten von der Analyse über Design bis hin zu Implementierung, Test, Dokumentation und Einführung.
-Koordination: Technischer Ansprechpartner (m/w/d) für Produktverantwortliche und Führungskräfte, sowie Steuerung der technischen Themen im Entwicklerteam. 
-Technische Implementierung: Enge Zusammenarbeit mit bankfachlichen Produktverantwortlichen und Implementierung von technischen Änderungswünschen.
-Qualitätssicherung & Performance-Optimierung: Konzeption und Durchführung von Maßnahmen zur Qualitätssicherung und Performance-Optimierung.
-Lösungsfinder: Übernahme des Last-Level-Supports für unsere entwickelten Komponenten und Management von Programmeinsätzen.
-#mitbringen – was wir erwarten:
-Background: Abgeschlossenes Studium der Informatik, Wirtschaftsinformatik oder vergleichbare Ausbildung (z.B. Fachinformatiker).
-Erfahrung: Mind. 6 Jahre fachbezogene Berufserfahrung und fundierte Kenntnisse in der Softwareentwicklung mit Java und JavaScript.
-Technologien: Kenntnisse in Tools wie IntelliJ, Subversion, Git, Maven, Harvest, Guice oder JUnit.
-Frontend-Entwicklung: Erfahrung mit React und Material UI ist wünschenswert.
-Arbeitsweise: Strukturierte, zielorientierte und eigenverantwortliche Herangehensweise an Aufgaben.
-Neugierde: Ausgeprägte Neugier und Ausdauer für neue Themen.
-Teamgeist: Freude an der Zusammenarbeit im Team, Zuverlässigkeit und Einsatzbereitschaft sowie Bereitschaft zu gelegentlichen Reisen.
-Ihre Benefits bei der Finanz Informatik:
-Sie fragen sich, warum Sie bei der Finanz Informatik arbeiten sollten? Wir hätten da ein paar gute Gründe für Sie. Neben flexiblen Arbeitszeiten, vergünstigten Jobtickets oder der Möglichkeit, mobil zu arbeiten, bieten wir Ihnen noch viel mehr:
-
-Altersvorsorge
-Barrierefrei
-Betriebssport
-Familienservice
-Firmenevents
-Flexible Arbeitszeiten
-Mobiles Arbeiten
-Jobticket
-Kantine
-Tarifvertrag
-Weiterbildung
-Fitnessförderung
-Bei uns erwartet Sie eine attraktive Vergütung basierend auf Ihrer Qualifikation sowie Ihrer relevanten, praktischen Erfahrung.
+Montage und Installation von Toranlagen jeglicher Art
+Reparatur und Instandsetzung von Toren

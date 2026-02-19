@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import java.io.IOException;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
@@ -570,9 +571,12 @@ public class GenerateController {
             return ResponseEntity.ok()
                     .headers(headers)
                     .body(pdfBytes);
+        } catch (IOException e) {
+            logger.error("IO error generating PDF: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to generate PDF: " + e.getMessage(), e);
         } catch (Exception e) {
-            logger.error("Error generating PDF", e);
-            throw new RuntimeException("Failed to generate PDF", e);
+            logger.error("Unexpected error generating PDF: {}", e.getMessage(), e);
+            throw new RuntimeException("Failed to generate PDF: " + e.getMessage(), e);
         }
     }
 

@@ -12,6 +12,11 @@ public class BewerbungAiApplication {
     private static final Logger logger = LoggerFactory.getLogger(BewerbungAiApplication.class);
 
     public static void main(String[] args) {
+        // Disable PDFBox font cache to prevent crashes on Oracle Linux with problematic system fonts
+        // This prevents PDFBox from scanning system fonts that may have missing CFF tables
+        System.setProperty("org.apache.pdfbox.fontcache.disabled", "true");
+        logger.info("PDFBox font cache disabled to prevent system font scanning issues");
+        
         // Load environment variables from variables.env file before Spring Boot starts
         // This ensures variables are available when Spring components are initialized
         try {
