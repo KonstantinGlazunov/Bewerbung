@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lebenslauf – Konstantin Glazunov</title>
+  <style>
+    :root {
+      --bg: #ececee;
+      --header-bg: #e3e3e5;
+      --text: #3f434a;
+      --muted: #666b74;
+      --line: #8c8f95;
+      --accent: #40454e;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    @page {
+      size: A4;
+      margin: 0;
+    }
+
+    body {
+      margin: 0;
+      background: #ffffff;
+      font-family: "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+    }
+
+    .page {
+      width: 210mm;
+      min-height: 297mm;
+      margin: 10mm auto 0;
+      background: #ffffff;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header-strip {
+      height: 52.5mm;
+      background: var(--header-bg);
+      display: grid;
+      grid-template-columns: 72% 28%;
+      align-items: center;
+      padding: 0 14mm;
+    }
+
+    .name-block {
+      margin: 0;
+      color: #4b5059;
+      font-weight: 300;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      line-height: 1.14;
+      font-size: 14mm;
+      max-width: 130mm;
+    }
+
+    .photo-wrap {
+      width: 46mm;
+      height: 46mm;
+      border-radius: 50%;
+      background: #f4f5f7;
+      border: 2px solid #e6e7ea;
+      overflow: hidden;
+      justify-self: center;
+      transform: translateY(10mm);
+    }
+
+    .photo-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .content {
+      display: grid;
+      grid-template-columns: 38% 62%;
+      min-height: calc(297mm - 52.5mm);
+      position: relative;
+    }
+
+    .content::before {
+      content: "";
+      position: absolute;
+      left: 38%;
+      top: 0;
+      bottom: 0;
+      width: 1px;
+      background: var(--line);
+    }
+
+    .top-left,
+    .top-right {
+      padding-top: 6mm;
+      padding-bottom: 3mm;
+      border-bottom: 1px solid var(--line);
+      min-height: 36mm;
+    }
+
+    .top-left {
+      padding-left: 15mm;
+      padding-right: 10mm;
+      display: flex;
+      align-items: center;
+    }
+
+    .top-right {
+      padding-left: 1ch;
+      padding-right: 15mm;
+    }
+
+    .bottom-left,
+    .bottom-right {
+      padding-top: 4mm;
+      padding-bottom: 4mm;
+    }
+
+    .bottom-left {
+      padding-left: 15mm;
+      padding-right: 10mm;
+    }
+
+    .bottom-right {
+      padding-left: 1ch;
+      padding-right: 15mm;
+    }
+
+    .contact {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      line-height: 1.35;
+      color: var(--muted);
+      font-size: 3.9mm;
+    }
+
+    .contact li {
+      display: flex;
+      gap: 3mm;
+      align-items: flex-start;
+      margin-bottom: 0.8mm;
+    }
+
+    .contact .icon {
+      width: 6mm;
+      text-align: center;
+      color: #767b84;
+    }
+
+    .left-block {
+      padding-top: 3.5mm;
+      margin-top: 0;
+      position: relative;
+    }
+
+    .left-block + .left-block {
+      margin-top: 3.5mm;
+      margin-left: 0;
+    }
+
+    .left-block + .left-block::before {
+      content: "";
+      position: absolute;
+      left: -15mm;
+      right: -10mm;
+      top: 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .right-block {
+      padding-top: 0;
+    }
+
+    .bottom-left .left-block:first-child {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .section-title {
+      margin: 0 0 2.6mm;
+      color: var(--accent);
+      font-size: 5.8mm;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .text {
+      margin: 0;
+      font-size: 3.8mm;
+      line-height: 1.42;
+      color: #4f555f;
+    }
+
+    ul.inline-dot-list {
+      list-style: none;
+      margin: 0;
+      padding-left: 0;
+      font-size: 3.8mm;
+      line-height: 1.35;
+      color: #4f555f;
+    }
+
+    ul.inline-dot-list li {
+      margin-bottom: 0.7mm;
+    }
+
+    ul.inline-dot-list li::before {
+      content: "\2022 ";
+      margin-right: 1.2mm;
+    }
+
+    .subhead {
+      margin: 0 0 2mm;
+      font-size: 4.8mm;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #4a4f58;
+      font-weight: 700;
+    }
+
+    .job-title {
+      margin: 0;
+      font-size: 4.8mm;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: #4a4f58;
+      font-weight: 700;
+    }
+
+    .company,
+    .period {
+      margin: 0.6mm 0 0;
+      font-size: 3.8mm;
+      color: #4f555f;
+    }
+
+    .period {
+      margin-bottom: 1.2mm;
+    }
+
+    .job {
+      margin-top: 3.4mm;
+    }
+
+    .edu-title {
+      margin: 0;
+      font-size: 4.8mm;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 700;
+      color: #4a4f58;
+    }
+
+    .edu-sub {
+      margin: 0.8mm 0 0;
+      font-size: 4.2mm;
+      color: #4f555f;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .small {
+      font-size: 3.7mm;
+      color: #4f555f;
+      line-height: 1.35;
+      margin: 0.8mm 0 0;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+      }
+      .page {
+        margin: 0 auto;
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="header-strip">
+      <h1 class="name-block">KONSTANTIN<br />GLAZUNOV</h1>
+      <div class="photo-wrap">
+        <img src="src/main/resources/static/author-photo.jpg" alt="" />
+      </div>
+    </header>
+
+    <main class="content">
+      <section class="top-left">
+        <ul class="contact">
+          <li><span class="icon">☎</span><span>0 1511 0974353</span></li>
+          <li><span class="icon">✉</span><span>glazunov.const@gmail.com</span></li>
+          <li><span class="icon">⌂</span><span>35619, Braunfels, Hessen</span></li>
+        </ul>
+      </section>
+
+      <section class="top-right">
+        <h2 class="section-title">Profil</h2>
+        <p class="text">
+          Zuverlässiger und verantwortungsbewusster Mitarbeiter mit strukturierter Arbeitsweise.
+          Arbeitet selbstständig und effizient, auch unter Zeitdruck.
+          Freundlich, lernbereit und flexibel einsetzbar.
+        </p>
+      </section>
+
+      <section class="bottom-left">
+        <section class="left-block">
+          <h2 class="section-title">Persönliche Daten</h2>
+          <ul class="inline-dot-list">
+            <li>Führerschein: Klasse B, über 25 Jahre Erfahrung</li>
+            <li>Deutsch: B2 Beruf (offiziell bestätigt)</li>
+            <li>Russisch: Muttersprache</li>
+          </ul>
+        </section>
+
+        <section class="left-block">
+          <h2 class="section-title">Fähigkeiten</h2>
+          <ul class="inline-dot-list">
+            <li>Zuverlässig und pünktlich</li>
+            <li>Verantwortungsbewusstes Arbeiten</li>
+            <li>Freundlicher Umgang mit Menschen</li>
+          </ul>
+        </section>
+
+        <section class="left-block">
+          <h2 class="section-title">Bildung</h2>
+
+          <p class="edu-title">Bachelor in Betriebswirtschaft</p>
+          <p class="small">Perm State Technical University</p>
+
+          <p class="edu-sub">Technische Ausbildung</p>
+          <p class="small">
+            (Elektromechanik)<br />
+            Militärische Hochschule, Russland<br />
+            4 Jahre Ausbildung (ohne Abschluss)
+          </p>
+          <ul class="inline-dot-list">
+            <li>Elektrotechnik und Mechanik (Grundlagen)</li>
+            <li>Technisches Verständnis für Baugruppen und Systeme</li>
+            <li>Arbeiten mit Werkzeugen und technischen Komponenten</li>
+            <li>Wartung, Montage und technische Kontrolle</li>
+          </ul>
+        </section>
+      </section>
+
+      <section class="bottom-right">
+        <section class="right-block">
+          <h2 class="section-title">Berufserfahrung</h2>
+
+          <article class="job">
+            <h3 class="job-title">Autovorbereiter / Autowerkstatt</h3>
+            <p class="company">FixAuto Weilburg</p>
+            <p class="period">2025</p>
+            <ul class="inline-dot-list">
+              <li>Vorbereitung und technische Durchsicht von Fahrzeugen</li>
+              <li>Innen- und Außenreinigung von PKW und Wohnmobilen</li>
+              <li>Gelegentliche Montage und Wechsel von Reifen</li>
+              <li>Zuverlässige und sorgfältige Arbeitsweise auch bei hohem Arbeitsaufkommen</li>
+            </ul>
+          </article>
+
+          <article class="job">
+            <h3 class="subhead">Sprachkurse und berufliche Orientierung</h3>
+            <p class="period">2023-2024</p>
+            <ul class="inline-dot-list">
+              <li>Deutschkurs von null bis Niveau B2</li>
+              <li>Vorbereitung auf den Einstieg in den deutschen Arbeitsmarkt</li>
+            </ul>
+          </article>
+
+          <article class="job">
+            <h3 class="job-title">Vertrieb / Kundenbetreuung</h3>
+            <p class="company">Pilteh Werkzeugmaschinenfabrik</p>
+            <p class="period">2010 - 2022</p>
+            <ul class="inline-dot-list">
+              <li>Technische Beratung von Kunden bei Bedienung und Problemen mit automatisierten Maschinen</li>
+              <li>Zusammenarbeit zwischen Vertrieb und Ingenieuren bei technischen Fragen</li>
+              <li>Montage und erste Inbetriebnahme von Maschinen und Geräten</li>
+              <li>Durchführung kleiner Reparaturen</li>
+              <li>Korrektur und Aktualisierung technischer Dokumentation</li>
+              <li>Lesen von technischen Zeichnungen und einfachen Schaltplänen</li>
+              <li>Grundkenntnisse in Mechanik und Technik</li>
+            </ul>
+          </article>
+        </section>
+      </section>
+    </main>
+  </div>
+</body>
+</html>
+
