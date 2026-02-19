@@ -2,43 +2,43 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <url>
-        <loc>https://bewerbung-production.up.railway.app/</loc>
+        <loc>http://130.162.224.203:8080/</loc>
         <lastmod>2026-01-29</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
-        <xhtml:link rel="alternate" hreflang="de" href="https://bewerbung-production.up.railway.app/"/>
-        <xhtml:link rel="alternate" hreflang="ru" href="https://bewerbung-production.up.railway.app/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://bewerbung-production.up.railway.app/"/>
+        <xhtml:link rel="alternate" hreflang="de" href="http://130.162.224.203:8080/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="http://130.162.224.203:8080/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="http://130.162.224.203:8080/"/>
     </url>
     <url>
-        <loc>https://bewerbung-production.up.railway.app/reviews.html</loc>
+        <loc>http://130.162.224.203:8080/reviews.html</loc>
         <lastmod>2026-01-29</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
-        <xhtml:link rel="alternate" hreflang="de" href="https://bewerbung-production.up.railway.app/reviews.html"/>
-        <xhtml:link rel="alternate" hreflang="ru" href="https://bewerbung-production.up.railway.app/reviews.html"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://bewerbung-production.up.railway.app/reviews.html"/>
+        <xhtml:link rel="alternate" hreflang="de" href="http://130.162.224.203:8080/reviews.html"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="http://130.162.224.203:8080/reviews.html"/>
+        <xhtml:link rel="alternate" hreflang="en" href="http://130.162.224.203:8080/reviews.html"/>
     </url>
     <url>
-        <loc>https://bewerbung-production.up.railway.app/datenschutz.html</loc>
+        <loc>http://130.162.224.203:8080/datenschutz.html</loc>
         <lastmod>2026-01-29</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.3</priority>
     </url>
     <url>
-        <loc>https://bewerbung-production.up.railway.app/impressum.html</loc>
+        <loc>http://130.162.224.203:8080/impressum.html</loc>
         <lastmod>2026-01-29</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.3</priority>
     </url>
     <url>
-        <loc>https://bewerbung-production.up.railway.app/faq.html</loc>
+        <loc>http://130.162.224.203:8080/faq.html</loc>
         <lastmod>2026-01-29</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
-        <xhtml:link rel="alternate" hreflang="de" href="https://bewerbung-production.up.railway.app/faq.html"/>
-        <xhtml:link rel="alternate" hreflang="ru" href="https://bewerbung-production.up.railway.app/faq.html"/>
-        <xhtml:link rel="alternate" hreflang="en" href="https://bewerbung-production.up.railway.app/faq.html"/>
+        <xhtml:link rel="alternate" hreflang="de" href="http://130.162.224.203:8080/faq.html"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="http://130.162.224.203:8080/faq.html"/>
+        <xhtml:link rel="alternate" hreflang="en" href="http://130.162.224.203:8080/faq.html"/>
     </url>
 </urlset>
 
