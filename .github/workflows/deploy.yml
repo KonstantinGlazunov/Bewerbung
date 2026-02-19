@@ -21,5 +21,144 @@ jobs:
       - name: Test SSH connection
         run: ssh -o StrictHostKeyChecking=no ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} "echo SSH OK"
 
-      - name: Deploy to VM
-        run: ssh -o StrictHostKeyChecking=no ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} "bash /home/opc/deploy.sh"
+      - name: Stop application and free memory
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'ENDSSH'
+            # Stop application
+            pkill -9 -f "bewerbung-ai-1.0.0.jar" || true
+            pkill -9 -f "java.*bewerbung" || true
+            sleep 2
+            
+            # Free memory
+            sync
+            sudo sh -c 'echo 3 > /proc/sys/vm/drop_caches' || true
+            
+            # Show memory status
+            free -h
+          ENDSSH
+
+      - name: Copy files to server
+        run: |
+          rsync -avz --exclude 'target' --exclude '.git' --exclude '*.class' \
+            -e "ssh -o StrictHostKeyChecking=no" \
+            ./ ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }}:/home/opc/bewerbung-ai/
+
+      - name: Deploy application
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'ENDSSH'
+            set -e
+            
+            APP_DIR="/home/opc/bewerbung-ai"
+            APP_JAR="bewerbung-ai-1.0.0.jar"
+            PID_FILE="$APP_DIR/app.pid"
+            LOG_FILE="$APP_DIR/app.log"
+            BUILD_LOG="$APP_DIR/build.log"
+            
+            cd "$APP_DIR"
+            
+            # Set up environment
+            export PATH=/home/opc/jdk-21.0.2/bin:/home/opc/apache-maven-3.9.5/bin:$PATH
+            export MAVEN_OPTS="-Xmx256m -Xms128m"
+            
+            echo "=========================================="
+            echo "=== Building application ==="
+            echo "=========================================="
+            echo "Working directory: $(pwd)"
+            echo "Java version: $(java -version 2>&1 | head -1)"
+            echo "Maven version: $(mvn -version | head -1)"
+            echo "Memory status:"
+            free -h
+            echo ""
+            
+            # Build with output to both console and log file
+            echo "Starting Maven build..."
+            mvn clean package -DskipTests 2>&1 | tee "$BUILD_LOG"
+            
+            if [ ! -f "target/$APP_JAR" ]; then
+              echo "ERROR: Build failed - JAR file not found"
+              echo "Build log (last 50 lines):"
+              tail -50 "$BUILD_LOG"
+              exit 1
+            fi
+            
+            JAR_SIZE=$(du -h "target/$APP_JAR" | cut -f1)
+            echo ""
+            echo "✓ Build successful! JAR size: $JAR_SIZE"
+            echo ""
+            
+            echo "=========================================="
+            echo "=== Starting application ==="
+            echo "=========================================="
+            
+            # Stop any existing instance
+            if [ -f "$PID_FILE" ]; then
+              PID=$(cat "$PID_FILE")
+              if ps -p $PID > /dev/null 2>&1; then
+                echo "Stopping existing instance (PID: $PID)..."
+                kill $PID || true
+                sleep 2
+                kill -9 $PID || true
+              fi
+              rm -f "$PID_FILE"
+            fi
+            
+            pkill -9 -f "$APP_JAR" || true
+            sleep 1
+            
+            # Start application
+            echo "Starting Java application..."
+            nohup java -Xmx512m -Xms256m \
+              -Dorg.apache.pdfbox.fontcache.disabled=true \
+              -jar "target/$APP_JAR" \
+              > "$LOG_FILE" 2>&1 &
+            
+            APP_PID=$!
+            echo $APP_PID > "$PID_FILE"
+            
+            echo "Application started with PID: $APP_PID"
+            echo "Log file: $LOG_FILE"
+            
+            # Wait and check if it's running
+            echo "Waiting for application to start..."
+            sleep 5
+            
+            if ! ps -p $APP_PID > /dev/null 2>&1; then
+              echo "ERROR: Application failed to start"
+              echo "Last 50 lines of log:"
+              tail -50 "$LOG_FILE"
+              exit 1
+            fi
+            
+            echo ""
+            echo "=========================================="
+            echo "=== Deployment successful ==="
+            echo "=========================================="
+            echo "PID: $APP_PID"
+            echo "Logs: $LOG_FILE"
+            echo "Build log: $BUILD_LOG"
+            echo ""
+            echo "Initial application output:"
+            tail -20 "$LOG_FILE"
+          ENDSSH
+
+      - name: Verify deployment
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VM_USER }}@${{ secrets.VM_HOST }} << 'ENDSSH'
+            APP_DIR="/home/opc/bewerbung-ai"
+            PID_FILE="$APP_DIR/app.pid"
+            
+            if [ -f "$PID_FILE" ]; then
+              PID=$(cat "$PID_FILE")
+              if ps -p $PID > /dev/null 2>&1; then
+                echo "✓ Application is running (PID: $PID)"
+                echo "✓ Memory usage:"
+                ps -p $PID -o pid,rss,vsz,comm --no-headers | awk '{printf "  RSS: %.1f MB, VSZ: %.1f MB\n", $2/1024, $3/1024}'
+              else
+                echo "✗ Application is not running"
+                exit 1
+              fi
+            else
+              echo "✗ PID file not found"
+              exit 1
+            fi
+          ENDSSH

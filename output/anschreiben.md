@@ -1,14 +1,12 @@
-Betreff: Bewerbung als Java Softwareentwickler
+Уважаемые господа,
 
-Sehr geehrte Damen und Herren,
+Меня заинтересовала вакансия "Monteur-Techniker" в компании "default", так как я вижу в этой позиции отличную возможность использовать мой опыт и знания в области электротехники и обслуживания техники. Обучение в Пермском военном институте ракетных войск стратегического назначения дало мне основу в электrotechnike, что является важной частью требований вашей вакансии.
 
-mit großem Interesse habe ich Ihre Stellenausschreibung für die Position Java Softwareentwickler bei der Finanz Informatik GmbH & Co. KG gelesen. Mit einem Bachelor-Abschluss in Informatik von der Technischen Universität Berlin und mehr als sechs Jahren Berufserfahrung in der Softwareentwicklung bringe ich umfassende Kenntnisse in Java und JavaScript mit, die den Anforderungen Ihrer Position entsprechen.
+На протяжении своей карьеры я неоднократно сталкивался с задачами по оптимизации процессов и экономии ресурсов, что также упоминается в вашем описании должности. Например, моя работа в FixAuto Weilburg включала в себя технический осмотр и систематическую проверку автомобилей, где я эффективно применял навыки поиска и устранения неисправностей. Это связано с вашими требованиями к умению работать в команде и ориентируясь на клиента.
 
-In meiner aktuellen Rolle als Softwareentwickler bei der Tech Solutions GmbH in Berlin war ich verantwortlich für die Entwicklung von Web-Anwendungen mit Java Spring Boot. Meine Expertise umfasst die Backend-Entwicklung, das API-Design sowie die Optimierung von Datenbanken. Diese Aufgaben führten zu deutlichen Verbesserungen in der Effizienz unserer Systeme. Ich bin routiniert im Umgang mit Technologien wie Git, Maven und Docker und habe durch meine Arbeit im agilen Team ein hohes Maß an Teamgeist und Eigenverantwortung entwickelt. 
+Я также обладаю навыками, которые могут принести пользу вашей компании, такими как самоорганизация и личная эффективность. Например, оптимизация рабочего процесса и эффективное планирование задач позволяет мне работать в сжатые сроки и завершать проекты вовремя. Эти умения я приобрел и развивал, управляя командой как Product Marketing Manager в Pilteh.
 
-Die Möglichkeit, bei der Finanz Informatik Teil komplexer Projekte zu sein und innovative Lösungen zu entwickeln, reizt mich sehr. Besonderes Interesse wecken bei mir die Aspekte der Qualitätssicherung und Performance-Optimierung, die ich bereits erfolgreich in meiner bisherigen Tätigkeit umsetzen konnte. Zudem fasziniert mich die Möglichkeit, innerhalb der Sparkassen-Finanzgruppe einen direkten Einfluss auf die Digitalisierung und Modernisierung der Finanzdienstleistungen zu haben.
+Очень надеюсь, что моя кандидатура заинтересует вас, так как я искренне стремлюсь присоединиться к вашей команде и внести свой вклад в развитие компании. Готов обсудить детали на собеседовании в удобное для вас время.
 
-Ich freue mich darauf, die Zukunft der Finanzinformatik aktiv mitgestalten zu dürfen und stehe Ihnen jederzeit für ein persönliches Gespräch zur Verfügung, um Ihre Anforderungen und meine Qualifikationen näher zu besprechen.
-
-Mit freundlichen Grüßen  
-Max Mustermann
+С уважением,  
+Nicht angegeben Nicht angegeben

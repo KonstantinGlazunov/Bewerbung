@@ -6,14 +6,13 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDFont;
 import org.apache.pdfbox.pdmodel.font.PDType0Font;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -38,27 +37,35 @@ public class PdfGenerationService {
     
     /**
      * Gets a font that supports UTF-8 characters (German umlauts, Cyrillic, etc.)
-     * Falls back to Helvetica if no UTF-8 font is available
+     * Uses only PDType0Font to avoid FontMapper initialization issues on Oracle Linux
+     * @throws IOException if no suitable font can be loaded
      */
     private static PDFont getUtf8Font(PDDocument document) throws IOException {
-        try {
-            // Try to load a TrueType font from the system that supports German characters
-            // Common system fonts that support German: Arial, DejaVu Sans, Liberation Sans
-            String[] fontPaths = {
-                "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
-                "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-                "/usr/share/fonts/truetype/arial.ttf",
-                "/usr/share/fonts/TTF/DejaVuSans.ttf",
-                "/usr/share/fonts/TTF/LiberationSans-Regular.ttf",
-                "/System/Library/Fonts/Helvetica.ttc",
-                "C:/Windows/Fonts/arial.ttf"
-            };
-            
-            for (String fontPath : fontPaths) {
-                try {
-                    java.io.File fontFile = new java.io.File(fontPath);
-                    if (fontFile.exists() && fontFile.canRead()) {
-                        logger.info("Loading UTF-8 font from: {}", fontPath);
+        // Try to load a TrueType/OpenType font from the system that supports German characters
+        // Common system fonts that support German: Arial, DejaVu Sans, Liberation Sans, Nimbus Sans
+        String[] fontPaths = {
+            // Standard Linux paths (TTF)
+            "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
+            "/usr/share/fonts/truetype/arial.ttf",
+            "/usr/share/fonts/TTF/DejaVuSans.ttf",
+            "/usr/share/fonts/TTF/LiberationSans-Regular.ttf",
+            // Oracle Linux / RHEL paths (OTF)
+            "/usr/share/fonts/opentype/urw-base35/NimbusSans-Regular.otf",
+            "/usr/share/fonts/opentype/urw-base35/NimbusSansNarrow-Regular.otf",
+            // macOS
+            "/System/Library/Fonts/Helvetica.ttc",
+            // Windows
+            "C:/Windows/Fonts/arial.ttf"
+        };
+        
+        for (String fontPath : fontPaths) {
+            try {
+                java.io.File fontFile = new java.io.File(fontPath);
+                if (fontFile.exists() && fontFile.canRead()) {
+                    logger.info("Found font file at: {} (size: {} bytes), attempting to load...", 
+                        fontPath, fontFile.length());
+                    try {
                         PDFont font = PDType0Font.load(document, fontFile);
                         // Test if font can handle a test character
                         try {
@@ -66,30 +73,67 @@ public class PdfGenerationService {
                             logger.info("UTF-8 font loaded successfully from: {}", fontPath);
                             return font;
                         } catch (Exception e) {
-                            logger.warn("Font from {} doesn't support UTF-8, trying next", fontPath);
+                            logger.warn("Font from {} doesn't support UTF-8 characters, trying next: {}", 
+                                fontPath, e.getMessage());
                             continue;
                         }
+                    } catch (Exception loadException) {
+                        logger.warn("Failed to load font from {}: {} (class: {})", 
+                            fontPath, loadException.getMessage(), loadException.getClass().getSimpleName());
+                        // Log full exception for debugging
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("Full exception when loading font from " + fontPath, loadException);
+                        }
+                        continue;
                     }
+                } else {
+                    logger.debug("Font file not found or not readable: {}", fontPath);
+                }
+            } catch (Exception e) {
+                // Try next font
+                logger.warn("Exception while checking font path {}: {}", fontPath, e.getMessage());
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Full exception for font path " + fontPath, e);
+                }
+                continue;
+            }
+        }
+        
+        // Try to load font from resources (if available)
+        try {
+            InputStream fontStream = PdfGenerationService.class.getResourceAsStream("/fonts/LiberationSans-Regular.ttf");
+            if (fontStream != null) {
+                logger.info("Loading UTF-8 font from resources");
+                PDFont font = PDType0Font.load(document, fontStream);
+                try {
+                    font.getStringWidth("Test äöü");
+                    logger.info("UTF-8 font loaded successfully from resources");
+                    return font;
                 } catch (Exception e) {
-                    // Try next font
-                    logger.debug("Could not load font from {}: {}", fontPath, e.getMessage());
-                    continue;
+                    logger.warn("Font from resources doesn't support UTF-8", e);
                 }
             }
-            
-            // Fallback: Use built-in font and handle encoding manually
-            logger.warn("No UTF-8 font found in system paths, using Helvetica with character replacement");
-            logger.warn("All non-ASCII characters (German umlauts, Cyrillic, etc.) will be replaced");
-            return new PDType1Font(Standard14Fonts.FontName.HELVETICA);
         } catch (Exception e) {
-            logger.warn("Error loading UTF-8 font, falling back to Helvetica: {}", e.getMessage());
-            return new PDType1Font(Standard14Fonts.FontName.HELVETICA);
+            logger.debug("Could not load font from resources: {}", e.getMessage());
         }
+        
+        // If no font found, throw descriptive error with details about what was checked
+        StringBuilder errorDetails = new StringBuilder();
+        errorDetails.append("No UTF-8 supporting font found. ");
+        errorDetails.append("Checked ").append(fontPaths.length).append(" system font paths. ");
+        errorDetails.append("Please ensure one of the following fonts is available: ");
+        errorDetails.append("Liberation Sans, DejaVu Sans, Nimbus Sans, or Arial. ");
+        errorDetails.append("Alternatively, place a TTF/OTF font file in src/main/resources/fonts/");
+        String errorMsg = errorDetails.toString();
+        logger.error(errorMsg);
+        logger.error("Font search failed. Check logs above for details about which paths were checked.");
+        throw new IOException(errorMsg);
     }
     
     /**
-     * Encodes text to handle special characters for Type1 fonts
+     * Encodes text to handle special characters (fallback encoding)
      * Replaces unsupported characters (German umlauts, Cyrillic, etc.) with ASCII equivalents
+     * Note: This should not be needed if UTF-8 font is loaded correctly
      */
     private static String encodeTextForType1Font(String text) {
         if (text == null) return "";

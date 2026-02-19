@@ -349,66 +349,54 @@ public class AnschreibenGeneratorService {
         prompt.append("Output format:\n");
         prompt.append("Requirement → Match type → Supporting CV evidence (if any)\n\n");
         
-        // === STEP 5: DEFINE COVER LETTER STRATEGY ===
-        prompt.append("STEP 5 — DEFINE COVER LETTER STRATEGY\n\n");
+        // === STEP 4.5: IDENTIFY CORE BUSINESS PROBLEMS OF THE ROLE ===
+        prompt.append("STEP 4.5 — IDENTIFY CORE BUSINESS PROBLEMS OF THE ROLE\n\n");
         
-        prompt.append("Derive the rhetorical and structural strategy for the cover letter:\n\n");
+        prompt.append("Based on:\n");
+        prompt.append("- Explicit requirements\n");
+        prompt.append("- Implied expectations\n");
+        prompt.append("- Job posting context\n\n");
         
-        prompt.append("What should be emphasized? (Core competencies, motivation, career logic)\n");
-        prompt.append("• Emphasis:\n");
-        prompt.append("  - Core competencies that directly match requirements\n");
-        prompt.append("  - Motivation for the position and company\n");
-        prompt.append("  - Logical career development and professional continuity\n");
-        prompt.append("  - Measurable achievements and concrete results — ONLY if explicitly present in the CV or Wishes\n\n");
+        prompt.append("Identify:\n\n");
         
-        prompt.append("What should be de-emphasized or avoided?\n");
-        prompt.append("• De-emphasis:\n");
-        prompt.append("  - Non-relevant experiences from other industries\n");
-        prompt.append("  - Overqualification that could raise doubts about seriousness\n");
-        prompt.append("  - Generic filler phrases without substance\n");
-        prompt.append("  - Negative aspects or deficits\n\n");
+        prompt.append("1. What real work problems is the company trying to solve with this position?\n");
+        prompt.append("   (workload, errors, lack of competencies, growth, quality, deadlines, clients, processes)\n\n");
         
-        prompt.append("What positioning profile should be used?\n");
-        prompt.append("• Positioning:\n");
-        prompt.append("  - Experienced specialist (with corresponding experience)\n");
-        prompt.append("  - Career changer (with industry change)\n");
-        prompt.append("  - Technical generalist (with broad skillset)\n");
-        prompt.append("  - Customer-oriented profile (with service/customer contact)\n");
-        prompt.append("  - Solution-oriented problem solver (for analytical roles)\n");
-        prompt.append("  - Team player and cooperation partner (for team roles)\n\n");
+        prompt.append("2. What risks exist if the position remains unfilled or is filled by a weak candidate?\n\n");
         
-        prompt.append("What tone is appropriate?\n");
-        prompt.append("• Tone & Style:\n");
-        if ("de".equals(language)) {
-            prompt.append("  - Formal, professional, German business style (Standard) - BUT write in German!\n");
-            prompt.append("  - Confident, but not arrogant\n");
-            prompt.append("  - Precise and concrete, not exaggerated\n");
-            prompt.append("  - Adapted to industry and company size:\n");
-            prompt.append("    * Public sector / NGO → more formal, mission-oriented tone\n");
-            prompt.append("    * Startup / Tech → concise, results-oriented language\n");
-            prompt.append("    * Healthcare / Education → empathetic, responsibility-oriented formulation\n");
-            prompt.append("    * Finance → precise, compliance-oriented\n\n");
-        } else if ("ru".equals(language)) {
-            prompt.append("  - Warmer, more personal tone while maintaining professionalism\n");
-            prompt.append("  - Strong emphasis on motivation and personal interest\n");
-            prompt.append("  - Balance between professionalism and personal touch\n");
-            prompt.append("  - Confident, but approachable\n");
-            prompt.append("  - Adapted to industry and company size:\n");
-            prompt.append("    * Public sector / NGO → respectful, mission-oriented tone\n");
-            prompt.append("    * Startup / Tech → dynamic, results-oriented language\n");
-            prompt.append("    * Healthcare / Education → empathetic, caring formulation\n");
-            prompt.append("    * Finance → precise, trustworthy\n\n");
-        } else { // "en"
-            prompt.append("  - Balance between professionalism and personality\n");
-            prompt.append("  - Professional yet approachable tone\n");
-            prompt.append("  - Confident, but not arrogant\n");
-            prompt.append("  - Precise and concrete, not exaggerated\n");
-            prompt.append("  - Adapted to industry and company size:\n");
-            prompt.append("    * Public sector / NGO → respectful, mission-oriented tone\n");
-            prompt.append("    * Startup / Tech → concise, results-oriented language\n");
-            prompt.append("    * Healthcare / Education → empathetic, responsibility-oriented formulation\n");
-            prompt.append("    * Finance → precise, compliance-oriented\n\n");
-        }
+        prompt.append("3. What is CRITICAL for the company to improve through this employee?\n\n");
+        
+        prompt.append("Format (internal):\n");
+        prompt.append("- Main pain points of the role\n");
+        prompt.append("- Secondary problems\n");
+        prompt.append("- Business goals of the position\n\n");
+        
+        // === STEP 5: DEFINE VALUE-BASED COVER LETTER STRATEGY ===
+        prompt.append("STEP 5 — DEFINE VALUE-BASED COVER LETTER STRATEGY\n\n");
+        
+        prompt.append("Build the letter strategy in the logic:\n");
+        prompt.append("PROBLEM → VALUE → DIFFERENTIATION\n\n");
+        
+        prompt.append("Determine:\n\n");
+        
+        prompt.append("1. What specific problem of the vacancy does the candidate solve best?\n\n");
+        
+        prompt.append("2. Which competencies from the biography directly address these pain points?\n\n");
+        
+        prompt.append("3. What is the practical value of the candidate for the company?\n");
+        prompt.append("   (results, stability, quality, speed, autonomy, etc.)\n\n");
+        
+        prompt.append("4. Why is this candidate rationally more beneficial than the average applicant?\n\n");
+        
+        prompt.append("Strategically:\n\n");
+        
+        prompt.append("- Focus not on \"I can do\", but on \"I solve\"\n");
+        prompt.append("- Position experience as a tool for improving the company's work\n");
+        prompt.append("- Avoid self-promotion — use cause-and-effect logic\n\n");
+        
+        prompt.append("Format (internal):\n");
+        prompt.append("- Problem → Evidence from CV → Value\n");
+        prompt.append("- Key arguments for choosing the candidate\n\n");
         
         // === STEP 6: GENERATE THE FINAL COVER LETTER ===
         prompt.append("STEP 6 — GENERATE THE FINAL COVER LETTER\n\n");
@@ -634,6 +622,19 @@ public class AnschreibenGeneratorService {
             prompt.append("User wishes may override facts ONLY by explicit factual correction or explicit exclusion.\n");
             prompt.append("User wishes must NEVER be used to invent new facts, experience, roles, skills, or timelines.\n\n");
         }
+        
+        // === CORE LOGIC OF THE LETTER ===
+        prompt.append("⚠️ CORE LOGIC OF THE LETTER (MANDATORY)\n\n");
+        
+        prompt.append("The letter must explicitly (but naturally, without question formulations) answer:\n\n");
+        
+        prompt.append("1. What work problem of the company do I solve with this role?\n\n");
+        
+        prompt.append("2. What is my practical value for processes and results?\n\n");
+        
+        prompt.append("3. Why is choosing me logical and beneficial for the employer?\n\n");
+        
+        prompt.append("If the letter does not reflect all three aspects — it is considered unsuccessful.\n\n");
         
         // === HUMANIZATION CHECK ===
         prompt.append("CRITICAL: HUMANIZATION AND NATURAL WRITING STYLE\n\n");
