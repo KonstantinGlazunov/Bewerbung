@@ -21,6 +21,7 @@ public class FileOutputService {
     private static final String OUTPUT_DIR = "output";
     private static final String ANALYSIS_FILE = "output/analysis.md";
     private static final String ANSCHREIBEN_FILE = "output/anschreiben.md";
+    private static final String LEBENSLAUF_FILE = "output/lebenslauf-filled.html";
     private static final String NOTES_FILE = "output/notes.json";
     
     private final Gson gson;
@@ -121,6 +122,51 @@ public class FileOutputService {
         } catch (IOException e) {
             logger.error("Failed to read anschreiben from: {}", filePath, e);
             return null;
+        }
+    }
+    
+    public void writeLebenslauf(String lebenslaufHtml) {
+        writeLebenslauf(lebenslaufHtml, LEBENSLAUF_FILE);
+    }
+    
+    public void writeLebenslauf(String lebenslaufHtml, String filePath) {
+        try {
+            if (lebenslaufHtml == null || lebenslaufHtml.trim().isEmpty()) {
+                logger.warn("Lebenslauf HTML is null or empty, skipping write");
+                return;
+            }
+            
+            java.nio.file.Path path = Paths.get(filePath).toAbsolutePath();
+            logger.info("Writing lebenslauf to: {} (length: {} chars)", path, lebenslaufHtml.length());
+            
+            // Ensure parent directory exists
+            java.nio.file.Path parentDir = path.getParent();
+            if (parentDir != null) {
+                Files.createDirectories(parentDir);
+                logger.debug("Parent directory ensured: {}", parentDir);
+            }
+            
+            logger.debug("Writing {} bytes to file: {}", lebenslaufHtml.getBytes(StandardCharsets.UTF_8).length, path);
+            Files.write(path, lebenslaufHtml.getBytes(StandardCharsets.UTF_8));
+            logger.debug("File write operation completed");
+            
+            // Verify file was written
+            if (Files.exists(path)) {
+                long fileSize = Files.size(path);
+                logger.info("Lebenslauf successfully written to: {} ({} bytes)", path, fileSize);
+                
+                // Log first 200 chars for debugging
+                if (fileSize > 0 && lebenslaufHtml.length() > 0) {
+                    String preview = lebenslaufHtml.length() > 200 ? lebenslaufHtml.substring(0, 200) + "..." : lebenslaufHtml;
+                    logger.debug("File content preview: {}", preview.replace("\n", "\\n").replace("\r", ""));
+                }
+            } else {
+                logger.error("File was not created: {}", path);
+                throw new RuntimeException("File was not created: " + path);
+            }
+        } catch (IOException e) {
+            logger.error("Failed to write lebenslauf to: {}", filePath, e);
+            throw new RuntimeException("Failed to write lebenslauf: " + e.getMessage(), e);
         }
     }
 

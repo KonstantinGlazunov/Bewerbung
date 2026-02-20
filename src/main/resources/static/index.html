@@ -238,15 +238,15 @@
             background-color: #1d4ed8;
         }
 
-        html.dark #downloadButton,
-        body.dark #downloadButton {
+        html.dark .download-button,
+        body.dark .download-button {
             background-color: #0f172a;
             border-color: #3b82f6;
             color: #bfdbfe;
         }
 
-        html.dark #downloadButton:hover,
-        body.dark #downloadButton:hover {
+        html.dark .download-button:hover,
+        body.dark .download-button:hover {
             background-color: #1e293b;
         }
 
@@ -499,6 +499,12 @@
                     Daten, Ihre Fähigkeiten, Berufserfahrung, Ausbildung:</label>
                 <textarea id="biographyTextarea" name="biography" required class="min-h-[300px] w-full resize-y rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-blue-400 dark:focus:ring-blue-900"></textarea>
             </div>
+
+            <div class="form-group space-y-2">
+                <button type="button" id="uploadPhotoButton" class="inline-flex items-center justify-center rounded-xl bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-slate-300 dark:bg-blue-500 dark:hover:bg-blue-600 dark:disabled:bg-slate-700" data-i18n="uploadPhotoButton">Загрузить фото для резюме</button>
+                <input id="photoInput" type="file" accept="image/*" class="hidden" />
+                <p id="photoUploadStatus" class="text-sm text-slate-600 dark:text-slate-300"></p>
+            </div>
             
             <div class="form-group space-y-2">
                 <label for="jobPostingTextarea" class="block text-sm font-medium text-slate-700 dark:text-slate-200" data-i18n="jobPostingLabel">Job Posting - kopieren Sie einfach den Text der Stellenanzeige hierher.:</label>
@@ -545,7 +551,10 @@
             <div class="result-section rounded-2xl border border-slate-200 bg-slate-50/60 px-6 py-5 shadow-sm dark:border-slate-700 dark:bg-slate-900/60">
                 <h2 class="text-base font-semibold text-slate-900 dark:text-slate-100" data-i18n="coverLetterTitle">Cover Letter (Anschreiben)</h2>
                 <textarea id="coverLetterTextarea" class="result-content editable mt-3 min-h-[400px] w-full resize-y rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-blue-400 dark:focus:ring-blue-900"></textarea>
-                <button type="button" id="downloadButton" class="mt-4 w-full rounded-xl border border-blue-600 bg-white px-6 py-3 text-sm font-semibold text-blue-700 shadow-sm transition-colors hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 dark:border-blue-500 dark:bg-slate-900 dark:text-blue-200 dark:hover:bg-slate-800" data-i18n="downloadButton">Herunterladen (PDF)</button>
+                <div class="mt-4 grid gap-3 sm:grid-cols-2">
+                    <button type="button" id="downloadLebenslaufButton" class="download-button w-full rounded-xl border border-blue-600 bg-white px-6 py-3 text-sm font-semibold text-blue-700 shadow-sm transition-colors hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 dark:border-blue-500 dark:bg-slate-900 dark:text-blue-200 dark:hover:bg-slate-800" data-i18n="downloadLebenslaufButton">Herunterladen Lebenslauf</button>
+                    <button type="button" id="downloadAnschreibenButton" class="download-button w-full rounded-xl border border-blue-600 bg-white px-6 py-3 text-sm font-semibold text-blue-700 shadow-sm transition-colors hover:bg-blue-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 dark:border-blue-500 dark:bg-slate-900 dark:text-blue-200 dark:hover:bg-slate-800" data-i18n="downloadAnschreibenButton">Herunterladen Bewerbungsanschreiben</button>
+                </div>
             </div>
         </div>
 
@@ -822,6 +831,12 @@
                     reviewPrompt: 'Ich wäre Ihnen dankbar, wenn Sie mir ein paar Zeilen mit Ihren Eindrücken zu diesem Service hinterlassen',
                     submitReview: 'Bewertung abgeben',
                     biographyLabel: 'Biography - Verfassen Sie Ihren Lebenslauf in einem freien Format: Ihre Fähigkeiten, Berufserfahrung, Ausbildung:',
+                    uploadPhotoButton: 'Foto fuer Lebenslauf hochladen',
+                    photoUploadProgress: 'Foto wird hochgeladen...',
+                    photoUploadSuccess: 'Foto erfolgreich hochgeladen',
+                    photoUploadError: 'Foto konnte nicht hochgeladen werden',
+                    photoUploadInvalidType: 'Nur Bilddateien sind erlaubt',
+                    photoUploadTooLarge: 'Foto ist zu gross (max. 5 MB)',
                     jobPostingLabel: 'Job Posting - kopieren Sie einfach den Text der Stellenanzeige hierher.:',
                     wishesLabel: 'Hier können Sie einen zusätzlichen Prompt (Anweisung für die KI) oder Informationen über Sie hinzufügen, die nicht in den Lebenslauf aufgenommen wurden (optional):',
                     generateButton: 'Dokumente erstellen',
@@ -836,8 +851,10 @@
                     progressComplete: 'Abgeschlossen',
                     errorTitle: 'Error',
                     coverLetterTitle: 'Cover Letter (Anschreiben)',
-                    downloadButton: 'Herunterladen (PDF)',
-                    downloadButtonGenerating: 'PDF wird generiert...',
+                    downloadLebenslaufButton: 'Herunterladen Lebenslauf',
+                    downloadAnschreibenButton: 'Herunterladen Bewerbungsanschreiben',
+                    downloadLebenslaufButtonGenerating: 'Lebenslauf-PDF wird generiert...',
+                    downloadAnschreibenButtonGenerating: 'Anschreiben-PDF wird generiert...',
                     privacyTitle: 'Datenschutz',
                     privacyText: 'Die technische Bereitstellung erfolgt über <a href="https://www.oracle.com/cloud/" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline">Oracle Cloud</a>, die Verarbeitung bestimmter Inhalte über die OpenAI-API – jeweils gemäß den Anforderungen der DSGVO.',
                     errorBiographyEmpty: 'Biography cannot be empty',
@@ -882,6 +899,12 @@
                     reviewPrompt: 'Буду благодарен, если вы оставите несколько строк с вашими впечатлениями об этом сервисе',
                     submitReview: 'Оставить отзыв',
                     biographyLabel: 'Биография - Составьте свое резюме в свободном формате: ваши навыки, профессиональный опыт, образование:',
+                    uploadPhotoButton: 'Загрузить фото для резюме',
+                    photoUploadProgress: 'Загрузка фото...',
+                    photoUploadSuccess: 'Фото успешно загружено',
+                    photoUploadError: 'Не удалось загрузить фото',
+                    photoUploadInvalidType: 'Разрешены только изображения',
+                    photoUploadTooLarge: 'Фото слишком большое (макс. 5 МБ)',
                     jobPostingLabel: 'Вакансия - просто скопируйте текст объявления о вакансии сюда.:',
                     wishesLabel: 'Здесь вы можете добавить дополнительный промпт (указание для ИИ) или сведения о вас, которые не вошли в резюме (необязательно):',
                     generateButton: 'Создать документы',
@@ -896,8 +919,10 @@
                     progressComplete: 'Завершено',
                     errorTitle: 'Ошибка',
                     coverLetterTitle: 'Cover Letter (Anschreiben)',
-                    downloadButton: 'Скачать (PDF)',
-                    downloadButtonGenerating: 'Генерация PDF...',
+                    downloadLebenslaufButton: 'Скачать резюме',
+                    downloadAnschreibenButton: 'Скачать сопроводительное письмо',
+                    downloadLebenslaufButtonGenerating: 'Генерация PDF резюме...',
+                    downloadAnschreibenButtonGenerating: 'Генерация PDF письма...',
                     privacyTitle: 'Конфиденциальность',
                     privacyText: 'Техническое обеспечение осуществляется через <a href="https://www.oracle.com/cloud/" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline">Oracle Cloud</a>, обработка определенного контента через OpenAI API – каждый в соответствии с требованиями GDPR.',
                     errorBiographyEmpty: 'Biography cannot be empty',
@@ -942,6 +967,12 @@
                     reviewPrompt: 'I would be grateful if you could leave a few lines with your impressions of this service',
                     submitReview: 'Submit Review',
                     biographyLabel: 'Biography - Write your resume in a free format: your skills, work experience, education:',
+                    uploadPhotoButton: 'Upload photo for resume',
+                    photoUploadProgress: 'Uploading photo...',
+                    photoUploadSuccess: 'Photo uploaded successfully',
+                    photoUploadError: 'Failed to upload photo',
+                    photoUploadInvalidType: 'Only image files are allowed',
+                    photoUploadTooLarge: 'Photo is too large (max 5 MB)',
                     jobPostingLabel: 'Job Posting - simply copy the job posting text here.:',
                     wishesLabel: 'Here you can add an additional prompt (instruction for AI) or information about you that was not included in the resume (optional):',
                     generateButton: 'Create Documents',
@@ -956,8 +987,10 @@
                     progressComplete: 'Complete',
                     errorTitle: 'Error',
                     coverLetterTitle: 'Cover Letter (Anschreiben)',
-                    downloadButton: 'Download (PDF)',
-                    downloadButtonGenerating: 'Generating PDF...',
+                    downloadLebenslaufButton: 'Download Resume',
+                    downloadAnschreibenButton: 'Download Cover Letter',
+                    downloadLebenslaufButtonGenerating: 'Generating resume PDF...',
+                    downloadAnschreibenButtonGenerating: 'Generating cover letter PDF...',
                     privacyTitle: 'Privacy',
                     privacyText: 'Technical provision is done via <a href="https://www.oracle.com/cloud/" target="_blank" rel="noopener noreferrer" class="text-blue-600 dark:text-blue-400 hover:underline">Oracle Cloud</a>, processing of certain content via the OpenAI API – each in accordance with GDPR requirements.',
                     errorBiographyEmpty: 'Biography cannot be empty',
@@ -1235,6 +1268,7 @@
             wishes: null,
             language: null
         };
+        let uploadedPhotoId = null;
 
         // Normalize text for comparison (remove all whitespace)
         function normalizeText(text) {
@@ -1250,6 +1284,10 @@
             
             const currentLang = window.i18n ? window.i18n.getCurrentLanguage() : 'de';
             
+            if (uploadedPhotoId) {
+                return true;
+            }
+
             // If language changed or samples not loaded, consider it as changed
             if (loadedSampleData.language !== currentLang || 
                 !loadedSampleData.biography || 
@@ -1338,6 +1376,83 @@
 
         // Export loadSampleData to window for use in language system
         window.loadSampleData = loadSampleData;
+
+        const photoInput = document.getElementById('photoInput');
+        const uploadPhotoButton = document.getElementById('uploadPhotoButton');
+        const photoUploadStatus = document.getElementById('photoUploadStatus');
+
+        async function uploadResumePhoto(file) {
+            if (!file) {
+                return;
+            }
+
+            if (!file.type || !file.type.startsWith('image/')) {
+                throw new Error(window.i18n ? window.i18n.translate('photoUploadInvalidType') : 'Only image files are allowed');
+            }
+
+            const maxFileSize = 5 * 1024 * 1024;
+            if (file.size > maxFileSize) {
+                throw new Error(window.i18n ? window.i18n.translate('photoUploadTooLarge') : 'Photo is too large (max 5 MB)');
+            }
+
+            if (photoUploadStatus) {
+                photoUploadStatus.textContent = window.i18n ? window.i18n.translate('photoUploadProgress') : 'Uploading photo...';
+                photoUploadStatus.className = 'text-sm text-slate-600 dark:text-slate-300';
+            }
+
+            const formData = new FormData();
+            formData.append('photo', file);
+
+            const response = await fetch('/api/generate/upload-photo', {
+                method: 'POST',
+                body: formData
+            });
+
+            let responseData = {};
+            try {
+                responseData = await response.json();
+            } catch (e) {
+                responseData = {};
+            }
+
+            if (!response.ok) {
+                const message = responseData.message || responseData.error || (window.i18n ? window.i18n.translate('photoUploadError') : 'Failed to upload photo');
+                throw new Error(message);
+            }
+
+            uploadedPhotoId = responseData.photoId || String(Date.now());
+
+            if (photoUploadStatus) {
+                photoUploadStatus.textContent = window.i18n ? window.i18n.translate('photoUploadSuccess') : 'Photo uploaded successfully';
+                photoUploadStatus.className = 'text-sm text-emerald-600 dark:text-emerald-400';
+            }
+        }
+
+        if (uploadPhotoButton && photoInput) {
+            uploadPhotoButton.addEventListener('click', function() {
+                photoInput.click();
+            });
+
+            photoInput.addEventListener('change', async function() {
+                const selectedFile = photoInput.files && photoInput.files.length > 0 ? photoInput.files[0] : null;
+                if (!selectedFile) {
+                    return;
+                }
+
+                uploadPhotoButton.disabled = true;
+                try {
+                    await uploadResumePhoto(selectedFile);
+                } catch (error) {
+                    if (photoUploadStatus) {
+                        photoUploadStatus.textContent = error.message || (window.i18n ? window.i18n.translate('photoUploadError') : 'Failed to upload photo');
+                        photoUploadStatus.className = 'text-sm text-red-600 dark:text-red-400';
+                    }
+                } finally {
+                    uploadPhotoButton.disabled = false;
+                    photoInput.value = '';
+                }
+            });
+        }
         
         // Load sample data when page loads (after language system is initialized)
         // Wait a bit to ensure language system is ready
@@ -1549,18 +1664,18 @@
             }
         });
 
-        // Download PDF button handler
-        document.getElementById('downloadButton').addEventListener('click', async function() {
+        // Download cover letter PDF button handler
+        document.getElementById('downloadAnschreibenButton').addEventListener('click', async function() {
             const coverLetterText = document.getElementById('coverLetterTextarea').value;
-            const downloadButton = document.getElementById('downloadButton');
+            const downloadAnschreibenButton = document.getElementById('downloadAnschreibenButton');
             
             if (!coverLetterText || coverLetterText.trim().length === 0) {
                 alert(window.i18n ? window.i18n.translate('alertFillLetter') : 'Bitte füllen Sie zuerst das Anschreiben aus.');
                 return;
             }
             
-            downloadButton.disabled = true;
-            downloadButton.textContent = window.i18n ? window.i18n.translate('downloadButtonGenerating') : 'PDF wird generiert...';
+            downloadAnschreibenButton.disabled = true;
+            downloadAnschreibenButton.textContent = window.i18n ? window.i18n.translate('downloadAnschreibenButtonGenerating') : 'Anschreiben-PDF wird generiert...';
             
             try {
                 const response = await fetch('/api/generate/pdf', {
@@ -1590,10 +1705,70 @@
                 const errorMsg = window.i18n ? window.i18n.translate('errorPdfError') : 'Fehler beim Generieren des PDFs: ';
                 alert(errorMsg + error.message);
             } finally {
-                downloadButton.disabled = false;
-                downloadButton.textContent = window.i18n ? window.i18n.translate('downloadButton') : 'Herunterladen (PDF)';
+                downloadAnschreibenButton.disabled = false;
+                downloadAnschreibenButton.textContent = window.i18n ? window.i18n.translate('downloadAnschreibenButton') : 'Herunterladen Bewerbungsanschreiben';
             }
         });
+
+        // Download resume PDF button handler
+        document.getElementById('downloadLebenslaufButton').addEventListener('click', async function() {
+            const downloadLebenslaufButton = document.getElementById('downloadLebenslaufButton');
+            downloadLebenslaufButton.disabled = true;
+            downloadLebenslaufButton.textContent = window.i18n ? window.i18n.translate('downloadLebenslaufButtonGenerating') : 'Lebenslauf-PDF wird generiert...';
+
+            try {
+                const useDefaultPdf = !hasSignificantChanges();
+                const response = await fetch(`/api/generate/pdf/lebenslauf?defaultData=${useDefaultPdf}`, {
+                    method: 'GET'
+                });
+
+                if (!response.ok) {
+                    throw new Error(window.i18n ? window.i18n.translate('errorPdfGeneration') : 'PDF-Generierung fehlgeschlagen');
+                }
+
+                const blob = await response.blob();
+                const contentDisposition = response.headers.get('content-disposition');
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = extractFilenameFromDisposition(contentDisposition) || 'Lebenslauf.pdf';
+                document.body.appendChild(a);
+                a.click();
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+            } catch (error) {
+                console.error('Error downloading resume PDF:', error);
+                const errorMsg = window.i18n ? window.i18n.translate('errorPdfError') : 'Fehler beim Generieren des PDFs: ';
+                alert(errorMsg + error.message);
+            } finally {
+                downloadLebenslaufButton.disabled = false;
+                downloadLebenslaufButton.textContent = window.i18n ? window.i18n.translate('downloadLebenslaufButton') : 'Herunterladen Lebenslauf';
+            }
+        });
+
+        function extractFilenameFromDisposition(contentDisposition) {
+            if (!contentDisposition || typeof contentDisposition !== 'string') {
+                return null;
+            }
+
+            // RFC 5987: filename*=UTF-8''encoded-name.pdf
+            const utf8FilenameMatch = contentDisposition.match(/filename\*=UTF-8''([^;]+)/i);
+            if (utf8FilenameMatch && utf8FilenameMatch[1]) {
+                try {
+                    return decodeURIComponent(utf8FilenameMatch[1].trim());
+                } catch (e) {
+                    return utf8FilenameMatch[1].trim();
+                }
+            }
+
+            // Fallback: filename="name.pdf" or filename=name.pdf
+            const basicFilenameMatch = contentDisposition.match(/filename="?([^";]+)"?/i);
+            if (basicFilenameMatch && basicFilenameMatch[1]) {
+                return basicFilenameMatch[1].trim();
+            }
+
+            return null;
+        }
 
         // Setup share links
         (function initShareLinks() {

@@ -1,12 +1,14 @@
-Уважаемые господа,
+Betreff: Bewerbung als Java Softwareentwickler
 
-Меня заинтересовала вакансия "Monteur-Techniker" в компании "default", так как я вижу в этой позиции отличную возможность использовать мой опыт и знания в области электротехники и обслуживания техники. Обучение в Пермском военном институте ракетных войск стратегического назначения дало мне основу в электrotechnike, что является важной частью требований вашей вакансии.
+Sehr geehrte Damen und Herren,
 
-На протяжении своей карьеры я неоднократно сталкивался с задачами по оптимизации процессов и экономии ресурсов, что также упоминается в вашем описании должности. Например, моя работа в FixAuto Weilburg включала в себя технический осмотр и систематическую проверку автомобилей, где я эффективно применял навыки поиска и устранения неисправностей. Это связано с вашими требованиями к умению работать в команде и ориентируясь на клиента.
+mit großem Interesse habe ich die Stellenanzeige für die Position des Java Softwareentwicklers bei der Finanz Informatik GmbH & Co. KG gelesen. Als erfahrener Softwareentwickler mit einem soliden Hintergrund in der Entwicklung von Web-Anwendungen und fundierten Kenntnissen in Java, Spring Boot und JavaScript, bin ich davon überzeugt, dass ich einen wertvollen Beitrag zu Ihrem Team leisten kann.
 
-Я также обладаю навыками, которые могут принести пользу вашей компании, такими как самоорганизация и личная эффективность. Например, оптимизация рабочего процесса и эффективное планирование задач позволяет мне работать в сжатые сроки и завершать проекты вовремя. Эти умения я приобрел и развивал, управляя командой как Product Marketing Manager в Pilteh.
+In meiner aktuellen Position als Softwareentwickler bei Tech Solutions GmbH habe ich meine Fähigkeiten in der Entwicklung von Web-Anwendungen mit Java Spring Boot erfolgreich eingesetzt und maßgeblich zur Optimierung von Backend-Systemen und Datenbanklösungen beigetragen. Ich habe Erfahrung in der Arbeit mit Tools wie Git und Maven sowie in der Zusammenarbeit in agilen Teams. Meine Zertifizierung als Oracle Certified Professional, Java SE 11 Developer unterstreicht zusätzlich meine Fachkenntnisse im Java-Umfeld.
 
-Очень надеюсь, что моя кандидатура заинтересует вас, так как я искренне стремлюсь присоединиться к вашей команде и внести свой вклад в развитие компании. Готов обсудить детали на собеседовании в удобное для вас время.
+Meine Leidenschaft für Softwareentwicklung geht Hand in Hand mit meiner Freude an der Teamarbeit und meiner ausgeprägten Neugier, neue Technologien zu erforschen. Ich schätze die Möglichkeit, in einem dynamischen Unternehmen wie der Finanz Informatik GmbH & Co. KG zu arbeiten, welches als Treiber der Digitalisierung in Europa fungiert und mir die Chance bietet, mein Wissen und meine Fähigkeiten kontinuierlich weiterzuentwickeln. Die Aussicht, an innovativen Softwarelösungen für die Digitalisierung von Banken mitzuarbeiten, motiviert mich besonders.
 
-С уважением,  
-Nicht angegeben Nicht angegeben
+Ich stehe Ihnen jederzeit für ein persönliches Gespräch zur Verfügung und freue mich darauf, Sie von meinen Fähigkeiten und meiner Begeisterung für diese herausfordernde Position zu überzeugen.
+
+Mit freundlichen Grüßen  
+Max ТУЩ

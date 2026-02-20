@@ -264,7 +264,7 @@ public class PdfGenerationService {
             return pdfBytes;
         }
     }
-    
+
     /**
      * Parses cover letter text into structured parts
      */
