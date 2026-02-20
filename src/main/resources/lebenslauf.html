@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lebenslauf – {{personalInformation.firstName}} {{personalInformation.lastName}}</title>
+
+<style>
+:root {
+  --header-bg: #e3e3e5;
+  --text: #3f434a;
+  --muted: #666b74;
+  --line: #8c8f95;
+  --accent: #40454e;
+}
+
+* { box-sizing: border-box; }
+
+@page {
+  size: A4;
+  margin: 0;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  color: var(--text);
+}
+
+.page {
+  width: 210mm;
+  min-height: 297mm;
+  margin: 10mm auto 0;
+  background: #ffffff;
+}
+
+/* HEADER */
+
+.header-strip {
+  height: 52.5mm;
+  background: var(--header-bg);
+  display: grid;
+  grid-template-columns: 72% 28%;
+  align-items: center;
+  padding: 0 14mm;
+}
+
+.name-block {
+  margin: 0;
+  font-weight: 300;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  line-height: 1.14;
+  font-size: 14mm;
+}
+
+.photo-wrap {
+  width: 46mm;
+  height: 46mm;
+  border-radius: 50%;
+  background: #d0d1d3; /* серый цвет на пару тонов темнее фона (#e3e3e5) */
+  border: 2px solid #e6e7ea;
+  overflow: hidden;
+  justify-self: center;
+  transform: translateY(10mm);
+}
+
+.photo-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* CONTENT */
+
+.content {
+  display: grid;
+  grid-template-columns: 38% 62%;
+  position: relative;
+}
+
+/* вертикальная линия */
+.content::before {
+  content: "";
+  position: absolute;
+  left: 38%;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--line);
+}
+
+/* НОВЫЙ контейнер верхней строки */
+.top-row {
+  grid-column: 1 / span 2;
+  display: grid;
+  grid-template-columns: 38% 62%;
+  align-items: center; /* выравнивание по центру вертикально */
+  padding-bottom: 1mm; /* отступ между содержимым и линией */
+  border-bottom: 1px solid var(--line);
+}
+
+/* верхние блоки */
+.top-left {
+  padding: 1.5mm 10mm 0 15mm;
+}
+
+.top-right {
+  padding: 1.5mm 15mm 0 1ch;
+}
+
+/* нижние блоки */
+.bottom-left {
+  padding: 4mm 10mm 4mm 15mm;
+}
+
+.bottom-right {
+  padding: 4mm 15mm 4mm 1ch;
+}
+
+.contact {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  line-height: 1.35;
+  color: var(--muted);
+  font-size: 3.9mm;
+}
+
+.contact li {
+  display: flex;
+  gap: 3mm;
+  align-items: flex-start;
+  margin-bottom: 0.8mm;
+}
+
+.contact .icon {
+  width: 6mm;
+  flex-shrink: 0; /* иконка не сжимается */
+  text-align: center;
+  color: #767b84;
+}
+
+.contact li span:last-child {
+  flex: 1;
+  text-align: left; /* текст выровнен по левому краю */
+}
+
+.left-block {
+  padding-top: 3.5mm;
+  margin-top: 0;
+  position: relative;
+}
+
+.left-block + .left-block {
+  margin-top: 3.5mm;
+  margin-left: 0;
+}
+
+.left-block + .left-block::before {
+  content: "";
+  position: absolute;
+  left: -15mm;
+  right: -10mm;
+  top: 0;
+  margin-top: 0.5mm; /* отступ между содержимым и линией (уменьшено на 50%) */
+  border-top: 1px solid var(--line);
+}
+
+.right-block {
+  padding-top: 0;
+}
+
+.bottom-left .left-block:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.section-title {
+  margin: 0 0 1.3mm;
+  color: var(--accent);
+  font-size: 5.8mm;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.text {
+  margin: 0;
+  font-size: 3.8mm;
+  line-height: 1.42;
+  color: #4f555f;
+}
+
+ul.inline-dot-list {
+  list-style: none;
+  margin: 0;
+  padding-left: 0;
+  font-size: 3.8mm;
+  line-height: 1.35;
+  color: #4f555f;
+}
+
+ul.inline-dot-list li {
+  margin-bottom: 0.7mm;
+}
+
+ul.inline-dot-list li::before {
+  content: "\2022 ";
+  margin-right: 1.2mm;
+}
+
+.subhead {
+  margin: 0 0 1mm;
+  font-size: 4.8mm;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #4a4f58;
+  font-weight: 700;
+}
+
+.job-title {
+  margin: 0;
+  font-size: 4.8mm;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: #4a4f58;
+  font-weight: 700;
+}
+
+.company,
+.period {
+  margin: 0.3mm 0 0;
+  font-size: 3.8mm;
+  color: #4f555f;
+}
+
+.period {
+  margin-bottom: 1.2mm;
+}
+
+.job {
+  margin-top: 3.4mm;
+}
+
+.edu-title {
+  margin: 0;
+  font-size: 4.8mm;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 700;
+  color: #4a4f58;
+}
+
+.edu-sub {
+  margin: 0.4mm 0 0;
+  font-size: 4.2mm;
+  color: #4f555f;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.small {
+  font-size: 3.7mm;
+  color: #4f555f;
+  line-height: 1.35;
+  margin: 0.8mm 0 0;
+}
+
+@media print {
+  body { background: #fff; }
+  .page {
+    margin: 0 auto;
+    box-shadow: none;
+  }
+}
+</style>
+</head>
+
+<body>
+<div class="page">
+
+<header class="header-strip">
+  <h1 class="name-block">
+    {{personalInformation.firstName}}<br />
+    {{personalInformation.lastName}}
+  </h1>
+
+  <div class="photo-wrap">
+    <img src="{{photoPath}}" alt="" />
+  </div>
+</header>
+
+<main class="content">
+
+<div class="top-row">
+<section class="top-left">
+<ul class="contact">
+<li><span class="icon">☎</span><span>{{personalInformation.phone}}</span></li>
+<li><span class="icon">✉</span><span>{{personalInformation.email}}</span></li>
+<li><span class="icon">⌂</span><span>{{personalInformation.address.street}}, {{personalInformation.address.postalCode}} {{personalInformation.address.city}}, {{personalInformation.address.country}}</span></li>
+</ul>
+</section>
+
+<section class="top-right">
+<h2 class="section-title">Profil</h2>
+<p class="text">{{profileText}}</p>
+</section>
+</div>
+
+<section class="bottom-left">
+<section class="left-block">
+<h2 class="section-title">Kompetenzen</h2>
+{{#skills.programmingLanguages.hasItems}}
+<p class="edu-sub">Programmiersprachen</p>
+<ul class="inline-dot-list">
+{{#skills.programmingLanguages.items}}
+<li>{{.}}</li>
+{{/skills.programmingLanguages.items}}
+</ul>
+{{/skills.programmingLanguages.hasItems}}
+{{#skills.frameworks.hasItems}}
+<p class="edu-sub">Frameworks</p>
+<ul class="inline-dot-list">
+{{#skills.frameworks.items}}
+<li>{{.}}</li>
+{{/skills.frameworks.items}}
+</ul>
+{{/skills.frameworks.hasItems}}
+{{#skills.databases.hasItems}}
+<p class="edu-sub">Datenbanken</p>
+<ul class="inline-dot-list">
+{{#skills.databases.items}}
+<li>{{.}}</li>
+{{/skills.databases.items}}
+</ul>
+{{/skills.databases.hasItems}}
+{{#skills.tools.hasItems}}
+<p class="edu-sub">Tools</p>
+<ul class="inline-dot-list">
+{{#skills.tools.items}}
+<li>{{.}}</li>
+{{/skills.tools.items}}
+</ul>
+{{/skills.tools.hasItems}}
+{{#skills.languages.hasItems}}
+<p class="edu-sub">Sprachen</p>
+<ul class="inline-dot-list">
+{{#skills.languages.items}}
+<li>{{language}}: {{level}}</li>
+{{/skills.languages.items}}
+</ul>
+{{/skills.languages.hasItems}}
+</section>
+
+<section class="left-block">
+<h2 class="section-title">Bildung</h2>
+{{#education}}
+{{#field}}
+<p class="edu-sub">{{field}}</p>
+{{/field}}
+<p class="small">
+{{degree}}{{#university}}<br />{{university}}{{/university}}{{#startDate}}<br />{{startDate}}{{#endDate}} - {{endDate}}{{/endDate}}{{/startDate}}{{#description}}<br />{{description}}{{/description}}
+</p>
+{{/education}}
+</section>
+</section>
+
+<section class="bottom-right">
+<section class="right-block">
+<h2 class="section-title">Berufserfahrung</h2>
+
+{{#workExperience}}
+<article class="job">
+<h3 class="job-title">{{position}}</h3>
+<p class="company">{{company}}</p>
+<p class="period">{{startDate}}{{#endDate}} - {{endDate}}{{/endDate}}</p>
+{{#description}}
+<p class="text">{{.}}</p>
+{{/description}}
+{{#technologies.hasItems}}
+<ul class="inline-dot-list">
+{{#technologies.items}}
+<li>{{.}}</li>
+{{/technologies.items}}
+</ul>
+{{/technologies.hasItems}}
+</article>
+{{/workExperience}}
+</section>
+</section>
+
+</main>
+</div>
+</body>
+</html>

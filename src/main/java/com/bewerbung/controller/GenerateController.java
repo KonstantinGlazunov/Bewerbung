@@ -11,15 +11,20 @@ import com.bewerbung.service.BiographyFileAnalyzerService;
 import com.bewerbung.service.BiographyService;
 import com.bewerbung.service.ChangeDetectionService;
 import com.bewerbung.service.FileOutputService;
+import com.bewerbung.service.LebenslaufTemplateService;
 import com.bewerbung.service.PdfGenerationService;
+import com.bewerbung.service.TempPhotoStorageService;
 import com.bewerbung.service.VacancyAnalyzerService;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;
 import jakarta.validation.Valid;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,13 +36,33 @@ import org.springframework.http.MediaType;
 import java.io.IOException;
 
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.Normalizer;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/api/generate")
 public class GenerateController {
 
     private static final Logger logger = LoggerFactory.getLogger(GenerateController.class);
+    private static final Pattern TITLE_NAME_PATTERN = Pattern.compile(
+            "<title>\\s*Lebenslauf\\s*[\\u2013\\-]\\s*([^<]+)</title>",
+            Pattern.CASE_INSENSITIVE
+    );
+    private static final Pattern NAME_BLOCK_PATTERN = Pattern.compile(
+            "<h1[^>]*class\\s*=\\s*\"name-block\"[^>]*>(.*?)</h1>",
+            Pattern.CASE_INSENSITIVE | Pattern.DOTALL
+    );
+    private static final Pattern HTML_TAGS_PATTERN = Pattern.compile("<[^>]+>");
+    private static final Pattern NON_ASCII_FILENAME_PATTERN = Pattern.compile("[^A-Za-z0-9_-]");
 
     private final VacancyAnalyzerService vacancyAnalyzerService;
     private final BiographyService biographyService;
@@ -46,7 +71,9 @@ public class GenerateController {
     private final AnschreibenGeneratorService anschreibenGeneratorService;
     private final ChangeDetectionService changeDetectionService;
     private final FileOutputService fileOutputService;
+    private final LebenslaufTemplateService lebenslaufTemplateService;
     private final PdfGenerationService pdfGenerationService;
+    private final TempPhotoStorageService tempPhotoStorageService;
     private final Gson gson;
 
     @Autowired
@@ -57,7 +84,9 @@ public class GenerateController {
                              AnschreibenGeneratorService anschreibenGeneratorService,
                              ChangeDetectionService changeDetectionService,
                              FileOutputService fileOutputService,
-                             PdfGenerationService pdfGenerationService) {
+                             LebenslaufTemplateService lebenslaufTemplateService,
+                             PdfGenerationService pdfGenerationService,
+                             TempPhotoStorageService tempPhotoStorageService) {
         this.vacancyAnalyzerService = vacancyAnalyzerService;
         this.biographyService = biographyService;
         this.biographyFileAnalyzerService = biographyFileAnalyzerService;
@@ -65,8 +94,20 @@ public class GenerateController {
         this.anschreibenGeneratorService = anschreibenGeneratorService;
         this.changeDetectionService = changeDetectionService;
         this.fileOutputService = fileOutputService;
+        this.lebenslaufTemplateService = lebenslaufTemplateService;
         this.pdfGenerationService = pdfGenerationService;
+        this.tempPhotoStorageService = tempPhotoStorageService;
         this.gson = new Gson();
+    }
+
+    @PostMapping("/upload-photo")
+    public ResponseEntity<Map<String, String>> uploadResumePhoto(@RequestParam("photo") MultipartFile photo) {
+        logger.info("Received CV photo upload request");
+        String photoId = tempPhotoStorageService.saveTemporaryPhoto(photo);
+        return ResponseEntity.ok(Map.of(
+                "message", "Photo uploaded successfully",
+                "photoId", photoId
+        ));
     }
 
     @PostMapping
@@ -98,6 +139,18 @@ public class GenerateController {
                 String dataAnschreibenPath = "data/anschreiben.txt";
                 fileOutputService.writeAnschreiben(sampleCoverLetter, dataAnschreibenPath);
                 changeDetectionService.saveAnschreibenPath(dataAnschreibenPath);
+
+                // Also regenerate lebenslauf to avoid serving stale file from previous session.
+                try {
+                    String biographyJsonString = gson.toJson(request.getBiography());
+                    JsonObject biographyJson = gson.fromJson(biographyJsonString, JsonObject.class);
+                    String lebenslaufHtml = lebenslaufTemplateService.generateLebenslauf(biographyJson);
+                    fileOutputService.writeLebenslauf(lebenslaufHtml);
+                    logger.info("Lebenslauf regenerated for default data flow");
+                } catch (Exception e) {
+                    logger.error("Failed to generate lebenslauf in default-data flow", e);
+                    throw new RuntimeException("Failed to generate lebenslauf for default data", e);
+                }
                 
                 logger.info("Sample cover letter loaded and saved to output files ({} chars)", sampleCoverLetter.length());
                 String outputPath = java.nio.file.Paths.get("output/anschreiben.md").toAbsolutePath().toString();
@@ -117,21 +170,32 @@ public class GenerateController {
             logger.debug("CV preview: {}", cvPreview.replace("\n", "\\n"));
         }
 
-        // Check for changes (including wishes)
-        ChangeDetectionService.ChangeResult changeResult = changeDetectionService.checkAndSave(vacancyText, cvText, request.getWishes());
-
-        // If no changes detected, return early without AI processing
-        if (!changeResult.hasChanges()) {
-            logger.info("No changes detected. Skipping AI processing.");
-            return ResponseEntity.ok("No changes detected. Existing analysis is still valid. AI processing skipped to save tokens.");
-        }
-
-        logger.info("Changes detected: {}", changeResult.getDescription());
-
-        // Convert biography Map to JsonObject for processing
+        // Convert biography Map to JsonObject for processing (needed for both anschreiben and lebenslauf)
         String biographyJsonString = gson.toJson(request.getBiography());
         JsonObject biographyJson = gson.fromJson(biographyJsonString, JsonObject.class);
         Biography biography = biographyService.parseBiographyFromJson(biographyJson);
+
+        // Check for changes (including wishes)
+        ChangeDetectionService.ChangeResult changeResult = changeDetectionService.checkAndSave(vacancyText, cvText, request.getWishes());
+
+        // If no changes detected, return early without AI processing (but still generate lebenslauf)
+        if (!changeResult.hasChanges()) {
+            logger.info("No changes detected. Skipping AI processing for anschreiben.");
+            
+            // Still generate lebenslauf even if no changes detected
+            try {
+                logger.info("Generating lebenslauf from biography data (no changes detected, but generating CV)");
+                String lebenslaufHtml = lebenslaufTemplateService.generateLebenslauf(biographyJson);
+                fileOutputService.writeLebenslauf(lebenslaufHtml);
+                logger.info("Lebenslauf generated and saved successfully");
+            } catch (Exception e) {
+                logger.error("Error generating lebenslauf, continuing without it", e);
+            }
+            
+            return ResponseEntity.ok("No changes detected. Existing analysis is still valid. AI processing skipped to save tokens. Lebenslauf generated.");
+        }
+
+        logger.info("Changes detected: {}", changeResult.getDescription());
 
         // Analyze job posting (only if vacancy changed)
         JobRequirements jobRequirements = null;
@@ -231,14 +295,28 @@ public class GenerateController {
             logger.info("No changes detected, skipping anschreiben generation");
         }
 
+        // Generate and save lebenslauf (CV)
+        try {
+            // Use already parsed biographyJson from above (line 137)
+            logger.info("Generating lebenslauf from biography data");
+            String lebenslaufHtml = lebenslaufTemplateService.generateLebenslauf(biographyJson);
+            fileOutputService.writeLebenslauf(lebenslaufHtml);
+            logger.info("Lebenslauf generated and saved successfully");
+        } catch (Exception e) {
+            logger.error("Error generating lebenslauf, continuing without it", e);
+            // Не прерываем выполнение, если lebenslauf не удалось сгенерировать
+        }
+
         // Write notes
         fileOutputService.writeNotes(changeResult.getDescription(), 
             changeResult.isVacancyChanged(), changeResult.isCvChanged());
         
         String outputPath = Paths.get("output/anschreiben.md").toAbsolutePath().toString();
+        String lebenslaufPath = Paths.get("output/lebenslauf-filled.html").toAbsolutePath().toString();
         logger.info("Processing complete. Results written to output files.");
         logger.info("Anschreiben file location: {}", outputPath);
-        return ResponseEntity.ok("Processing complete. Results written to output files. Anschreiben: " + outputPath);
+        logger.info("Lebenslauf file location: {}", lebenslaufPath);
+        return ResponseEntity.ok("Processing complete. Results written to output files. Anschreiben: " + outputPath + ", Lebenslauf: " + lebenslaufPath);
     }
 
     @PostMapping("/cover-letter")
@@ -260,6 +338,11 @@ public class GenerateController {
             language = "de";
         }
 
+        // Convert biography Map to JsonObject for processing (needed for both anschreiben and lebenslauf)
+        String biographyJsonString = gson.toJson(request.getBiography());
+        JsonObject biographyJson = gson.fromJson(biographyJsonString, JsonObject.class);
+        Biography biography = biographyService.parseBiographyFromJson(biographyJson);
+
         // Check for changes (including wishes and language)
         ChangeDetectionService.ChangeResult changeResult = changeDetectionService.checkAndSave(vacancyText, cvText, request.getWishes(), language);
 
@@ -273,19 +356,36 @@ public class GenerateController {
                     logger.info("Successfully loaded saved Anschreiben from: {}", savedAnschreibenPath);
                     // Also save to output directory for consistency
                     fileOutputService.writeAnschreiben(savedAnschreiben);
-                    return ResponseEntity.ok("No changes detected. Using saved Anschreiben from: " + savedAnschreibenPath);
+                    
+                    // Still generate lebenslauf even if no changes detected
+                    try {
+                        logger.info("Generating lebenslauf from biography data (no changes detected, but generating CV)");
+                        String lebenslaufHtml = lebenslaufTemplateService.generateLebenslauf(biographyJson);
+                        fileOutputService.writeLebenslauf(lebenslaufHtml);
+                        logger.info("Lebenslauf generated and saved successfully");
+                    } catch (Exception e) {
+                        logger.error("Error generating lebenslauf, continuing without it", e);
+                    }
+                    
+                    return ResponseEntity.ok("No changes detected. Using saved Anschreiben from: " + savedAnschreibenPath + ". Lebenslauf generated.");
                 }
             }
             logger.info("No saved Anschreiben found. Skipping AI processing.");
-            return ResponseEntity.ok("No changes detected. Existing analysis is still valid. AI processing skipped to save tokens.");
+            
+            // Still generate lebenslauf even if no changes detected
+            try {
+                logger.info("Generating lebenslauf from biography data (no changes detected, but generating CV)");
+                String lebenslaufHtml = lebenslaufTemplateService.generateLebenslauf(biographyJson);
+                fileOutputService.writeLebenslauf(lebenslaufHtml);
+                logger.info("Lebenslauf generated and saved successfully");
+            } catch (Exception e) {
+                logger.error("Error generating lebenslauf, continuing without it", e);
+            }
+            
+            return ResponseEntity.ok("No changes detected. Existing analysis is still valid. AI processing skipped to save tokens. Lebenslauf generated.");
         }
 
         logger.info("Changes detected: {}", changeResult.getDescription());
-
-        // Convert biography Map to JsonObject for processing
-        String biographyJsonString = gson.toJson(request.getBiography());
-        JsonObject biographyJson = gson.fromJson(biographyJsonString, JsonObject.class);
-        Biography biography = biographyService.parseBiographyFromJson(biographyJson);
 
         // Analyze job posting
         JobRequirements jobRequirements = vacancyAnalyzerService.analyzeVacancy(request.getJobPosting());
@@ -353,6 +453,21 @@ public class GenerateController {
         
         // Save path to state
         changeDetectionService.saveAnschreibenPath(dataAnschreibenPath);
+
+        // Generate and save lebenslauf (CV)
+        try {
+            // Convert biography Map to JsonObject for lebenslauf generation
+            String biographyJsonStr = gson.toJson(request.getBiography());
+            JsonObject biographyJsonForLebenslauf = gson.fromJson(biographyJsonStr, JsonObject.class);
+            
+            logger.info("Generating lebenslauf from biography data");
+            String lebenslaufHtml = lebenslaufTemplateService.generateLebenslauf(biographyJsonForLebenslauf);
+            fileOutputService.writeLebenslauf(lebenslaufHtml);
+            logger.info("Lebenslauf generated and saved successfully");
+        } catch (Exception e) {
+            logger.error("Error generating lebenslauf, continuing without it", e);
+            // Не прерываем выполнение, если lebenslauf не удалось сгенерировать
+        }
 
         // Write notes
         fileOutputService.writeNotes(changeResult.getDescription(), 
@@ -542,6 +657,17 @@ public class GenerateController {
         // Save path to state
         changeDetectionService.saveAnschreibenPath(dataAnschreibenPath);
 
+        // Generate and save lebenslauf (CV)
+        try {
+            logger.info("Generating lebenslauf from Biography object");
+            String lebenslaufHtml = lebenslaufTemplateService.generateLebenslauf(biography);
+            fileOutputService.writeLebenslauf(lebenslaufHtml);
+            logger.info("Lebenslauf generated and saved successfully");
+        } catch (Exception e) {
+            logger.error("Error generating lebenslauf, continuing without it", e);
+            // Не прерываем выполнение, если lebenslauf не удалось сгенерировать
+        }
+
         // Build response
         GenerateResponseDto response = new GenerateResponseDto(coverLetter);
         
@@ -578,6 +704,206 @@ public class GenerateController {
             logger.error("Unexpected error generating PDF: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to generate PDF: " + e.getMessage(), e);
         }
+    }
+
+    @GetMapping("/lebenslauf/html")
+    public ResponseEntity<String> getLebenslaufHtml() {
+        Path htmlPath = Paths.get("output", "lebenslauf-filled.html").toAbsolutePath();
+        if (!Files.exists(htmlPath)) {
+            throw new RuntimeException("Lebenslauf HTML file not found: " + htmlPath);
+        }
+
+        try {
+            String html = Files.readString(htmlPath, StandardCharsets.UTF_8);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_HTML_VALUE)
+                    .body(html);
+        } catch (IOException e) {
+            logger.error("Failed to read lebenslauf HTML from {}", htmlPath, e);
+            throw new RuntimeException("Failed to read lebenslauf HTML", e);
+        }
+    }
+
+    @GetMapping("/lebenslauf/default-html")
+    public ResponseEntity<String> getDefaultLebenslaufHtml() {
+        try {
+            ClassPathResource resource = new ClassPathResource("lebenslauf-filled.html");
+            if (!resource.exists()) {
+                throw new RuntimeException("Default lebenslauf HTML template not found in resources");
+            }
+
+            String html = new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+            // Ensure absolute static path for image and other static assets during PDF rendering.
+            String normalizedHtml = html.replace("src=\"static/", "src=\"/static/");
+
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_HTML_VALUE)
+                    .body(normalizedHtml);
+        } catch (IOException e) {
+            logger.error("Failed to read default lebenslauf HTML template", e);
+            throw new RuntimeException("Failed to read default lebenslauf HTML template", e);
+        }
+    }
+
+    @GetMapping("/pdf/lebenslauf")
+    public ResponseEntity<byte[]> generateLebenslaufPdf(
+            HttpServletRequest request,
+            @RequestParam(name = "defaultData", defaultValue = "false") boolean defaultData
+    ) {
+        Path htmlPath = Paths.get("output", "lebenslauf-filled.html").toAbsolutePath();
+
+        final String filename;
+        final Path outputPdfPath;
+        final String sourceUrl;
+
+        if (defaultData) {
+            filename = "Musterman_Lebenslauf.PDF";
+            outputPdfPath = Paths.get("output", filename).toAbsolutePath();
+            sourceUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+                    + "/api/generate/lebenslauf/default-html";
+        } else {
+            if (!Files.exists(htmlPath)) {
+                throw new RuntimeException("Lebenslauf HTML file not found. Please generate Lebenslauf first.");
+            }
+            String surname = extractSurnameFromLebenslaufHtml(htmlPath);
+            filename = surname + "_LebensLauf.PDF";
+            outputPdfPath = Paths.get("output", filename).toAbsolutePath();
+            sourceUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+                    + "/api/generate/lebenslauf/html";
+        }
+
+        boolean pdfAlreadyExists = false;
+        try {
+            pdfAlreadyExists = Files.exists(outputPdfPath) && Files.size(outputPdfPath) > 0;
+        } catch (IOException ignored) {
+            pdfAlreadyExists = false;
+        }
+
+        if (!pdfAlreadyExists) {
+            boolean generated = generateLebenslaufPdfWithChrome(sourceUrl, outputPdfPath);
+            if (!generated) {
+                throw new RuntimeException("Failed to generate Lebenslauf PDF. Ensure google-chrome/chromium is installed.");
+            }
+        }
+
+        try {
+            byte[] pdfBytes = Files.readAllBytes(outputPdfPath);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", filename);
+            headers.setContentLength(pdfBytes.length);
+
+            logger.info("Lebenslauf PDF generated successfully: {} ({} bytes)", outputPdfPath, pdfBytes.length);
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(pdfBytes);
+        } catch (IOException e) {
+            logger.error("Failed to read generated lebenslauf PDF from {}", outputPdfPath, e);
+            throw new RuntimeException("Failed to read generated lebenslauf PDF", e);
+        }
+    }
+
+    private boolean generateLebenslaufPdfWithChrome(String sourceUrl, Path outputPdfPath) {
+        try {
+            Path parent = outputPdfPath.getParent();
+            if (parent != null) {
+                Files.createDirectories(parent);
+            }
+        } catch (IOException e) {
+            logger.error("Failed to create output directory for PDF {}", outputPdfPath, e);
+            return false;
+        }
+
+        List<List<String>> commands = Arrays.asList(
+                Arrays.asList(
+                        "google-chrome", "--headless", "--disable-gpu", "--no-sandbox",
+                        "--print-to-pdf-no-header",
+                        "--print-to-pdf=" + outputPdfPath.toString(),
+                        sourceUrl
+                ),
+                Arrays.asList(
+                        "chromium-browser", "--headless", "--disable-gpu", "--no-sandbox",
+                        "--print-to-pdf-no-header",
+                        "--print-to-pdf=" + outputPdfPath.toString(),
+                        sourceUrl
+                ),
+                Arrays.asList(
+                        "chromium", "--headless", "--disable-gpu", "--no-sandbox",
+                        "--print-to-pdf-no-header",
+                        "--print-to-pdf=" + outputPdfPath.toString(),
+                        sourceUrl
+                )
+        );
+
+        for (List<String> command : commands) {
+            try {
+                Process process = new ProcessBuilder(command)
+                        .redirectErrorStream(true)
+                        .start();
+                boolean finished = process.waitFor(60, TimeUnit.SECONDS);
+                String processOutput = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+
+                if (!finished) {
+                    process.destroyForcibly();
+                    logger.warn("Timeout while generating Lebenslauf PDF with command: {}", command.get(0));
+                    continue;
+                }
+
+                if (process.exitValue() == 0 && Files.exists(outputPdfPath) && Files.size(outputPdfPath) > 0) {
+                    logger.info("Lebenslauf PDF generated via {}: {}", command.get(0), outputPdfPath);
+                    return true;
+                }
+
+                logger.warn(
+                        "PDF generation command '{}' failed with exit code {}. Output: {}",
+                        command.get(0), process.exitValue(), processOutput
+                );
+            } catch (Exception e) {
+                logger.warn("Failed to execute PDF generation command '{}': {}", command.get(0), e.getMessage());
+            }
+        }
+
+        return false;
+    }
+
+    private String extractSurnameFromLebenslaufHtml(Path htmlPath) {
+        try {
+            String html = Files.readString(htmlPath, StandardCharsets.UTF_8);
+            String fullName = extractFullName(html);
+
+            if (fullName == null || fullName.isBlank()) {
+                return "LEBENSLAUF";
+            }
+
+            String[] parts = fullName.trim().split("\\s+");
+            String rawSurname = parts[parts.length - 1];
+            String sanitized = sanitizeFilenamePart(rawSurname);
+            return sanitized.isBlank() ? "LEBENSLAUF" : sanitized.toUpperCase(Locale.ROOT);
+        } catch (IOException e) {
+            logger.warn("Failed to extract surname from lebenslauf HTML {}", htmlPath, e);
+            return "LEBENSLAUF";
+        }
+    }
+
+    private String extractFullName(String html) {
+        Matcher titleMatcher = TITLE_NAME_PATTERN.matcher(html);
+        if (titleMatcher.find()) {
+            return titleMatcher.group(1).trim();
+        }
+
+        Matcher nameBlockMatcher = NAME_BLOCK_PATTERN.matcher(html);
+        if (nameBlockMatcher.find()) {
+            String raw = HTML_TAGS_PATTERN.matcher(nameBlockMatcher.group(1)).replaceAll(" ");
+            return raw.replaceAll("\\s+", " ").trim();
+        }
+
+        return "";
+    }
+
+    private String sanitizeFilenamePart(String value) {
+        String normalized = Normalizer.normalize(value, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "");
+        return NON_ASCII_FILENAME_PATTERN.matcher(normalized).replaceAll("");
     }
 
     private String convertBiographyToText(java.util.Map<String, Object> biography) {
