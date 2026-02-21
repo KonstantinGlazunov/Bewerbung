@@ -130,20 +130,26 @@ public class LebenslaufTemplateService {
         // Photo path (uploaded photo has priority over default)
         data.put("photoPath", resolvePhotoPath());
         
-        // Profile text
+        // Profile text - оптимизируем для одной страницы
         String profileText = extractProfileText(biographyJson);
+        profileText = optimizeProfileTextForOnePage(profileText);
         data.put("profileText", profileText);
         
-        // Skills
+        // Skills - оптимизируем для одной страницы
         Map<String, Object> skills = extractSkills(biographyJson);
+        skills = optimizeSkillsForOnePage(skills);
         data.put("skills", skills);
         
-        // Education
+        // Education - оптимизируем для одной страницы
         List<Map<String, Object>> education = extractEducation(biographyJson);
+        education = optimizeEducationForOnePage(education);
         data.put("education", education);
         
-        // Work Experience
+        // Work Experience - оптимизируем для одной страницы
         List<Map<String, Object>> workExperience = extractWorkExperience(biographyJson);
+        logger.debug("Work experience before optimization: {} items", workExperience != null ? workExperience.size() : 0);
+        workExperience = optimizeWorkExperienceForOnePage(workExperience);
+        logger.debug("Work experience after optimization: {} items", workExperience != null ? workExperience.size() : 0);
         data.put("workExperience", workExperience);
         
         return data;
@@ -323,6 +329,7 @@ public class LebenslaufTemplateService {
         
         JsonArray workExpArray = biographyJson.getAsJsonArray("workExperience");
         if (workExpArray != null) {
+            logger.debug("Found {} work experience items in biography", workExpArray.size());
             for (int i = 0; i < workExpArray.size(); i++) {
                 JsonObject workObj = workExpArray.get(i).getAsJsonObject();
                 Map<String, Object> workExp = new HashMap<>();
@@ -335,18 +342,24 @@ public class LebenslaufTemplateService {
                 
                 // Technologies - оборачиваем в объект с hasItems и items
                 JsonArray technologies = extractItemsArray(workObj, "technologies");
+                Map<String, Object> techWrapper = new HashMap<>();
                 if (technologies != null && technologies.size() > 0) {
                     List<String> techList = new ArrayList<>();
                     for (int j = 0; j < technologies.size(); j++) {
                         techList.add(technologies.get(j).getAsString());
                     }
-                    Map<String, Object> techWrapper = new HashMap<>();
                     techWrapper.put("hasItems", true);
                     techWrapper.put("items", techList);
-                    workExp.put("technologies", techWrapper);
+                } else {
+                    // Создаем пустой объект для совместимости с шаблоном
+                    techWrapper.put("hasItems", false);
+                    techWrapper.put("items", new ArrayList<>());
                 }
+                workExp.put("technologies", techWrapper);
                 
                 workExpList.add(workExp);
+                logger.debug("Extracted work experience item {}: position={}, company={}", 
+                        i, workExp.get("position"), workExp.get("company"));
             }
         }
         
@@ -386,6 +399,192 @@ public class LebenslaufTemplateService {
 
     private String resolvePhotoPath() {
         return tempPhotoStorageService.getCurrentPhotoDataUri().orElse(PHOTO_PATH);
+    }
+
+    /**
+     * Оптимизирует текст профиля для одной страницы A4
+     * Ограничивает длину текста профиля
+     */
+    private String optimizeProfileTextForOnePage(String profileText) {
+        if (profileText == null || profileText.isEmpty()) {
+            return profileText;
+        }
+        
+        final int MAX_PROFILE_LENGTH = 250; // максимальная длина профиля в символах
+        
+        if (profileText.length() > MAX_PROFILE_LENGTH) {
+            // Обрезаем до MAX_PROFILE_LENGTH и пытаемся обрезать по последнему предложению
+            String truncated = profileText.substring(0, MAX_PROFILE_LENGTH).trim();
+            int lastPeriod = truncated.lastIndexOf('.');
+            if (lastPeriod > MAX_PROFILE_LENGTH * 0.7) {
+                return truncated.substring(0, lastPeriod + 1);
+            } else {
+                return truncated + "...";
+            }
+        }
+        
+        return profileText;
+    }
+
+    /**
+     * Оптимизирует навыки для одной страницы A4
+     * Ограничивает количество навыков в каждой категории
+     */
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> optimizeSkillsForOnePage(Map<String, Object> skills) {
+        if (skills == null) {
+            return skills;
+        }
+        
+        Map<String, Object> optimized = new HashMap<>(skills);
+        
+        // Максимальное количество навыков в каждой категории
+        final int MAX_SKILLS_PER_CATEGORY = 5;
+        
+        // Оптимизируем каждую категорию навыков
+        String[] skillCategories = {"programmingLanguages", "frameworks", "databases", "tools"};
+        for (String category : skillCategories) {
+            if (optimized.containsKey(category)) {
+                Object categoryObj = optimized.get(category);
+                if (categoryObj instanceof Map) {
+                    Map<String, Object> categoryMap = (Map<String, Object>) categoryObj;
+                    if (categoryMap.containsKey("items") && categoryMap.get("items") instanceof List) {
+                        List<String> items = (List<String>) categoryMap.get("items");
+                        if (items.size() > MAX_SKILLS_PER_CATEGORY) {
+                            // Оставляем только первые MAX_SKILLS_PER_CATEGORY
+                            List<String> optimizedItems = new ArrayList<>(items.subList(0, MAX_SKILLS_PER_CATEGORY));
+                            Map<String, Object> optimizedCategory = new HashMap<>();
+                            optimizedCategory.put("hasItems", !optimizedItems.isEmpty());
+                            optimizedCategory.put("items", optimizedItems);
+                            optimized.put(category, optimizedCategory);
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Языки обычно немного, но ограничим до 3
+        if (optimized.containsKey("languages")) {
+            Object languagesObj = optimized.get("languages");
+            if (languagesObj instanceof Map) {
+                Map<String, Object> languagesMap = (Map<String, Object>) languagesObj;
+                if (languagesMap.containsKey("items") && languagesMap.get("items") instanceof List) {
+                    List<Map<String, String>> items = (List<Map<String, String>>) languagesMap.get("items");
+                    if (items.size() > 3) {
+                        List<Map<String, String>> optimizedItems = new ArrayList<>(items.subList(0, 3));
+                        Map<String, Object> optimizedLanguages = new HashMap<>();
+                        optimizedLanguages.put("hasItems", !optimizedItems.isEmpty());
+                        optimizedLanguages.put("items", optimizedItems);
+                        optimized.put("languages", optimizedLanguages);
+                    }
+                }
+            }
+        }
+        
+        return optimized;
+    }
+
+    /**
+     * Оптимизирует образование для одной страницы A4
+     * Оставляет только последние или самые важные записи
+     */
+    private List<Map<String, Object>> optimizeEducationForOnePage(List<Map<String, Object>> education) {
+        if (education == null || education.isEmpty()) {
+            return education;
+        }
+        
+        // Оставляем максимум 2 последних образования
+        final int MAX_EDUCATION_ITEMS = 2;
+        
+        if (education.size() > MAX_EDUCATION_ITEMS) {
+            // Берем последние MAX_EDUCATION_ITEMS (предполагаем, что они отсортированы от новых к старым)
+            return new ArrayList<>(education.subList(0, MAX_EDUCATION_ITEMS));
+        }
+        
+        return education;
+    }
+
+    /**
+     * Оптимизирует опыт работы для одной страницы A4
+     * Оставляет только последние и релевантные должности, сокращает описания
+     */
+    @SuppressWarnings("unchecked")
+    private List<Map<String, Object>> optimizeWorkExperienceForOnePage(List<Map<String, Object>> workExperience) {
+        if (workExperience == null || workExperience.isEmpty()) {
+            return workExperience;
+        }
+        
+        // Оставляем максимум 3-4 последних должности
+        final int MAX_WORK_EXPERIENCE_ITEMS = 3;
+        final int MAX_DESCRIPTION_LENGTH = 150; // максимальная длина описания в символах
+        final int MAX_TECHNOLOGIES = 4; // максимальное количество технологий
+        
+        logger.debug("Optimizing work experience: {} items found, max allowed: {}", 
+                workExperience.size(), MAX_WORK_EXPERIENCE_ITEMS);
+        
+        List<Map<String, Object>> optimized = new ArrayList<>();
+        
+        // Берем первые MAX_WORK_EXPERIENCE_ITEMS (предполагаем, что они отсортированы от новых к старым)
+        int itemsToTake = Math.min(workExperience.size(), MAX_WORK_EXPERIENCE_ITEMS);
+        
+        logger.debug("Taking {} items from work experience", itemsToTake);
+        
+        for (int i = 0; i < itemsToTake; i++) {
+            Map<String, Object> workExp = new HashMap<>(workExperience.get(i));
+            
+            logger.debug("Processing work experience item {}: position={}, company={}", 
+                    i, workExp.get("position"), workExp.get("company"));
+            
+            // Сокращаем описание, если оно слишком длинное
+            if (workExp.containsKey("description")) {
+                Object descObj = workExp.get("description");
+                if (descObj instanceof String) {
+                    String description = (String) descObj;
+                    if (description.length() > MAX_DESCRIPTION_LENGTH) {
+                        // Обрезаем до MAX_DESCRIPTION_LENGTH и добавляем "..."
+                        description = description.substring(0, MAX_DESCRIPTION_LENGTH).trim();
+                        // Пытаемся обрезать по последнему предложению
+                        int lastPeriod = description.lastIndexOf('.');
+                        if (lastPeriod > MAX_DESCRIPTION_LENGTH * 0.7) {
+                            description = description.substring(0, lastPeriod + 1);
+                        } else {
+                            description += "...";
+                        }
+                        workExp.put("description", description);
+                    }
+                }
+            }
+            
+            // Ограничиваем количество технологий
+            if (workExp.containsKey("technologies")) {
+                Object techObj = workExp.get("technologies");
+                if (techObj instanceof Map) {
+                    Map<String, Object> techMap = (Map<String, Object>) techObj;
+                    if (techMap.containsKey("items") && techMap.get("items") instanceof List) {
+                        List<String> techItems = (List<String>) techMap.get("items");
+                        if (techItems.size() > MAX_TECHNOLOGIES) {
+                            List<String> optimizedTech = new ArrayList<>(techItems.subList(0, MAX_TECHNOLOGIES));
+                            Map<String, Object> optimizedTechMap = new HashMap<>();
+                            optimizedTechMap.put("hasItems", !optimizedTech.isEmpty());
+                            optimizedTechMap.put("items", optimizedTech);
+                            workExp.put("technologies", optimizedTechMap);
+                        }
+                    }
+                }
+            } else {
+                // Если technologies нет, создаем пустой объект для совместимости с шаблоном
+                Map<String, Object> emptyTechMap = new HashMap<>();
+                emptyTechMap.put("hasItems", false);
+                emptyTechMap.put("items", new ArrayList<>());
+                workExp.put("technologies", emptyTechMap);
+            }
+            
+            optimized.add(workExp);
+            logger.debug("Added work experience item {} to optimized list", i);
+        }
+        
+        logger.debug("Optimized work experience: {} items in result", optimized.size());
+        return optimized;
     }
 
     /**

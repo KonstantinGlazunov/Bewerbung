@@ -1304,8 +1304,33 @@
         }
 
         // Load sample data from separate files based on language
+        function shouldReplaceWithSample(currentValue, previousSampleValue) {
+            const normalizedCurrent = normalizeText(currentValue || '');
+            if (!normalizedCurrent) {
+                return true;
+            }
+            if (!previousSampleValue) {
+                return false;
+            }
+            return normalizedCurrent === normalizeText(previousSampleValue);
+        }
+
         async function loadSampleData(lang) {
             try {
+                const biographyTextarea = document.getElementById('biographyTextarea');
+                const jobPostingTextarea = document.getElementById('jobPostingTextarea');
+                const wishesTextarea = document.getElementById('wishesTextarea');
+
+                const currentBiographyValue = biographyTextarea ? biographyTextarea.value : '';
+                const currentJobPostingValue = jobPostingTextarea ? jobPostingTextarea.value : '';
+                const currentWishesValue = wishesTextarea ? wishesTextarea.value : '';
+
+                const previousSampleData = {
+                    biography: loadedSampleData.biography,
+                    jobPosting: loadedSampleData.jobPosting,
+                    wishes: loadedSampleData.wishes
+                };
+
                 // Determine file suffix based on language (default to empty for German)
                 let suffix = '';
                 if (lang === 'en') {
@@ -1322,12 +1347,14 @@
                     // Fallback to default if language-specific file doesn't exist
                     const fallbackResponse = await fetch('/sample_biography.txt');
                     sampleBiography = await fallbackResponse.text();
-                    document.getElementById('biographyTextarea').value = sampleBiography.trim();
                 } else {
                     sampleBiography = await biographyResponse.text();
-                    document.getElementById('biographyTextarea').value = sampleBiography.trim();
                 }
-                loadedSampleData.biography = sampleBiography.trim();
+                const biographySampleTrimmed = sampleBiography.trim();
+                if (biographyTextarea && shouldReplaceWithSample(currentBiographyValue, previousSampleData.biography)) {
+                    biographyTextarea.value = biographySampleTrimmed;
+                }
+                loadedSampleData.biography = biographySampleTrimmed;
                 
                 // Fetch sample job posting
                 let sampleJobPosting = null;
@@ -1336,12 +1363,14 @@
                     // Fallback to default if language-specific file doesn't exist
                     const fallbackResponse = await fetch('/sample_job_posting.txt');
                     sampleJobPosting = await fallbackResponse.text();
-                    document.getElementById('jobPostingTextarea').value = sampleJobPosting.trim();
                 } else {
                     sampleJobPosting = await jobPostingResponse.text();
-                    document.getElementById('jobPostingTextarea').value = sampleJobPosting.trim();
                 }
-                loadedSampleData.jobPosting = sampleJobPosting.trim();
+                const jobPostingSampleTrimmed = sampleJobPosting.trim();
+                if (jobPostingTextarea && shouldReplaceWithSample(currentJobPostingValue, previousSampleData.jobPosting)) {
+                    jobPostingTextarea.value = jobPostingSampleTrimmed;
+                }
+                loadedSampleData.jobPosting = jobPostingSampleTrimmed;
                 
                 // Fetch sample wishes
                 try {
@@ -1351,15 +1380,21 @@
                         const fallbackResponse = await fetch('/sample_wishes.txt');
                         if (fallbackResponse.ok) {
                             const sampleWishes = await fallbackResponse.text();
-                            document.getElementById('wishesTextarea').value = sampleWishes.trim();
-                            loadedSampleData.wishes = sampleWishes.trim();
+                            const wishesSampleTrimmed = sampleWishes.trim();
+                            if (wishesTextarea && shouldReplaceWithSample(currentWishesValue, previousSampleData.wishes || '')) {
+                                wishesTextarea.value = wishesSampleTrimmed;
+                            }
+                            loadedSampleData.wishes = wishesSampleTrimmed;
                         } else {
                             loadedSampleData.wishes = '';
                         }
                     } else {
                         const sampleWishes = await wishesResponse.text();
-                        document.getElementById('wishesTextarea').value = sampleWishes.trim();
-                        loadedSampleData.wishes = sampleWishes.trim();
+                        const wishesSampleTrimmed = sampleWishes.trim();
+                        if (wishesTextarea && shouldReplaceWithSample(currentWishesValue, previousSampleData.wishes || '')) {
+                            wishesTextarea.value = wishesSampleTrimmed;
+                        }
+                        loadedSampleData.wishes = wishesSampleTrimmed;
                     }
                 } catch (wishesError) {
                     console.warn('Error loading sample wishes (optional field):', wishesError);

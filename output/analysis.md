@@ -6,9 +6,9 @@
 
 **Location:** Braunfels
 
-**Education:** not specified
+**Education:** n/a
 
-**Experience:** not specified
+**Experience:** n/a
 
 **Required Skills:**
 

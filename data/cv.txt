@@ -1,39 +1,81 @@
-Name: Max ТУЩ
-Email: max.mustermann@email.de
-Phone: +49 30 12345678
-Address: Musterstraße 123, 12345 Berlin, Deutschland
-Date of Birth: 1990-05-15
-Nationality: Deutsch
+Konstantin Glazunov
+PROFIL
+Technisch orientierter Quereinsteiger in der Softwareentwicklung mit Schwerpunkt Backend und Fullstack (Java, Spring). Grundkenntnisse in Softwaretests und QA-Prozessen aus Kursen und Projektarbeit. Motiviert, mich im Bereich Softwaretests und industrieller Automatisierung weiterzuentwickeln.
 
-=== EDUCATION ===
-Degree: Bachelor of Science - Informatik
-Institution: Technische Universität Berlin
-Location: Berlin
-Start Date: 2010-10
-End Date: 2014-09
-Description: Schwerpunkt: Softwareentwicklung und Datenbanken
+Zuverlässiger und verantwortungsbewusster Mitarbeiter mit strukturierter Arbeitsweise. Arbeitet selbstständig und effizient, auch unter Zeitdruck. Freundlich, lernbereit und flexibel einsetzbar.
 
-=== WORK EXPERIENCE ===
-Position: Softwareentwickler
-Company: Tech Solutions GmbH
-Location: Berlin
-Start Date: 2018-03
-End Date: 2024-12
-Responsibilities: Entwicklung von Web-Anwendungen mit Java Spring Boot. Verantwortlich für Backend-Entwicklung, API-Design und Datenbankoptimierung. Zusammenarbeit in agilen Teams. Technologien: Java, Spring Boot, MySQL, REST APIs, Git, Docker
 
-Position: Junior Softwareentwickler
-Company: Startup Innovations AG
-Location: Berlin
-Start Date: 2015-01
-End Date: 2018-02
-Responsibilities: Entwicklung von Java-Anwendungen. Unterstützung bei der Implementierung neuer Features und Bug-Fixes. Technologien: Java, Spring Framework, PostgreSQL, Maven
 
-=== TECHNICAL SKILLS ===
-Java, Python, JavaScript, Spring Boot, Spring Framework, React, MySQL, PostgreSQL, MongoDB, Git, Docker, Jenkins, Maven, Gradle
 
-=== LANGUAGES ===
-Deutsch: Muttersprache
-Englisch: Fließend (C1)
+KOMPETENZEN
+Backend-Entwicklung Java Stack
+QA-Grundlagen
+Datenbanken (PostgreSQL, H2, MongoDB)
+Projektmanagement-Werkzeuge (Jira)
 
-=== CERTIFICATIONS ===
-Oracle Certified Professional, Java SE 11 Developer (Oracle, 2021-06)
+Deutsch - B2 Beruf
+
+Englisch - fließend
+
+Russisch - Muttersprache
+
+Führerschein B B96 
+
+
+
+BERUFSERFAHRUNG
+
+TECHNISCHE MITARBEIT / WERKSTATT
+FixAuto Weilburg
+
+Technische Durchsicht und systematische Prüfung von Fahrzeugen
+Erkennen und Dokumentieren technischer Abweichungen
+Sorgfältige und zuverlässige Arbeitsweise auch unter Zeitdruck
+Praktischer Umgang mit mechanischen und elektrischen Komponenten
+
+SPRACHKURSE UND BERUFLICHE ORIENTIERUNG
+Deutschkurs von null bis Niveau B2
+Vorbereitung auf den Einstieg in den deutschen Arbeitsmarkt
+
+
+
+PRODUCT MARKETING MANAGER
+Pilteh · Full-time
+Er leitete ein Team von Verkaufsleitern. Bewirbt das Produkt im Internet. Die Anzahl der abgeschlossenen Verträge sicherte den einjährigen Betrieb des Werks für die Herstellung von Geräten.
+
+Pilteh Werkzeugmaschinenfabrik
+Vertrieb / Kundenbetreuung
+ILesen von technischen Zeichnungen und einfachen Schaltplänen
+Grundkenntnisse in Mechanik und Technik
+Technische Beratung von Kunden bei der Bedienung und bei Problemen mit automatisierten Maschinen
+Zusammenarbeit zwischen Vertrieb und Ingenieuren bei technischen Fragen
+Montage und erste Inbetriebnahme von Maschinen und Geräten
+Durchführung kleiner Reparaturen
+Korrektur und Aktualisierung technischer Dokumentation
+2010 - 2022
+
+
+
+
+
+BILDUNG
+
+
+AIT TR 2023
+Fullstack-Entwickler 
+Java Stack
+
+
+PRODUKTMANAGER skillfactory Bootcamp 2020
+
+BACHELOR IN BETRIEBSWIRTSCHAFT
+Perm State Technical University 2000-2003
+• CRM Integration · Facebook Marketing · Video Production · YouTube · Website Administration · Google Adwords
+
+ELEKTROTECHNIKER
+Perm Military Institute of 1996-2000
+
+SALES MANAGER
+Energotechstroy · Full-time
+Von Null zum Spitzenverkäufer.
+• Telemarketing · Direct Sales · 1s
