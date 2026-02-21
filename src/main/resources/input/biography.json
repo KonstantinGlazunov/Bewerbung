@@ -25,11 +25,20 @@
   ],
   "workExperience": [
     {
+      "position": "Senior Softwareentwickler",
+      "company": "Innovative Tech Solutions GmbH",
+      "location": "Berlin",
+      "startDate": "2023-01",
+      "endDate": "2024-12",
+      "description": "Leitung eines Entwicklungsteams von 5 Entwicklern. Verantwortlich für Architektur-Entscheidungen und Code-Reviews. Entwicklung von Microservices mit Spring Boot und Kubernetes.",
+      "technologies": ["Java", "Spring Boot", "Kubernetes", "Docker", "Microservices"]
+    },
+    {
       "position": "Softwareentwickler",
       "company": "Tech Solutions GmbH",
       "location": "Berlin",
       "startDate": "2018-03",
-      "endDate": "2024-12",
+      "endDate": "2022-12",
       "description": "Entwicklung von Web-Anwendungen mit Java Spring Boot. Verantwortlich für Backend-Entwicklung, API-Design und Datenbankoptimierung. Zusammenarbeit in agilen Teams.",
       "technologies": ["Java", "Spring Boot", "MySQL", "REST APIs", "Git", "Docker"]
     },

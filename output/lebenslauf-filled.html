@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Lebenslauf – Max ТУЩ</title>
+<title>Lebenslauf – Konstantin Glazunov</title>
 
 <style>
 :root {
@@ -136,8 +136,14 @@ body {
 
 .contact .icon {
   width: 6mm;
+  flex-shrink: 0; /* иконка не сжимается */
   text-align: center;
   color: #767b84;
+}
+
+.contact li span:last-child {
+  flex: 1;
+  text-align: left; /* текст выровнен по левому краю */
 }
 
 .left-block {
@@ -277,8 +283,8 @@ ul.inline-dot-list li::before {
 
 <header class="header-strip">
   <h1 class="name-block">
-    Max<br />
-    ТУЩ
+    Konstantin<br />
+    Glazunov
   </h1>
 
   <div class="photo-wrap">
@@ -291,9 +297,9 @@ ul.inline-dot-list li::before {
 <div class="top-row">
 <section class="top-left">
 <ul class="contact">
-<li><span class="icon">☎</span><span>+49 30 12345678</span></li>
-<li><span class="icon">✉</span><span>max.mustermann@email.de</span></li>
-<li><span class="icon">⌂</span><span>Musterstraße 123, 12345 Berlin, Deutschland</span></li>
+<li><span class="icon">☎</span><span></span></li>
+<li><span class="icon">✉</span><span></span></li>
+<li><span class="icon">⌂</span><span>,  , </span></li>
 </ul>
 </section>
 
@@ -309,31 +315,26 @@ ul.inline-dot-list li::before {
 <p class="edu-sub">Programmiersprachen</p>
 <ul class="inline-dot-list">
 <li>Java</li>
-<li>Python</li>
-<li>JavaScript</li>
-<li>Spring Boot</li>
-<li>Spring Framework</li>
-<li>React</li>
-<li>MySQL</li>
+<li>Spring</li>
 <li>PostgreSQL</li>
+<li>H2</li>
 <li>MongoDB</li>
-<li>Git</li>
-<li>Docker</li>
-<li>Jenkins</li>
-<li>Maven</li>
-<li>Gradle</li>
 </ul>
 <p class="edu-sub">Sprachen</p>
 <ul class="inline-dot-list">
-<li>Deutsch: Muttersprache</li>
-<li>Englisch: Fließend (C1)</li>
+<li>Deutsch: B2 Beruf</li>
+<li>Englisch: fließend</li>
+<li>Russisch: Muttersprache</li>
 </ul>
 </section>
 
 <section class="left-block">
 <h2 class="section-title">Bildung</h2>
 <p class="small">
-Bachelor of Science - Informatik<br />Technische Universität Berlin<br />2010-10 - 2014-09<br />Schwerpunkt: Softwareentwicklung und Datenbanken
+Fullstack-Entwickler - Java Stack<br />AIT TR<br />2023-01 - 2023-12
+</p>
+<p class="small">
+Produktmanager - <br />skillfactory Bootcamp<br />2020-01 - 2020-12
 </p>
 </section>
 </section>
@@ -343,30 +344,22 @@ Bachelor of Science - Informatik<br />Technische Universität Berlin<br />2010-1
 <h2 class="section-title">Berufserfahrung</h2>
 
 <article class="job">
-<h3 class="job-title">Softwareentwickler</h3>
-<p class="company">Tech Solutions GmbH</p>
-<p class="period">2018-03 - 2024-12</p>
-<p class="text">Entwicklung von Web-Anwendungen mit Java Spring Boot. Verantwortlich für Backend-Entwicklung, API-Design und Datenbankoptimierung. Zusammenarbeit in agilen Teams. Technologien: Java, Spring Boot, MySQL, REST APIs, Git, Docker</p>
-<ul class="inline-dot-list">
-<li>Java</li>
-<li>Spring Boot</li>
-<li>MySQL</li>
-<li>REST APIs</li>
-<li>Git</li>
-<li>Docker</li>
-</ul>
+<h3 class="job-title">Technische Mitarbeit / Werkstatt</h3>
+<p class="company">FixAuto Weilburg</p>
+<p class="period"></p>
+<p class="text">Technische Durchsicht und systematische Prüfung von Fahrzeugen. Erkennen und Dokumentieren technischer Abweichungen.</p>
 </article>
 <article class="job">
-<h3 class="job-title">Junior Softwareentwickler</h3>
-<p class="company">Startup Innovations AG</p>
-<p class="period">2015-01 - 2018-02</p>
-<p class="text">Entwicklung von Java-Anwendungen. Unterstützung bei der Implementierung neuer Features und Bug-Fixes. Technologien: Java, Spring Framework, PostgreSQL, Maven</p>
-<ul class="inline-dot-list">
-<li>Java</li>
-<li>Spring Framework</li>
-<li>PostgreSQL</li>
-<li>Maven</li>
-</ul>
+<h3 class="job-title">Product Marketing Manager</h3>
+<p class="company">Pilteh Werkzeugmaschinenfabrik</p>
+<p class="period">2010-01 - 2022-12</p>
+<p class="text">Er leitete ein Team von Verkaufsleitern. Bewirbt das Produkt im Internet. Die Anzahl der abgeschlossenen Verträge sicherte den einjährigen Betrieb des...</p>
+</article>
+<article class="job">
+<h3 class="job-title">Sales Manager</h3>
+<p class="company">Energotechstroy</p>
+<p class="period"></p>
+<p class="text">Von Null zum Spitzenverkäufer.</p>
 </article>
 </section>
 </section>

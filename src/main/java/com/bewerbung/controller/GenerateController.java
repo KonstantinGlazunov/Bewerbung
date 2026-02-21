@@ -748,7 +748,8 @@ public class GenerateController {
     @GetMapping("/pdf/lebenslauf")
     public ResponseEntity<byte[]> generateLebenslaufPdf(
             HttpServletRequest request,
-            @RequestParam(name = "defaultData", defaultValue = "false") boolean defaultData
+            @RequestParam(name = "defaultData", defaultValue = "false") boolean defaultData,
+            @RequestParam(name = "force", defaultValue = "false") boolean forceRegenerate
     ) {
         Path htmlPath = Paths.get("output", "lebenslauf-filled.html").toAbsolutePath();
 
@@ -772,18 +773,43 @@ public class GenerateController {
                     + "/api/generate/lebenslauf/html";
         }
 
-        boolean pdfAlreadyExists = false;
-        try {
-            pdfAlreadyExists = Files.exists(outputPdfPath) && Files.size(outputPdfPath) > 0;
-        } catch (IOException ignored) {
-            pdfAlreadyExists = false;
+        // Check if PDF needs to be regenerated
+        // Regenerate if: force flag is set, PDF doesn't exist, or HTML file is newer than PDF
+        boolean needsRegeneration = false;
+        if (forceRegenerate) {
+            needsRegeneration = true;
+            logger.info("Force regeneration requested, will regenerate PDF");
+        } else {
+            try {
+                if (!Files.exists(outputPdfPath) || Files.size(outputPdfPath) == 0) {
+                    needsRegeneration = true;
+                    logger.debug("PDF file does not exist or is empty, will regenerate");
+                } else if (!defaultData && Files.exists(htmlPath)) {
+                    // Check if HTML file is newer than PDF
+                    long htmlLastModified = Files.getLastModifiedTime(htmlPath).toMillis();
+                    long pdfLastModified = Files.getLastModifiedTime(outputPdfPath).toMillis();
+                    if (htmlLastModified > pdfLastModified) {
+                        needsRegeneration = true;
+                        logger.info("HTML file is newer than PDF (HTML: {}, PDF: {}), will regenerate PDF", 
+                                new java.util.Date(htmlLastModified), new java.util.Date(pdfLastModified));
+                    } else {
+                        logger.debug("PDF file is up to date (HTML: {}, PDF: {})", 
+                                new java.util.Date(htmlLastModified), new java.util.Date(pdfLastModified));
+                    }
+                }
+            } catch (IOException e) {
+                logger.warn("Error checking file timestamps, will regenerate PDF: {}", e.getMessage());
+                needsRegeneration = true;
+            }
         }
 
-        if (!pdfAlreadyExists) {
+        if (needsRegeneration) {
             boolean generated = generateLebenslaufPdfWithChrome(sourceUrl, outputPdfPath);
             if (!generated) {
                 throw new RuntimeException("Failed to generate Lebenslauf PDF. Ensure google-chrome/chromium is installed.");
             }
+        } else {
+            logger.info("PDF file is up to date, using existing file: {}", outputPdfPath);
         }
 
         try {

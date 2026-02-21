@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест смены языка</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .pass {
+            color: green;
+            font-weight: bold;
+        }
+        .fail {
+            color: red;
+            font-weight: bold;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #results {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Тест сохранения данных при смене языка</h1>
+    
+    <div class="test-section">
+        <h2>Инструкции:</h2>
+        <ol>
+            <li>Откройте основное приложение в другой вкладке: <a href="http://localhost:8080" target="_blank">http://localhost:8080</a></li>
+            <li>Введите свои данные в поля биографии и вакансии</li>
+            <li>Вернитесь на эту страницу и нажмите "Начать тест"</li>
+            <li>Тест автоматически проверит сохранение данных при смене языка</li>
+        </ol>
+    </div>
+    
+    <div class="test-section">
+        <button onclick="runTest()">Начать автоматический тест</button>
+        <button onclick="runManualTest()">Ручной тест (откроет приложение)</button>
+    </div>
+    
+    <div id="results"></div>
+
+    <script>
+        // Тестовые данные пользователя
+        const userBiography = "МОЯ ПЕРСОНАЛЬНАЯ БИОГРАФИЯ\n\nИмя: Тестовый Пользователь\nОпыт: 5 лет разработки\nНавыки: Java, JavaScript";
+        const userJobPosting = "МОЯ ПЕРСОНАЛЬНАЯ ВАКАНСИЯ\n\nПозиция: Senior Developer\nКомпания: Test Corp\nТребования: Java, Spring";
+        const userWishes = "Мои личные пожелания для теста";
+
+        async function runTest() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<h2>Запуск теста...</h2>';
+            
+            try {
+                // Открываем приложение в iframe или новом окне
+                const testWindow = window.open('http://localhost:8080', '_blank');
+                
+                if (!testWindow) {
+                    resultsDiv.innerHTML = '<div class="fail">Ошибка: Не удалось открыть окно. Проверьте блокировку всплывающих окон.</div>';
+                    return;
+                }
+                
+                // Ждем загрузки страницы
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                resultsDiv.innerHTML = `
+                    <h2>Тест запущен</h2>
+                    <p>Пожалуйста, выполните следующие шаги в открывшемся окне:</p>
+                    <ol>
+                        <li>Введите тестовые данные в поле биографии: "${userBiography.substring(0, 50)}..."</li>
+                        <li>Введите тестовые данные в поле вакансии: "${userJobPosting.substring(0, 50)}..."</li>
+                        <li>Смените язык с DE на RU</li>
+                        <li>Проверьте, что данные остались прежними</li>
+                        <li>Смените язык с RU на EN</li>
+                        <li>Проверьте, что данные остались прежними</li>
+                        <li>Смените язык с EN обратно на DE</li>
+                        <li>Проверьте, что данные остались прежними</li>
+                    </ol>
+                    <p class="pass">Если данные не изменились во всех случаях - тест пройден!</p>
+                `;
+            } catch (error) {
+                resultsDiv.innerHTML = `<div class="fail">Ошибка: ${error.message}</div>`;
+            }
+        }
+
+        function runManualTest() {
+            // Открываем приложение
+            window.open('http://localhost:8080', '_blank');
+            
+            document.getElementById('results').innerHTML = `
+                <h2>Ручной тест</h2>
+                <p>Выполните следующие шаги в открывшемся окне:</p>
+                <ol>
+                    <li><strong>Введите свои данные:</strong>
+                        <ul>
+                            <li>В поле "Biography" введите: <code>${userBiography}</code></li>
+                            <li>В поле "Job Posting" введите: <code>${userJobPosting}</code></li>
+                            <li>В поле "Wishes" (опционально) введите: <code>${userWishes}</code></li>
+                        </ul>
+                    </li>
+                    <li><strong>Смените язык несколько раз:</strong>
+                        <ul>
+                            <li>DE → RU</li>
+                            <li>RU → EN</li>
+                            <li>EN → DE</li>
+                            <li>DE → RU</li>
+                        </ul>
+                    </li>
+                    <li><strong>После каждой смены языка проверьте:</strong>
+                        <ul>
+                            <li>Данные в поле "Biography" остались прежними</li>
+                            <li>Данные в поле "Job Posting" остались прежними</li>
+                            <li>Данные в поле "Wishes" остались прежними (если были введены)</li>
+                        </ul>
+                    </li>
+                </ol>
+                <p class="pass">Если данные не изменились - тест пройден успешно!</p>
+                <p class="fail">Если данные заменились на sample-данные - есть баг, который нужно исправить.</p>
+            `;
+        }
+
+        // Автоматический тест через консоль браузера
+        window.testLanguageSwitch = async function() {
+            console.log('=== Начало автоматического теста ===');
+            
+            // Получаем элементы (если мы на странице приложения)
+            const biographyTextarea = document.getElementById('biographyTextarea');
+            const jobPostingTextarea = document.getElementById('jobPostingTextarea');
+            const wishesTextarea = document.getElementById('wishesTextarea');
+            const languageSelector = document.getElementById('languageSelector');
+            
+            if (!biographyTextarea || !jobPostingTextarea || !languageSelector) {
+                console.error('Элементы не найдены. Убедитесь, что вы находитесь на странице приложения.');
+                return;
+            }
+            
+            // Сохраняем исходные значения
+            const originalBiography = biographyTextarea.value;
+            const originalJobPosting = jobPostingTextarea.value;
+            const originalWishes = wishesTextarea ? wishesTextarea.value : '';
+            
+            // Вводим тестовые данные
+            biographyTextarea.value = userBiography;
+            jobPostingTextarea.value = userJobPosting;
+            if (wishesTextarea) {
+                wishesTextarea.value = userWishes;
+            }
+            
+            console.log('✓ Тестовые данные введены');
+            
+            // Тестируем смену языков
+            const languages = ['de', 'ru', 'en', 'de', 'ru'];
+            let allTestsPassed = true;
+            
+            for (let i = 0; i < languages.length; i++) {
+                const lang = languages[i];
+                console.log(`\n--- Тест ${i + 1}: Смена языка на ${lang.toUpperCase()} ---`);
+                
+                // Меняем язык
+                languageSelector.value = lang;
+                languageSelector.dispatchEvent(new Event('change'));
+                
+                // Ждем загрузки sample данных
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Проверяем, что данные не изменились
+                const currentBiography = biographyTextarea.value;
+                const currentJobPosting = jobPostingTextarea.value;
+                const currentWishes = wishesTextarea ? wishesTextarea.value : '';
+                
+                const biographyOk = currentBiography === userBiography;
+                const jobPostingOk = currentJobPosting === userJobPosting;
+                const wishesOk = currentWishes === userWishes;
+                
+                if (biographyOk && jobPostingOk && wishesOk) {
+                    console.log(`✓ Тест ${i + 1} пройден: данные сохранены`);
+                } else {
+                    console.error(`✗ Тест ${i + 1} провален:`);
+                    if (!biographyOk) console.error('  - Биография изменилась!');
+                    if (!jobPostingOk) console.error('  - Вакансия изменилась!');
+                    if (!wishesOk) console.error('  - Пожелания изменились!');
+                    allTestsPassed = false;
+                }
+            }
+            
+            console.log('\n=== Результаты теста ===');
+            if (allTestsPassed) {
+                console.log('✓ ВСЕ ТЕСТЫ ПРОЙДЕНЫ! Данные сохраняются при смене языка.');
+            } else {
+                console.error('✗ НЕКОТОРЫЕ ТЕСТЫ ПРОВАЛЕНЫ! Данные не сохраняются при смене языка.');
+            }
+            
+            // Восстанавливаем исходные значения
+            biographyTextarea.value = originalBiography;
+            jobPostingTextarea.value = originalJobPosting;
+            if (wishesTextarea) {
+                wishesTextarea.value = originalWishes;
+            }
+        };
+    </script>
+</body>
+</html>
+
