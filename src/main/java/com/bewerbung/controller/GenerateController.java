@@ -48,6 +48,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.io.InputStream;
+import java.util.Base64;
+
+import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+import org.jsoup.Jsoup;
+import org.jsoup.helper.W3CDom;
+import org.w3c.dom.Document;
 
 @RestController
 @RequestMapping("/api/generate")
@@ -828,8 +834,12 @@ public class GenerateController {
 
         if (needsRegeneration) {
             boolean generated = generateLebenslaufPdfWithChrome(sourceUrl, outputPdfPath);
+            if (!generated && !defaultData && Files.exists(htmlPath)) {
+                logger.info("Chrome/Chromium not available, using Java fallback (OpenHTML to PDF)");
+                generated = generateLebenslaufPdfWithOpenHtml(htmlPath, outputPdfPath);
+            }
             if (!generated) {
-                throw new RuntimeException("Failed to generate Lebenslauf PDF. Ensure google-chrome/chromium is installed.");
+                throw new RuntimeException("Failed to generate Lebenslauf PDF. Install google-chrome/chromium or ensure font is in resources/fonts/.");
             }
         } else {
             logger.info("PDF file is up to date, using existing file: {}", outputPdfPath);
@@ -913,6 +923,73 @@ public class GenerateController {
         }
 
         return false;
+    }
+
+    /**
+     * Generates Lebenslauf PDF using OpenHTML to PDF (pure Java, no Chrome).
+     * Uses the same font from resources/fonts/ as the Anschreiben PDF.
+     */
+    private boolean generateLebenslaufPdfWithOpenHtml(Path htmlPath, Path outputPdfPath) {
+        try {
+            Path parent = outputPdfPath.getParent();
+            if (parent != null) {
+                Files.createDirectories(parent);
+            }
+        } catch (IOException e) {
+            logger.error("Failed to create output directory for PDF {}", outputPdfPath, e);
+            return false;
+        }
+
+        String html;
+        try {
+            if (Files.exists(htmlPath)) {
+                html = Files.readString(htmlPath, StandardCharsets.UTF_8);
+            } else {
+                ClassPathResource resource = new ClassPathResource("lebenslauf-filled.html");
+                if (!resource.exists()) {
+                    logger.warn("No HTML source for OpenHTML PDF (no file and no default template)");
+                    return false;
+                }
+                try (InputStream in = resource.getInputStream()) {
+                    html = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+                }
+            }
+        } catch (IOException e) {
+            logger.warn("Failed to read HTML for OpenHTML PDF: {}", e.getMessage());
+            return false;
+        }
+
+        try (InputStream fontStream = getClass().getResourceAsStream("/fonts/LiberationSans-Regular.ttf")) {
+            if (fontStream != null) {
+                byte[] fontBytes = fontStream.readAllBytes();
+                String fontBase64 = Base64.getEncoder().encodeToString(fontBytes);
+                String dataUri = "data:font/ttf;base64," + fontBase64;
+                html = html.replace("url('../fonts/LiberationSans-Regular.ttf')", "url('" + dataUri + "')");
+                html = html.replace("url(\"../fonts/LiberationSans-Regular.ttf\")", "url(\"" + dataUri + "\")");
+            }
+        } catch (IOException e) {
+            logger.warn("Could not embed font for OpenHTML PDF: {}", e.getMessage());
+        }
+
+        try {
+            org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(html, "UTF-8");
+            jsoupDoc.outputSettings().syntax(org.jsoup.nodes.Document.OutputSettings.Syntax.html);
+            W3CDom w3cDom = new W3CDom();
+            Document w3cDoc = w3cDom.fromJsoup(jsoupDoc);
+
+            try (java.io.OutputStream os = Files.newOutputStream(outputPdfPath)) {
+                PdfRendererBuilder builder = new PdfRendererBuilder();
+                builder.useFastMode();
+                builder.withW3cDocument(w3cDoc, "file:///");
+                builder.toStream(os);
+                builder.run();
+            }
+            logger.info("Lebenslauf PDF generated via OpenHTML to PDF: {}", outputPdfPath);
+            return true;
+        } catch (Exception e) {
+            logger.warn("OpenHTML to PDF failed: {}", e.getMessage(), e);
+            return false;
+        }
     }
 
     private String extractSurnameFromLebenslaufHtml(Path htmlPath) {

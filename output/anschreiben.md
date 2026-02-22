@@ -1,14 +1,15 @@
-Betreff: Bewerbung als Java Softwareentwickler
+Dear Hiring Manager,
 
-Sehr geehrte Damen und Herren,
+I am writing to express my interest in the Java Software Developer position at Finanz Informatik GmbH & Co. KG, based in Hannover. With a Bachelor’s degree in Computer Science from the Technical University of Berlin and over nine years of experience in software development, I believe I possess the necessary skills and enthusiasm to contribute effectively to your team.
 
-mit großem Interesse habe ich Ihre Stellenanzeige für die Position des Java Softwareentwicklers bei der Finanz Informatik GmbH & Co. KG gelesen. Aufgrund meiner fundierten Kenntnisse in der Softwareentwicklung, insbesondere mit Java, sowie meiner Fähigkeit, innovative Lösungen zu erarbeiten, bin ich überzeugt, einen positiven Beitrag zu Ihrem Team leisten zu können.
+In my previous role at Tech Solutions GmbH, I was responsible for backend development, API design, and database optimisation using Java and Spring Boot, which aligns well with your requirement for strong professional experience in Java and JavaScript. My proficiency with tools such as Git and Maven and my experience in frontend development with React will enable me to work effectively on your diverse and innovative projects. Additionally, my certification as an Oracle Certified Professional in Java SE 11 demonstrates my commitment to maintaining a high level of technical expertise.
 
-Ich bringe über sechs Jahre Berufserfahrung in der technischen Projektarbeit mit und habe Fähigkeiten in Java und JavaScript, die den Anforderungen Ihrer Position entsprechen. In meiner Rolle als Product Marketing Manager bei der Pilteh Werkzeugmaschinenfabrik leitete ich ein Team und entwickelte Strategien zur Produktvermarktung. Die strukturierte Herangehensweise an komplexe Probleme sowie die Fähigkeit, technische Aspekte verständlich zu vermitteln, sind dabei zentrale Bestandteile meines beruflichen Profils.
+I am particularly drawn to the role at Finanz Informatik because of the opportunity to participate in innovative software development and take responsibility for complex projects. My ability to work independently, coupled with a structured and goal-oriented approach, will allow me to contribute meaningfully to quality assurance and performance optimisation efforts. Furthermore, my keen interest in teamwork and technical challenges resonates well with your organisational culture that values curiosity and collaboration.
 
-Ihre Unternehmensphilosophie, durch Digitalisierung die Leistungsfähigkeit im Bankensektor zu steigern, spricht mir sehr zu. Meine persönliche Leidenschaft für Prozessoptimierung und meine Neugier auf neue Technologien passen gut zu Ihrer Ausrichtung. Auch die Möglichkeit, im Homeoffice zu arbeiten, finde ich sehr interessant, da ich dadurch eine bessere Work-Life-Balance erreichen kann.
+I am excited about the possibility of joining Finanz Informatik, a leader in digital banking services, where I can apply my analytical skills and technical proficiency to solve complex problems and deliver high-quality solutions. I am enthusiastic about bringing my unique blend of skills and experience to your team and contributing to the exciting digitalisation projects at your company.
 
-Ich freue mich darauf, meine Fähigkeiten in Ihrem Unternehmen einzubringen und zur Weiterentwicklung innovativer Finanz-Services beizutragen. Über die Einladung zu einem persönlichen Gespräch würde ich mich sehr freuen.
+Thank you for considering my application. I look forward to the opportunity to discuss how I can contribute to the continued success of Finanz Informatik GmbH & Co. KG.
 
-Mit freundlichen Grüßen  
-Konstantin Glazunov  
+Yours sincerely,
+
+Max Mustermann
