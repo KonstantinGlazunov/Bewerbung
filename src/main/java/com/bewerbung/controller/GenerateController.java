@@ -47,6 +47,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.io.InputStream;
 
 @RestController
 @RequestMapping("/api/generate")
@@ -703,6 +704,28 @@ public class GenerateController {
         } catch (Exception e) {
             logger.error("Unexpected error generating PDF: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to generate PDF: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Serves the same UTF-8 font used for Anschreiben PDF (from resources/fonts/).
+     * Used by the Lebenslauf HTML so that PDF export uses the same font when rendered by Chrome.
+     */
+    @GetMapping(value = "/fonts/LiberationSans-Regular.ttf", produces = "font/ttf")
+    public ResponseEntity<byte[]> getLebenslaufFont() {
+        try (InputStream fontStream = getClass().getResourceAsStream("/fonts/LiberationSans-Regular.ttf")) {
+            if (fontStream == null) {
+                logger.warn("Font resource /fonts/LiberationSans-Regular.ttf not found");
+                return ResponseEntity.notFound().build();
+            }
+            byte[] fontBytes = fontStream.readAllBytes();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType("font/ttf"));
+            headers.setCacheControl("public, max-age=86400");
+            return ResponseEntity.ok().headers(headers).body(fontBytes);
+        } catch (IOException e) {
+            logger.error("Failed to read font resource", e);
+            return ResponseEntity.internalServerError().build();
         }
     }
 

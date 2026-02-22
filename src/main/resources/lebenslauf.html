@@ -6,12 +6,21 @@
 <title>Lebenslauf – {{personalInformation.firstName}} {{personalInformation.lastName}}</title>
 
 <style>
+/* Same font as Anschreiben PDF (from resources/fonts/LiberationSans-Regular.ttf) */
+@font-face {
+  font-family: 'Liberation Sans';
+  src: url('../fonts/LiberationSans-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 :root {
   --header-bg: #e3e3e5;
   --text: #3f434a;
   --muted: #666b74;
   --line: #8c8f95;
   --accent: #40454e;
+  --font-primary: 'Liberation Sans', 'Segoe UI', Arial, sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -23,7 +32,7 @@
 
 body {
   margin: 0;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: var(--font-primary);
   color: var(--text);
 }
 
