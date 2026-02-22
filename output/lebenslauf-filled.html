@@ -3,15 +3,24 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Lebenslauf – Konstantin Glazunov</title>
+<title>Lebenslauf – Max Mustermann</title>
 
 <style>
+/* Same font as Anschreiben PDF (from resources/fonts/LiberationSans-Regular.ttf) */
+@font-face {
+  font-family: 'Liberation Sans';
+  src: url('../fonts/LiberationSans-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 :root {
   --header-bg: #e3e3e5;
   --text: #3f434a;
   --muted: #666b74;
   --line: #8c8f95;
   --accent: #40454e;
+  --font-primary: 'Liberation Sans', 'Segoe UI', Arial, sans-serif;
 }
 
 * { box-sizing: border-box; }
@@ -23,7 +32,7 @@
 
 body {
   margin: 0;
-  font-family: "Segoe UI", Arial, sans-serif;
+  font-family: var(--font-primary);
   color: var(--text);
 }
 
@@ -283,8 +292,8 @@ ul.inline-dot-list li::before {
 
 <header class="header-strip">
   <h1 class="name-block">
-    Konstantin<br />
-    Glazunov
+    Max<br />
+    Mustermann
   </h1>
 
   <div class="photo-wrap">
@@ -297,9 +306,9 @@ ul.inline-dot-list li::before {
 <div class="top-row">
 <section class="top-left">
 <ul class="contact">
-<li><span class="icon">☎</span><span></span></li>
-<li><span class="icon">✉</span><span></span></li>
-<li><span class="icon">⌂</span><span>,  , </span></li>
+<li><span class="icon">☎</span><span>+49 30 12345678</span></li>
+<li><span class="icon">✉</span><span>max.mustermann@email.de</span></li>
+<li><span class="icon">⌂</span><span>Musterstraße 123, 12345 Berlin, Germany</span></li>
 </ul>
 </section>
 
@@ -315,26 +324,23 @@ ul.inline-dot-list li::before {
 <p class="edu-sub">Programmiersprachen</p>
 <ul class="inline-dot-list">
 <li>Java</li>
-<li>Spring</li>
-<li>PostgreSQL</li>
-<li>H2</li>
-<li>MongoDB</li>
+<li>Python</li>
+<li>JavaScript</li>
+<li>Spring Boot</li>
+<li>Spring Framework</li>
 </ul>
 <p class="edu-sub">Sprachen</p>
 <ul class="inline-dot-list">
-<li>Deutsch: B2 Beruf</li>
-<li>Englisch: fließend</li>
-<li>Russisch: Muttersprache</li>
+<li>German: Native</li>
+<li>English: Fluent (C1)</li>
+<li>Russich: Unknown</li>
 </ul>
 </section>
 
 <section class="left-block">
 <h2 class="section-title">Bildung</h2>
 <p class="small">
-Fullstack-Entwickler - Java Stack<br />AIT TR<br />2023-01 - 2023-12
-</p>
-<p class="small">
-Produktmanager - <br />skillfactory Bootcamp<br />2020-01 - 2020-12
+Bachelor of Science - Computer Science<br />Technical University of Berlin<br />2010-10 - 2014-09<br />Focus: Software Development and Databases
 </p>
 </section>
 </section>
@@ -344,22 +350,28 @@ Produktmanager - <br />skillfactory Bootcamp<br />2020-01 - 2020-12
 <h2 class="section-title">Berufserfahrung</h2>
 
 <article class="job">
-<h3 class="job-title">Technische Mitarbeit / Werkstatt</h3>
-<p class="company">FixAuto Weilburg</p>
-<p class="period"></p>
-<p class="text">Technische Durchsicht und systematische Prüfung von Fahrzeugen. Erkennen und Dokumentieren technischer Abweichungen.</p>
+<h3 class="job-title">Software Developer</h3>
+<p class="company">Tech Solutions GmbH</p>
+<p class="period">2018-03 - 2024-12</p>
+<p class="text">Development of web applications with Java Spring Boot. Responsible for backend development, API design and database optimization.</p>
+<ul class="inline-dot-list">
+<li>Java</li>
+<li>Spring Boot</li>
+<li>MySQL</li>
+<li>REST APIs</li>
+</ul>
 </article>
 <article class="job">
-<h3 class="job-title">Product Marketing Manager</h3>
-<p class="company">Pilteh Werkzeugmaschinenfabrik</p>
-<p class="period">2010-01 - 2022-12</p>
-<p class="text">Er leitete ein Team von Verkaufsleitern. Bewirbt das Produkt im Internet. Die Anzahl der abgeschlossenen Verträge sicherte den einjährigen Betrieb des...</p>
-</article>
-<article class="job">
-<h3 class="job-title">Sales Manager</h3>
-<p class="company">Energotechstroy</p>
-<p class="period"></p>
-<p class="text">Von Null zum Spitzenverkäufer.</p>
+<h3 class="job-title">Junior Software Developer</h3>
+<p class="company">Startup Innovations AG</p>
+<p class="period">2015-01 - 2018-02</p>
+<p class="text">Development of Java applications. Support in implementing new features and bug fixes. Technologien: Java, Spring Framework, PostgreSQL, Maven</p>
+<ul class="inline-dot-list">
+<li>Java</li>
+<li>Spring Framework</li>
+<li>PostgreSQL</li>
+<li>Maven</li>
+</ul>
 </article>
 </section>
 </section>

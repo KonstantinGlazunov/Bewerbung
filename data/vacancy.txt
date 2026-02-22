@@ -1,57 +1,55 @@
 Finanz Informatik GmbH & Co. KG logo
-Java Softwareentwickler (m/w/d)
-Finanz Informatik GmbH & Co. KG
-Hannover, Münster, Frankfurt am Main
-Feste Anstellung
-Homeoffice möglich, Vollzeit
-Erschienen: vor 3 Tagen
-52.000€ - 79.000€/Jahr (geschätzt für Vollzeit)
-Sei einer der ersten Bewerber
+
+Permanent Employment
+Home office possible, Full-time
+Posted: 3 days ago
+€52,000 - €79,000/year (estimated for full-time)
+Be one of the first applicants
 Finanz Informatik GmbH & Co. KG logo
-Java Softwareentwickler (m/w/d)
+Java Software Developer (m/f/d)
 Finanz Informatik GmbH & Co. KG
-Passt dieser Job zu mir?
-Prüfe vor deiner Bewerbung, ob du die Voraussetzungen erfüllst.
+Does this job suit me?
+Check before applying whether you meet the requirements.
 
-Passt weniger
-Passt hervorragend
+Less suitable
+Excellent fit
 slide number 1
-Als einer der größten Banken-IT-Dienstleister und Digitalisierungspartner Europas sind wir der Treiber der Digitalisierung innerhalb der Sparkassen-Finanzgruppe. Mit über 5.000 Mitarbeitenden an 3 Standorten machen wir digitales Banking von heute leistungsfähig und entwickeln smarte Finanz-Services von morgen. Dabei bieten wir ein breites Aufgabenspektrum, in dem die individuellen Stärken hervorragend eingebracht werden können. Ob App-Entwicklung, Netzwerktechnologien und Serverbetrieb oder Beratung, Schulung und Support – bei uns findet jede:r seine bzw. ihre Berufung! Als Spezialist:in oder auch als Generalist:in. Alles mit besten Karrierechancen, viel Raum für persönliche Entfaltung und zahlreichen Benefits.
+As one of Europe's largest banking IT service providers and digitalization partners, we are the driver of digitalization within the Sparkassen-Finanzgruppe. With over 5,000 employees at 3 locations, we make today's digital banking powerful and develop smart financial services for tomorrow. We offer a wide range of tasks in which individual strengths can be excellently applied. Whether app development, network technologies and server operations or consulting, training and support – everyone finds their calling with us! As a specialist or generalist. All with the best career opportunities, plenty of room for personal development and numerous benefits.
 
-Für die Organisationseinheit Rahmenkredite, Avale & Konsortial, suchen wir zum nächstmöglichen Termin für den Standort Hannover, Münster oder Frankfurt am Main einen
+For the organizational unit Framework Credits, Aval & Consortium, we are looking for the earliest possible date for the location Hannover, Münster or Frankfurt am Main a
 
-Java Softwareentwickler (m/w/d).
+Java Software Developer (m/f/d).
 
-Hinweis: Das Team ist ausschließlich am Standort Hannover angesiedelt.
+Note: The team is exclusively located at the Hannover location.
 
-#mitgestalten – was dich erwartet:
-Innovative Software-Entwicklung: Architekturelle Konzeption und eigenverantwortliche Neu- und Weiterentwicklung von Geschäftsprozessen, Services und Workflows in Java und JavaScript.
-Vielfältige Projekte: Verantwortungsübernahme und Mitarbeit in komplexen Projekten von der Analyse über Design bis hin zu Implementierung, Test, Dokumentation und Einführung.
-Koordination: Technischer Ansprechpartner (m/w/d) für Produktverantwortliche und Führungskräfte, sowie Steuerung der technischen Themen im Entwicklerteam. 
-Technische Implementierung: Enge Zusammenarbeit mit bankfachlichen Produktverantwortlichen und Implementierung von technischen Änderungswünschen.
-Qualitätssicherung & Performance-Optimierung: Konzeption und Durchführung von Maßnahmen zur Qualitätssicherung und Performance-Optimierung.
-Lösungsfinder: Übernahme des Last-Level-Supports für unsere entwickelten Komponenten und Management von Programmeinsätzen.
-#mitbringen – was wir erwarten:
-Background: Abgeschlossenes Studium der Informatik, Wirtschaftsinformatik oder vergleichbare Ausbildung (z.B. Fachinformatiker).
-Erfahrung: Mind. 6 Jahre fachbezogene Berufserfahrung und fundierte Kenntnisse in der Softwareentwicklung mit Java und JavaScript.
-Technologien: Kenntnisse in Tools wie IntelliJ, Subversion, Git, Maven, Harvest, Guice oder JUnit.
-Frontend-Entwicklung: Erfahrung mit React und Material UI ist wünschenswert.
-Arbeitsweise: Strukturierte, zielorientierte und eigenverantwortliche Herangehensweise an Aufgaben.
-Neugierde: Ausgeprägte Neugier und Ausdauer für neue Themen.
-Teamgeist: Freude an der Zusammenarbeit im Team, Zuverlässigkeit und Einsatzbereitschaft sowie Bereitschaft zu gelegentlichen Reisen.
-Ihre Benefits bei der Finanz Informatik:
-Sie fragen sich, warum Sie bei der Finanz Informatik arbeiten sollten? Wir hätten da ein paar gute Gründe für Sie. Neben flexiblen Arbeitszeiten, vergünstigten Jobtickets oder der Möglichkeit, mobil zu arbeiten, bieten wir Ihnen noch viel mehr:
+#participate – what awaits you:
+Innovative Software Development: Architectural conception and independent new and further development of business processes, services and workflows in Java and JavaScript.
+Diverse Projects: Taking responsibility and participating in complex projects from analysis through design to implementation, testing, documentation and introduction.
+Coordination: Technical contact person (m/f/d) for product managers and executives, as well as steering technical topics in the development team.
+Technical Implementation: Close collaboration with banking product managers and implementation of technical change requests.
+Quality Assurance & Performance Optimization: Conception and implementation of measures for quality assurance and performance optimization.
+Solution Finder: Taking over the last-level support for our developed components and managing program deployments.
+#bring – what we expect:
+Background: Completed degree in computer science, business informatics or comparable training (e.g. IT specialist).
+Experience: Min. 6 years of relevant professional experience and solid knowledge in software development with Java and JavaScript.
+Technologies: Knowledge of tools such as IntelliJ, Subversion, Git, Maven, Harvest, Guice or JUnit.
+Frontend Development: Experience with React and Material UI is desirable.
+Working Style: Structured, goal-oriented and independent approach to tasks.
+Curiosity: Pronounced curiosity and perseverance for new topics.
+Team Spirit: Enjoyment of teamwork, reliability and commitment as well as willingness to occasional travel.
+Your Benefits at Finanz Informatik:
+You're wondering why you should work at Finanz Informatik? We have a few good reasons for you. In addition to flexible working hours, discounted job tickets or the possibility to work mobile, we offer you much more:
 
-Altersvorsorge
-Barrierefrei
-Betriebssport
-Familienservice
-Firmenevents
-Flexible Arbeitszeiten
-Mobiles Arbeiten
-Jobticket
-Kantine
-Tarifvertrag
-Weiterbildung
-Fitnessförderung
-Bei uns erwartet Sie eine attraktive Vergütung basierend auf Ihrer Qualifikation sowie Ihrer relevanten, praktischen Erfahrung.
+Retirement Provision
+Barrier-free
+Company Sports
+Family Service
+Company Events
+Flexible Working Hours
+Mobile Working
+Job Ticket
+Canteen
+Collective Agreement
+Further Training
+Fitness Promotion
+We offer you an attractive salary based on your qualifications as well as your relevant practical experience.
