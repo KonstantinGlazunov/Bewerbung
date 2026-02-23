@@ -50,11 +50,6 @@ import java.util.regex.Pattern;
 import java.io.InputStream;
 import java.util.Base64;
 
-import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
-import org.jsoup.Jsoup;
-import org.jsoup.helper.W3CDom;
-import org.w3c.dom.Document;
-
 @RestController
 @RequestMapping("/api/generate")
 public class GenerateController {
@@ -835,11 +830,11 @@ public class GenerateController {
         if (needsRegeneration) {
             boolean generated = generateLebenslaufPdfWithChrome(sourceUrl, outputPdfPath);
             if (!generated && !defaultData && Files.exists(htmlPath)) {
-                logger.info("Chrome/Chromium not available, using Java fallback (OpenHTML to PDF)");
-                generated = generateLebenslaufPdfWithOpenHtml(htmlPath, outputPdfPath);
+                logger.info("Chrome/Chromium not available, trying wkhtmltopdf (lightweight WebKit)");
+                generated = generateLebenslaufPdfWithWkhtmltopdf(htmlPath, outputPdfPath);
             }
             if (!generated) {
-                throw new RuntimeException("Failed to generate Lebenslauf PDF. Install google-chrome/chromium or ensure font is in resources/fonts/.");
+                throw new RuntimeException("Failed to generate Lebenslauf PDF. Install google-chrome/chromium or wkhtmltopdf.");
             }
         } else {
             logger.info("PDF file is up to date, using existing file: {}", outputPdfPath);
@@ -926,10 +921,10 @@ public class GenerateController {
     }
 
     /**
-     * Generates Lebenslauf PDF using OpenHTML to PDF (pure Java, no Chrome).
-     * Uses the same font from resources/fonts/ as the Anschreiben PDF.
+     * Generates Lebenslauf PDF using wkhtmltopdf (lightweight WebKit, no full browser).
+     * Embeds the same font from resources so no external URLs are needed.
      */
-    private boolean generateLebenslaufPdfWithOpenHtml(Path htmlPath, Path outputPdfPath) {
+    private boolean generateLebenslaufPdfWithWkhtmltopdf(Path htmlPath, Path outputPdfPath) {
         try {
             Path parent = outputPdfPath.getParent();
             if (parent != null) {
@@ -942,53 +937,62 @@ public class GenerateController {
 
         String html;
         try {
-            if (Files.exists(htmlPath)) {
-                html = Files.readString(htmlPath, StandardCharsets.UTF_8);
-            } else {
-                ClassPathResource resource = new ClassPathResource("lebenslauf-filled.html");
-                if (!resource.exists()) {
-                    logger.warn("No HTML source for OpenHTML PDF (no file and no default template)");
-                    return false;
-                }
-                try (InputStream in = resource.getInputStream()) {
-                    html = new String(in.readAllBytes(), StandardCharsets.UTF_8);
-                }
-            }
+            html = Files.readString(htmlPath, StandardCharsets.UTF_8);
         } catch (IOException e) {
-            logger.warn("Failed to read HTML for OpenHTML PDF: {}", e.getMessage());
+            logger.warn("Failed to read HTML for wkhtmltopdf: {}", e.getMessage());
             return false;
         }
 
         try (InputStream fontStream = getClass().getResourceAsStream("/fonts/LiberationSans-Regular.ttf")) {
             if (fontStream != null) {
                 byte[] fontBytes = fontStream.readAllBytes();
-                String fontBase64 = Base64.getEncoder().encodeToString(fontBytes);
-                String dataUri = "data:font/ttf;base64," + fontBase64;
+                String dataUri = "data:font/ttf;base64," + Base64.getEncoder().encodeToString(fontBytes);
                 html = html.replace("url('../fonts/LiberationSans-Regular.ttf')", "url('" + dataUri + "')");
                 html = html.replace("url(\"../fonts/LiberationSans-Regular.ttf\")", "url(\"" + dataUri + "\")");
             }
         } catch (IOException e) {
-            logger.warn("Could not embed font for OpenHTML PDF: {}", e.getMessage());
+            logger.debug("Could not embed font for wkhtmltopdf: {}", e.getMessage());
         }
 
+        Path tempHtml = null;
         try {
-            org.jsoup.nodes.Document jsoupDoc = Jsoup.parse(html, "UTF-8");
-            jsoupDoc.outputSettings().syntax(org.jsoup.nodes.Document.OutputSettings.Syntax.html);
-            W3CDom w3cDom = new W3CDom();
-            Document w3cDoc = w3cDom.fromJsoup(jsoupDoc);
+            tempHtml = Files.createTempFile("lebenslauf_", ".html");
+            Files.writeString(tempHtml, html, StandardCharsets.UTF_8);
 
-            try (java.io.OutputStream os = Files.newOutputStream(outputPdfPath)) {
-                PdfRendererBuilder builder = new PdfRendererBuilder();
-                builder.useFastMode();
-                builder.withW3cDocument(w3cDoc, "file:///");
-                builder.toStream(os);
-                builder.run();
+            String uri = "file://" + tempHtml.toAbsolutePath().toString();
+            Process process = new ProcessBuilder(
+                    "wkhtmltopdf",
+                    "--quiet",
+                    "--enable-local-file-access",
+                    uri,
+                    outputPdfPath.toAbsolutePath().toString()
+            ).redirectErrorStream(true).start();
+
+            boolean finished = process.waitFor(30, TimeUnit.SECONDS);
+            if (!finished) {
+                process.destroyForcibly();
+                logger.warn("wkhtmltopdf timed out");
+                return false;
             }
-            logger.info("Lebenslauf PDF generated via OpenHTML to PDF: {}", outputPdfPath);
+            if (process.exitValue() != 0) {
+                String out = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+                logger.warn("wkhtmltopdf failed with exit {}: {}", process.exitValue(), out);
+                return false;
+            }
+            if (!Files.exists(outputPdfPath) || Files.size(outputPdfPath) == 0) {
+                return false;
+            }
+            logger.info("Lebenslauf PDF generated via wkhtmltopdf: {}", outputPdfPath);
             return true;
         } catch (Exception e) {
-            logger.warn("OpenHTML to PDF failed: {}", e.getMessage(), e);
+            logger.warn("wkhtmltopdf failed: {}", e.getMessage());
             return false;
+        } finally {
+            if (tempHtml != null) {
+                try {
+                    Files.deleteIfExists(tempHtml);
+                } catch (IOException ignored) {}
+            }
         }
     }
 
