@@ -739,6 +739,7 @@ public class GenerateController {
 
         try {
             String html = Files.readString(htmlPath, StandardCharsets.UTF_8);
+            html = embedPhotoAsDataUri(html);
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_HTML_VALUE)
                     .body(html);
@@ -757,12 +758,12 @@ public class GenerateController {
             }
 
             String html = new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-            // Ensure absolute static path for image and other static assets during PDF rendering.
-            String normalizedHtml = html.replace("src=\"static/", "src=\"/static/");
+            html = html.replace("src=\"static/", "src=\"/static/");
+            html = embedPhotoAsDataUri(html);
 
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_HTML_VALUE)
-                    .body(normalizedHtml);
+                    .body(html);
         } catch (IOException e) {
             logger.error("Failed to read default lebenslauf HTML template", e);
             throw new RuntimeException("Failed to read default lebenslauf HTML template", e);
@@ -954,6 +955,10 @@ public class GenerateController {
             logger.debug("Could not embed font for wkhtmltopdf: {}", e.getMessage());
         }
 
+        html = embedPhotoAsDataUriForWkhtmltopdf(html);
+        html = replaceCssVariablesForWkhtmltopdf(html);
+        html = injectWkhtmltopdfLayoutFallback(html);
+
         Path tempHtml = null;
         try {
             tempHtml = Files.createTempFile("lebenslauf_", ".html");
@@ -963,6 +968,7 @@ public class GenerateController {
             Process process = new ProcessBuilder(
                     "wkhtmltopdf",
                     "--quiet",
+                    "--page-size", "A4",
                     "--enable-local-file-access",
                     uri,
                     outputPdfPath.toAbsolutePath().toString()
@@ -994,6 +1000,89 @@ public class GenerateController {
                 } catch (IOException ignored) {}
             }
         }
+    }
+
+    /**
+     * Embeds the CV photo as a data URI only when the user has uploaded one.
+     * If no photo is uploaded, the image is removed so the PDF shows empty space (no broken image).
+     */
+    private String embedPhotoAsDataUri(String html) {
+        String dataUri = tempPhotoStorageService.getCurrentPhotoDataUri().orElse("");
+        if (dataUri == null || dataUri.isEmpty()) {
+            // No photo uploaded — remove img so we get empty place (no broken image)
+            html = html.replaceFirst("\\s*<img\\s+[^>]*src=\"[^\"]*\"[^>]*/?>", " ");
+            logger.debug("No photo uploaded: empty place in PDF");
+            return html;
+        }
+        boolean changed = false;
+        if (html.contains("src=\"/static/author-photo.jpg\"")) {
+            html = html.replace("src=\"/static/author-photo.jpg\"", "src=\"" + dataUri + "\"");
+            changed = true;
+        }
+        if (html.contains("src=\"static/author-photo.jpg\"")) {
+            html = html.replace("src=\"static/author-photo.jpg\"", "src=\"" + dataUri + "\"");
+            changed = true;
+        }
+        if (!changed) {
+            html = html.replaceFirst("(<img\\s+[^>]*src=\")[^\"]*(\")", "$1" + dataUri + "$2");
+        }
+        logger.info("Photo embedded in HTML for PDF");
+        return html;
+    }
+
+    private String embedPhotoAsDataUriForWkhtmltopdf(String html) {
+        return embedPhotoAsDataUri(html);
+    }
+
+    /** Replace CSS variables with fixed values so old WebKit (wkhtmltopdf) doesn't ignore rules. */
+    private String replaceCssVariablesForWkhtmltopdf(String html) {
+        html = html.replace("var(--header-bg)", "#e3e3e5");
+        html = html.replace("var(--text)", "#3f434a");
+        html = html.replace("var(--muted)", "#666b74");
+        html = html.replace("var(--line)", "#8c8f95");
+        html = html.replace("var(--accent)", "#40454e");
+        html = html.replace("var(--font-primary)", "'Liberation Sans', 'Segoe UI', Arial, sans-serif");
+        return html;
+    }
+
+    /**
+     * Injects CSS overrides for wkhtmltopdf (old WebKit does not support CSS Grid/Flexbox).
+     * Injected at end of first <style> so same block, our rules override.
+     * Also neutralizes grid/flex in the block so the engine doesn't misapply them.
+     */
+    private String injectWkhtmltopdfLayoutFallback(String html) {
+        int startStyle = html.indexOf("<style>");
+        int endStyle = html.indexOf("</style>");
+        if (startStyle == -1 || endStyle == -1 || endStyle <= startStyle) {
+            return html;
+        }
+        String styleContent = html.substring(startStyle + 7, endStyle);
+        // Neutralize Grid/Flex so old WebKit doesn't use them
+        styleContent = styleContent.replace("display: grid", "display: block");
+        styleContent = styleContent.replace("display: flex", "display: block");
+        styleContent = styleContent.replaceAll("grid-template-columns:\\s*[^;]+;?", "");
+        styleContent = styleContent.replaceAll("grid-template-areas:\\s*[^;]+;?", "");
+        styleContent = styleContent.replace("align-items: center", "");
+        styleContent = styleContent.replace("justify-self: center", "");
+
+        String css = ""
+            + "/* wkhtmltopdf fallback: no Grid - use table/float */"
+            + ".page { width: 210mm !important; margin: 0 auto !important; background: #fff !important; overflow: hidden !important; }"
+            + ".header-strip { display: table !important; width: 100% !important; height: 52.5mm !important; background: #e3e3e5 !important; padding: 0 14mm !important; table-layout: fixed !important; }"
+            + ".header-strip .name-block { display: table-cell !important; width: 72% !important; vertical-align: middle !important; }"
+            + ".header-strip .photo-wrap { display: table-cell !important; width: 28% !important; vertical-align: middle !important; text-align: center !important; }"
+            + ".content { overflow: hidden !important; }"
+            + ".top-row { overflow: hidden !important; padding-bottom: 1mm !important; border-bottom: 1px solid #8c8f95 !important; }"
+            + ".top-row .top-left { float: left !important; width: 38% !important; padding: 1.5mm 10mm 0 15mm !important; }"
+            + ".top-row .top-right { float: right !important; width: 62% !important; padding: 1.5mm 15mm 0 1em !important; }"
+            + ".content .bottom-left { float: left !important; clear: left !important; width: 38% !important; padding: 4mm 10mm 4mm 15mm !important; border-right: 1px solid #8c8f95 !important; min-height: 1px !important; }"
+            + ".content .bottom-right { float: right !important; width: 62% !important; padding: 4mm 15mm 4mm 1em !important; min-height: 1px !important; }"
+            + ".content::before { display: none !important; }"
+            + ".contact li { overflow: hidden !important; }"
+            + ".contact .icon { float: left !important; width: 6mm !important; }"
+            + ".contact li span:last-child { display: block !important; margin-left: 8mm !important; }";
+
+        return html.substring(0, startStyle + 7) + styleContent + css + html.substring(endStyle);
     }
 
     private String extractSurnameFromLebenslaufHtml(Path htmlPath) {
