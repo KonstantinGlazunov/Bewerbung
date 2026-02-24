@@ -72,12 +72,18 @@ body {
   overflow: hidden;
   justify-self: center;
   transform: translateY(10mm);
+  position: relative;
 }
 
 .photo-wrap img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
+  /* fallback для движков без object-fit: заполнить круг по центру */
+  min-width: 100%;
+  min-height: 100%;
 }
 
 /* CONTENT */
