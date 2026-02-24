@@ -21,6 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;
 import jakarta.validation.Valid;
@@ -77,6 +78,9 @@ public class GenerateController {
     private final PdfGenerationService pdfGenerationService;
     private final TempPhotoStorageService tempPhotoStorageService;
     private final Gson gson;
+
+    @Value("${pdf.lebenslauf.use-wkhtmltopdf:false}")
+    private boolean pdfUseWkhtmltopdfByDefault;
 
     @Autowired
     public GenerateController(VacancyAnalyzerService vacancyAnalyzerService,
@@ -774,7 +778,8 @@ public class GenerateController {
     public ResponseEntity<byte[]> generateLebenslaufPdf(
             HttpServletRequest request,
             @RequestParam(name = "defaultData", defaultValue = "false") boolean defaultData,
-            @RequestParam(name = "force", defaultValue = "false") boolean forceRegenerate
+            @RequestParam(name = "force", defaultValue = "false") boolean forceRegenerate,
+            @RequestParam(name = "useWkhtmltopdf", defaultValue = "false") boolean useWkhtmltopdf
     ) {
         Path htmlPath = Paths.get("output", "lebenslauf-filled.html").toAbsolutePath();
 
@@ -829,10 +834,21 @@ public class GenerateController {
         }
 
         if (needsRegeneration) {
-            boolean generated = generateLebenslaufPdfWithChrome(sourceUrl, outputPdfPath);
-            if (!generated && !defaultData && Files.exists(htmlPath)) {
-                logger.info("Chrome/Chromium not available, trying wkhtmltopdf (lightweight WebKit)");
-                generated = generateLebenslaufPdfWithWkhtmltopdf(htmlPath, outputPdfPath);
+            boolean useWkhtmltopdfNow = useWkhtmltopdf || pdfUseWkhtmltopdfByDefault;
+            boolean generated;
+            if (useWkhtmltopdfNow) {
+                logger.info("Using wkhtmltopdf (requested or server default)");
+                if (defaultData) {
+                    generated = generateLebenslaufPdfWithWkhtmltopdfDefault(outputPdfPath);
+                } else {
+                    generated = generateLebenslaufPdfWithWkhtmltopdf(htmlPath, outputPdfPath);
+                }
+            } else {
+                generated = generateLebenslaufPdfWithChrome(sourceUrl, outputPdfPath);
+                if (!generated && !defaultData && Files.exists(htmlPath)) {
+                    logger.info("Chrome/Chromium not available, trying wkhtmltopdf (lightweight WebKit)");
+                    generated = generateLebenslaufPdfWithWkhtmltopdf(htmlPath, outputPdfPath);
+                }
             }
             if (!generated) {
                 throw new RuntimeException("Failed to generate Lebenslauf PDF. Install google-chrome/chromium or wkhtmltopdf.");
@@ -926,6 +942,36 @@ public class GenerateController {
      * Embeds the same font from resources so no external URLs are needed.
      */
     private boolean generateLebenslaufPdfWithWkhtmltopdf(Path htmlPath, Path outputPdfPath) {
+        String html;
+        try {
+            html = Files.readString(htmlPath, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            logger.warn("Failed to read HTML for wkhtmltopdf: {}", e.getMessage());
+            return false;
+        }
+        return runWkhtmltopdf(html, outputPdfPath);
+    }
+
+    /**
+     * Generates default (Mustermann) Lebenslauf PDF via wkhtmltopdf when useWkhtmltopdf=true and defaultData=true.
+     */
+    private boolean generateLebenslaufPdfWithWkhtmltopdfDefault(Path outputPdfPath) {
+        try {
+            ClassPathResource resource = new ClassPathResource("lebenslauf-filled.html");
+            if (!resource.exists()) {
+                logger.warn("Default lebenslauf HTML not found");
+                return false;
+            }
+            String html = new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+            html = html.replace("src=\"static/", "src=\"/static/");
+            return runWkhtmltopdf(html, outputPdfPath);
+        } catch (IOException e) {
+            logger.warn("Failed to load default HTML for wkhtmltopdf: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    private boolean runWkhtmltopdf(String html, Path outputPdfPath) {
         try {
             Path parent = outputPdfPath.getParent();
             if (parent != null) {
@@ -933,14 +979,6 @@ public class GenerateController {
             }
         } catch (IOException e) {
             logger.error("Failed to create output directory for PDF {}", outputPdfPath, e);
-            return false;
-        }
-
-        String html;
-        try {
-            html = Files.readString(htmlPath, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            logger.warn("Failed to read HTML for wkhtmltopdf: {}", e.getMessage());
             return false;
         }
 
@@ -1071,6 +1109,7 @@ public class GenerateController {
             + ".header-strip { display: table !important; width: 100% !important; height: 52.5mm !important; background: #e3e3e5 !important; padding: 0 14mm !important; table-layout: fixed !important; }"
             + ".header-strip .name-block { display: table-cell !important; width: 72% !important; vertical-align: middle !important; }"
             + ".header-strip .photo-wrap { display: table-cell !important; width: 28% !important; vertical-align: middle !important; text-align: center !important; }"
+            + ".photo-wrap img { display: block !important; width: 46mm !important; height: 46mm !important; max-width: 100% !important; object-fit: cover !important; object-position: center !important; }"
             + ".content { overflow: hidden !important; }"
             + ".top-row { overflow: hidden !important; padding-bottom: 1mm !important; border-bottom: 1px solid #8c8f95 !important; }"
             + ".top-row .top-left { float: left !important; width: 38% !important; padding: 1.5mm 10mm 0 15mm !important; }"
