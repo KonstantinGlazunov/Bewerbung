@@ -45,6 +45,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -66,6 +68,8 @@ public class GenerateController {
     );
     private static final Pattern HTML_TAGS_PATTERN = Pattern.compile("<[^>]+>");
     private static final Pattern NON_ASCII_FILENAME_PATTERN = Pattern.compile("[^A-Za-z0-9_-]");
+    /** One-time tokens for Chrome PDF: when Chrome loads lebenslauf/html it has no session cookie; token maps to sessionId. */
+    private static final ConcurrentHashMap<String, String> PDF_SESSION_TOKENS = new ConcurrentHashMap<>();
 
     private final VacancyAnalyzerService vacancyAnalyzerService;
     private final BiographyService biographyService;
@@ -106,10 +110,16 @@ public class GenerateController {
         this.gson = new Gson();
     }
 
+    private static String safeSessionId(String sessionId) {
+        return sessionId == null ? "" : sessionId.replaceAll("[^A-Za-z0-9_-]", "_");
+    }
+
     @PostMapping("/upload-photo")
-    public ResponseEntity<Map<String, String>> uploadResumePhoto(@RequestParam("photo") MultipartFile photo) {
+    public ResponseEntity<Map<String, String>> uploadResumePhoto(HttpServletRequest request,
+                                                                  @RequestParam("photo") MultipartFile photo) {
         logger.info("Received CV photo upload request");
-        String photoId = tempPhotoStorageService.saveTemporaryPhoto(photo);
+        String sessionId = request.getSession(true).getId();
+        String photoId = tempPhotoStorageService.saveTemporaryPhoto(sessionId, photo);
         return ResponseEntity.ok(Map.of(
                 "message", "Photo uploaded successfully",
                 "photoId", photoId
@@ -117,56 +127,48 @@ public class GenerateController {
     }
 
     @PostMapping
-    public ResponseEntity<?> generate(@Valid @RequestBody GenerateRequestDto request) {
+    public ResponseEntity<?> generate(HttpServletRequest request, @Valid @RequestBody GenerateRequestDto dto) {
         logger.info("Received generate request");
-        
-        // Validate biography is not empty (null is already handled by @NotNull)
-        if (request.getBiography().isEmpty()) {
+        String sessionId = request.getSession(true).getId();
+        GenerateRequestDto req = dto;
+
+        if (req.getBiography().isEmpty()) {
             throw new IllegalArgumentException("Biography must not be empty");
         }
 
-        // Convert biography Map to text for storage
-        String cvText = convertBiographyToText(request.getBiography());
-        String vacancyText = request.getJobPosting();
-        
-        logger.info("Data received - Vacancy: {} chars, CV (biography): {} chars, Wishes: {} chars", 
+        String cvText = convertBiographyToText(req.getBiography());
+        String vacancyText = req.getJobPosting();
+
+        logger.info("Data received - Vacancy: {} chars, CV (biography): {} chars, Wishes: {} chars",
             vacancyText != null ? vacancyText.length() : 0,
             cvText != null ? cvText.length() : 0,
-            request.getWishes() != null ? request.getWishes().length() : 0);
-        
-        // Check if data matches default samples - if so, use sample cover letter without AI
-        // BUT: if wishes are provided, we need to regenerate even for default data
-        if (fileOutputService.isDefaultData(vacancyText, cvText) && (request.getWishes() == null || request.getWishes().trim().isEmpty())) {
+            req.getWishes() != null ? req.getWishes().length() : 0);
+
+        if (fileOutputService.isDefaultData(vacancyText, cvText) && (req.getWishes() == null || req.getWishes().trim().isEmpty())) {
             logger.info("Data matches default samples - using sample cover letter without AI processing");
             String sampleCoverLetter = fileOutputService.loadSampleCoverLetter();
             if (sampleCoverLetter != null && !sampleCoverLetter.trim().isEmpty()) {
-                // Save to output files
-                fileOutputService.writeAnschreiben(sampleCoverLetter);
-                String dataAnschreibenPath = "data/anschreiben.txt";
-                fileOutputService.writeAnschreiben(sampleCoverLetter, dataAnschreibenPath);
-                changeDetectionService.saveAnschreibenPath(dataAnschreibenPath);
-
-                // Also regenerate lebenslauf to avoid serving stale file from previous session.
+                fileOutputService.writeAnschreiben(sessionId, sampleCoverLetter);
+                String dataAnschreibenPath = "data/" + safeSessionId(sessionId) + "/anschreiben.txt";
+                fileOutputService.writeAnschreiben(sessionId, sampleCoverLetter, dataAnschreibenPath);
+                changeDetectionService.saveAnschreibenPath(sessionId, dataAnschreibenPath);
                 try {
-                    String biographyJsonString = gson.toJson(request.getBiography());
+                    String biographyJsonString = gson.toJson(req.getBiography());
                     JsonObject biographyJson = gson.fromJson(biographyJsonString, JsonObject.class);
-                    String lebenslaufHtml = lebenslaufTemplateService.generateLebenslauf(biographyJson);
-                    fileOutputService.writeLebenslauf(lebenslaufHtml);
+                    String lebenslaufHtml = lebenslaufTemplateService.generateLebenslauf(sessionId, biographyJson);
+                    fileOutputService.writeLebenslauf(sessionId, lebenslaufHtml);
                     logger.info("Lebenslauf regenerated for default data flow");
                 } catch (Exception e) {
                     logger.error("Failed to generate lebenslauf in default-data flow", e);
                     throw new RuntimeException("Failed to generate lebenslauf for default data", e);
                 }
-                
                 logger.info("Sample cover letter loaded and saved to output files ({} chars)", sampleCoverLetter.length());
-                String outputPath = java.nio.file.Paths.get("output/anschreiben.md").toAbsolutePath().toString();
-                return ResponseEntity.ok("Using sample cover letter (default data detected, AI skipped). File: " + outputPath);
+                return ResponseEntity.ok("Using sample cover letter (default data detected, AI skipped).");
             } else {
                 logger.warn("Sample cover letter not found, falling back to AI generation");
             }
         }
-        
-        // Log preview of data for debugging
+
         if (vacancyText != null && !vacancyText.isEmpty()) {
             String vacancyPreview = vacancyText.length() > 200 ? vacancyText.substring(0, 200) + "..." : vacancyText;
             logger.debug("Vacancy preview: {}", vacancyPreview.replace("\n", "\\n"));
@@ -176,309 +178,234 @@ public class GenerateController {
             logger.debug("CV preview: {}", cvPreview.replace("\n", "\\n"));
         }
 
-        // Convert biography Map to JsonObject for processing (needed for both anschreiben and lebenslauf)
-        String biographyJsonString = gson.toJson(request.getBiography());
+        String biographyJsonString = gson.toJson(req.getBiography());
         JsonObject biographyJson = gson.fromJson(biographyJsonString, JsonObject.class);
         Biography biography = biographyService.parseBiographyFromJson(biographyJson);
 
-        // Check for changes (including wishes)
-        ChangeDetectionService.ChangeResult changeResult = changeDetectionService.checkAndSave(vacancyText, cvText, request.getWishes());
+        ChangeDetectionService.ChangeResult changeResult = changeDetectionService.checkAndSave(sessionId, vacancyText, cvText, req.getWishes());
 
-        // If no changes detected, return early without AI processing (but still generate lebenslauf)
         if (!changeResult.hasChanges()) {
             logger.info("No changes detected. Skipping AI processing for anschreiben.");
-            
-            // Still generate lebenslauf even if no changes detected
             try {
                 logger.info("Generating lebenslauf from biography data (no changes detected, but generating CV)");
-                String lebenslaufHtml = lebenslaufTemplateService.generateLebenslauf(biographyJson);
-                fileOutputService.writeLebenslauf(lebenslaufHtml);
+                String lebenslaufHtml = lebenslaufTemplateService.generateLebenslauf(sessionId, biographyJson);
+                fileOutputService.writeLebenslauf(sessionId, lebenslaufHtml);
                 logger.info("Lebenslauf generated and saved successfully");
             } catch (Exception e) {
                 logger.error("Error generating lebenslauf, continuing without it", e);
             }
-            
             return ResponseEntity.ok("No changes detected. Existing analysis is still valid. AI processing skipped to save tokens. Lebenslauf generated.");
         }
 
         logger.info("Changes detected: {}", changeResult.getDescription());
 
-        // Analyze job posting (only if vacancy changed)
         JobRequirements jobRequirements = null;
         if (changeResult.isVacancyChanged()) {
-            jobRequirements = vacancyAnalyzerService.analyzeVacancy(request.getJobPosting());
-            fileOutputService.writeAnalysis(jobRequirements);
+            jobRequirements = vacancyAnalyzerService.analyzeVacancy(req.getJobPosting());
+            fileOutputService.writeAnalysis(sessionId, jobRequirements);
         } else {
-            // Load existing analysis if available
             logger.info("Vacancy unchanged, skipping analysis");
         }
 
-        // Generate cover letter (Anschreiben) - only if vacancy, CV, or wishes changed
         if (changeResult.isVacancyChanged() || changeResult.isCvChanged() || changeResult.isWishesChanged()) {
             String coverLetter;
-            
-            // Special case: if only wishes changed (not vacancy or CV), check if we can apply corrections
             if (changeResult.isWishesChanged() && !changeResult.isVacancyChanged() && !changeResult.isCvChanged()) {
-                // Check if wishes contain FACT_EXCLUSION (deletions) - if yes, need full regeneration
-                boolean hasFactExclusion = anschreibenGeneratorService.containsFactExclusion(request.getWishes());
-                
+                boolean hasFactExclusion = anschreibenGeneratorService.containsFactExclusion(req.getWishes());
                 if (hasFactExclusion) {
                     logger.info("Wishes contain FACT_EXCLUSION (deletions) - must regenerate letter from scratch using all fields");
-                    // Need full generation when deletions are present
                     if (jobRequirements == null) {
-                        logger.info("Job requirements null, analyzing vacancy for anschreiben generation");
-                        jobRequirements = vacancyAnalyzerService.analyzeVacancy(request.getJobPosting());
+                        jobRequirements = vacancyAnalyzerService.analyzeVacancy(req.getJobPosting());
                     }
                     coverLetter = anschreibenGeneratorService.generateAnschreiben(
-                            jobRequirements, biography, request.getJobPosting(), request.getWishes());
+                            jobRequirements, biography, req.getJobPosting(), req.getWishes());
                 } else {
                     logger.info("Only wishes changed (no deletions) - attempting to apply corrections to existing anschreiben...");
-                    
-                    // Try to load existing anschreiben
-                    String savedAnschreibenPath = changeDetectionService.getSavedAnschreibenPath();
-                    String existingAnschreiben = null;
-                    
-                    if (savedAnschreibenPath != null && !savedAnschreibenPath.isEmpty()) {
-                        existingAnschreiben = fileOutputService.readAnschreiben(savedAnschreibenPath);
+                    String savedAnschreibenPath = changeDetectionService.getSavedAnschreibenPath(sessionId);
+                    String existingAnschreiben = fileOutputService.readAnschreiben(sessionId);
+                    if (existingAnschreiben == null && savedAnschreibenPath != null && !savedAnschreibenPath.isEmpty()) {
+                        existingAnschreiben = fileOutputService.readAnschreiben(sessionId, savedAnschreibenPath);
                     }
-                    
-                    // Also try to read from default output location
                     if (existingAnschreiben == null || existingAnschreiben.trim().isEmpty()) {
-                        existingAnschreiben = fileOutputService.readAnschreiben("output/anschreiben.md");
+                        existingAnschreiben = fileOutputService.readAnschreiben(sessionId, "output/anschreiben.md");
                     }
-                    
                     if (existingAnschreiben != null && !existingAnschreiben.trim().isEmpty()) {
                         logger.info("Found existing anschreiben (length: {} chars), applying corrections...", existingAnschreiben.length());
-                        // Default to German if language not specified
-                        String language = request.getLanguage();
-                        if (language == null || language.trim().isEmpty()) {
-                            language = "de";
-                        }
-                        // Ensure we have job requirements for reference
+                        String language = req.getLanguage();
+                        if (language == null || language.trim().isEmpty()) language = "de";
                         if (jobRequirements == null) {
-                            logger.info("Job requirements null, analyzing vacancy for reference data");
-                            jobRequirements = vacancyAnalyzerService.analyzeVacancy(request.getJobPosting());
+                            jobRequirements = vacancyAnalyzerService.analyzeVacancy(req.getJobPosting());
                         }
                         coverLetter = anschreibenGeneratorService.applyCorrectionsToAnschreiben(
-                                existingAnschreiben, request.getWishes(), language, 
-                                jobRequirements, biography, request.getJobPosting());
+                                existingAnschreiben, req.getWishes(), language,
+                                jobRequirements, biography, req.getJobPosting());
                         logger.info("Corrections applied successfully (length: {} chars)", coverLetter.length());
                     } else {
                         logger.warn("No existing anschreiben found, falling back to full generation");
-                        // Fallback to full generation if no existing letter found
                         if (jobRequirements == null) {
-                            logger.info("Job requirements null, analyzing vacancy for anschreiben generation");
-                            jobRequirements = vacancyAnalyzerService.analyzeVacancy(request.getJobPosting());
+                            jobRequirements = vacancyAnalyzerService.analyzeVacancy(req.getJobPosting());
                         }
                         coverLetter = anschreibenGeneratorService.generateAnschreiben(
-                                jobRequirements, biography, request.getJobPosting(), request.getWishes());
+                                jobRequirements, biography, req.getJobPosting(), req.getWishes());
                     }
                 }
             } else {
-                // Full generation needed (vacancy or CV changed, or wishes changed but no existing letter)
                 if (jobRequirements == null) {
-                    // Need to analyze even if vacancy didn't change, for anschreiben generation
-                    logger.info("Job requirements null, analyzing vacancy for anschreiben generation");
-                    jobRequirements = vacancyAnalyzerService.analyzeVacancy(request.getJobPosting());
+                    jobRequirements = vacancyAnalyzerService.analyzeVacancy(req.getJobPosting());
                 }
                 logger.info("Generating anschreiben from scratch...");
                 coverLetter = anschreibenGeneratorService.generateAnschreiben(
-                        jobRequirements, biography, request.getJobPosting(), request.getWishes());
+                        jobRequirements, biography, req.getJobPosting(), req.getWishes());
             }
-            
             logger.info("Anschreiben ready (length: {} chars), writing to file...", coverLetter.length());
-            
-            // Save to both output directory and data directory
-            fileOutputService.writeAnschreiben(coverLetter);
-            String dataAnschreibenPath = "data/anschreiben.txt";
-            fileOutputService.writeAnschreiben(coverLetter, dataAnschreibenPath);
-            
-            // Save path to state
-            changeDetectionService.saveAnschreibenPath(dataAnschreibenPath);
-            
+            fileOutputService.writeAnschreiben(sessionId, coverLetter);
+            String dataAnschreibenPath = "data/" + safeSessionId(sessionId) + "/anschreiben.txt";
+            fileOutputService.writeAnschreiben(sessionId, coverLetter, dataAnschreibenPath);
+            changeDetectionService.saveAnschreibenPath(sessionId, dataAnschreibenPath);
             logger.info("Anschreiben file write completed");
         } else {
             logger.info("No changes detected, skipping anschreiben generation");
         }
 
-        // Generate and save lebenslauf (CV)
         try {
-            // Use already parsed biographyJson from above (line 137)
             logger.info("Generating lebenslauf from biography data");
-            String lebenslaufHtml = lebenslaufTemplateService.generateLebenslauf(biographyJson);
-            fileOutputService.writeLebenslauf(lebenslaufHtml);
+            String lebenslaufHtml = lebenslaufTemplateService.generateLebenslauf(sessionId, biographyJson);
+            fileOutputService.writeLebenslauf(sessionId, lebenslaufHtml);
             logger.info("Lebenslauf generated and saved successfully");
         } catch (Exception e) {
             logger.error("Error generating lebenslauf, continuing without it", e);
-            // Не прерываем выполнение, если lebenslauf не удалось сгенерировать
         }
 
-        // Write notes
-        fileOutputService.writeNotes(changeResult.getDescription(), 
+        fileOutputService.writeNotes(sessionId, changeResult.getDescription(),
             changeResult.isVacancyChanged(), changeResult.isCvChanged());
-        
-        String outputPath = Paths.get("output/anschreiben.md").toAbsolutePath().toString();
-        String lebenslaufPath = Paths.get("output/lebenslauf-filled.html").toAbsolutePath().toString();
-        logger.info("Processing complete. Results written to output files.");
-        logger.info("Anschreiben file location: {}", outputPath);
-        logger.info("Lebenslauf file location: {}", lebenslaufPath);
-        return ResponseEntity.ok("Processing complete. Results written to output files. Anschreiben: " + outputPath + ", Lebenslauf: " + lebenslaufPath);
+
+        logger.info("Processing complete. Results written for session.");
+        return ResponseEntity.ok("Processing complete. Results written to session storage.");
     }
 
     @PostMapping("/cover-letter")
-    public ResponseEntity<?> generateCoverLetter(@Valid @RequestBody GenerateRequestDto request) {
+    public ResponseEntity<?> generateCoverLetter(HttpServletRequest request, @Valid @RequestBody GenerateRequestDto dto) {
         logger.info("Received cover letter generation request");
-        
-        // Validate biography is not empty (null is already handled by @NotNull)
-        if (request.getBiography().isEmpty()) {
+        String sessionId = request.getSession(true).getId();
+        GenerateRequestDto req = dto;
+        if (req.getBiography().isEmpty()) {
             throw new IllegalArgumentException("Biography must not be empty");
         }
 
         // Convert biography Map to text for storage
-        String cvText = convertBiographyToText(request.getBiography());
-        String vacancyText = request.getJobPosting();
+        String cvText = convertBiographyToText(req.getBiography());
+        String vacancyText = req.getJobPosting();
 
         // Default to German if language not specified
-        String language = request.getLanguage();
+        String language = req.getLanguage();
         if (language == null || language.trim().isEmpty()) {
             language = "de";
         }
 
         // Convert biography Map to JsonObject for processing (needed for both anschreiben and lebenslauf)
-        String biographyJsonString = gson.toJson(request.getBiography());
+        String biographyJsonString = gson.toJson(req.getBiography());
         JsonObject biographyJson = gson.fromJson(biographyJsonString, JsonObject.class);
         Biography biography = biographyService.parseBiographyFromJson(biographyJson);
 
-        // Check for changes (including wishes and language)
-        ChangeDetectionService.ChangeResult changeResult = changeDetectionService.checkAndSave(vacancyText, cvText, request.getWishes(), language);
+        ChangeDetectionService.ChangeResult changeResult = changeDetectionService.checkAndSave(sessionId, vacancyText, cvText, req.getWishes(), language);
 
         // If no changes detected, try to load saved Anschreiben
         if (!changeResult.hasChanges()) {
             logger.info("No changes detected. Attempting to load saved Anschreiben...");
-            String savedAnschreibenPath = changeDetectionService.getSavedAnschreibenPath();
-            if (savedAnschreibenPath != null && !savedAnschreibenPath.isEmpty()) {
-                String savedAnschreiben = fileOutputService.readAnschreiben(savedAnschreibenPath);
-                if (savedAnschreiben != null && !savedAnschreiben.trim().isEmpty()) {
-                    logger.info("Successfully loaded saved Anschreiben from: {}", savedAnschreibenPath);
-                    // Also save to output directory for consistency
-                    fileOutputService.writeAnschreiben(savedAnschreiben);
-                    
-                    // Still generate lebenslauf even if no changes detected
+            String savedAnschreibenPath = changeDetectionService.getSavedAnschreibenPath(sessionId);
+            String savedAnschreiben = fileOutputService.readAnschreiben(sessionId);
+            if ((savedAnschreiben == null || savedAnschreiben.trim().isEmpty()) && savedAnschreibenPath != null && !savedAnschreibenPath.isEmpty()) {
+                savedAnschreiben = fileOutputService.readAnschreiben(sessionId, savedAnschreibenPath);
+            }
+            if (savedAnschreiben != null && !savedAnschreiben.trim().isEmpty()) {
+                    logger.info("Successfully loaded saved Anschreiben from session");
+                    fileOutputService.writeAnschreiben(sessionId, savedAnschreiben);
                     try {
                         logger.info("Generating lebenslauf from biography data (no changes detected, but generating CV)");
-                        String lebenslaufHtml = lebenslaufTemplateService.generateLebenslauf(biographyJson);
-                        fileOutputService.writeLebenslauf(lebenslaufHtml);
+                        String lebenslaufHtml = lebenslaufTemplateService.generateLebenslauf(sessionId, biographyJson);
+                        fileOutputService.writeLebenslauf(sessionId, lebenslaufHtml);
                         logger.info("Lebenslauf generated and saved successfully");
                     } catch (Exception e) {
                         logger.error("Error generating lebenslauf, continuing without it", e);
                     }
                     
-                    return ResponseEntity.ok("No changes detected. Using saved Anschreiben from: " + savedAnschreibenPath + ". Lebenslauf generated.");
-                }
+                    return ResponseEntity.ok("No changes detected. Using saved Anschreiben. Lebenslauf generated.");
             }
             logger.info("No saved Anschreiben found. Skipping AI processing.");
             
             // Still generate lebenslauf even if no changes detected
             try {
                 logger.info("Generating lebenslauf from biography data (no changes detected, but generating CV)");
-                String lebenslaufHtml = lebenslaufTemplateService.generateLebenslauf(biographyJson);
-                fileOutputService.writeLebenslauf(lebenslaufHtml);
+                String lebenslaufHtml = lebenslaufTemplateService.generateLebenslauf(sessionId, biographyJson);
+                fileOutputService.writeLebenslauf(sessionId, lebenslaufHtml);
                 logger.info("Lebenslauf generated and saved successfully");
             } catch (Exception e) {
                 logger.error("Error generating lebenslauf, continuing without it", e);
             }
-            
             return ResponseEntity.ok("No changes detected. Existing analysis is still valid. AI processing skipped to save tokens. Lebenslauf generated.");
         }
 
         logger.info("Changes detected: {}", changeResult.getDescription());
-
-        // Analyze job posting
-        JobRequirements jobRequirements = vacancyAnalyzerService.analyzeVacancy(request.getJobPosting());
+        JobRequirements jobRequirements = vacancyAnalyzerService.analyzeVacancy(req.getJobPosting());
         if (changeResult.isVacancyChanged()) {
-            fileOutputService.writeAnalysis(jobRequirements);
+            fileOutputService.writeAnalysis(sessionId, jobRequirements);
         }
 
-        // Generate cover letter (Anschreiben) - use the same language from request
         String coverLetter;
-        
-        // Special case: if only wishes changed (not vacancy, CV, or language), check if we can apply corrections
-        // IMPORTANT: If language changed, we must regenerate completely even if only wishes changed
         if (changeResult.isWishesChanged() && !changeResult.isVacancyChanged() && !changeResult.isCvChanged() && !changeResult.isLanguageChanged()) {
-            // Check if wishes contain FACT_EXCLUSION (deletions) - if yes, need full regeneration
-            boolean hasFactExclusion = anschreibenGeneratorService.containsFactExclusion(request.getWishes());
-            
+            boolean hasFactExclusion = anschreibenGeneratorService.containsFactExclusion(req.getWishes());
             if (hasFactExclusion) {
                 logger.info("Wishes contain FACT_EXCLUSION (deletions) - must regenerate letter from scratch using all fields");
-                // Need full generation when deletions are present
                 coverLetter = anschreibenGeneratorService.generateAnschreiben(
-                        jobRequirements, biography, request.getJobPosting(), request.getWishes(), language);
+                        jobRequirements, biography, req.getJobPosting(), req.getWishes(), language);
             } else {
                 logger.info("Only wishes changed (no deletions, language unchanged) - attempting to apply corrections to existing anschreiben...");
-                
-                // Try to load existing anschreiben
-                String savedAnschreibenPath = changeDetectionService.getSavedAnschreibenPath();
-                String existingAnschreiben = null;
-                
-                if (savedAnschreibenPath != null && !savedAnschreibenPath.isEmpty()) {
-                    existingAnschreiben = fileOutputService.readAnschreiben(savedAnschreibenPath);
+                String savedAnschreibenPath = changeDetectionService.getSavedAnschreibenPath(sessionId);
+                String existingAnschreiben = fileOutputService.readAnschreiben(sessionId);
+                if (existingAnschreiben == null && savedAnschreibenPath != null && !savedAnschreibenPath.isEmpty()) {
+                    existingAnschreiben = fileOutputService.readAnschreiben(sessionId, savedAnschreibenPath);
                 }
-                
-                // Also try to read from default output location
                 if (existingAnschreiben == null || existingAnschreiben.trim().isEmpty()) {
-                    existingAnschreiben = fileOutputService.readAnschreiben("output/anschreiben.md");
+                    existingAnschreiben = fileOutputService.readAnschreiben(sessionId, "output/anschreiben.md");
                 }
-                
                 if (existingAnschreiben != null && !existingAnschreiben.trim().isEmpty()) {
                     logger.info("Found existing anschreiben (length: {} chars), applying corrections...", existingAnschreiben.length());
                     coverLetter = anschreibenGeneratorService.applyCorrectionsToAnschreiben(
-                            existingAnschreiben, request.getWishes(), language, 
-                            jobRequirements, biography, request.getJobPosting());
+                            existingAnschreiben, req.getWishes(), language,
+                            jobRequirements, biography, req.getJobPosting());
                     logger.info("Corrections applied successfully (length: {} chars)", coverLetter.length());
                 } else {
                     logger.warn("No existing anschreiben found, falling back to full generation");
-                    // Fallback to full generation if no existing letter found
                     coverLetter = anschreibenGeneratorService.generateAnschreiben(
-                            jobRequirements, biography, request.getJobPosting(), request.getWishes(), language);
+                            jobRequirements, biography, req.getJobPosting(), req.getWishes(), language);
                 }
             }
         } else {
-            // Full generation needed (vacancy, CV, or language changed, or wishes changed but no existing letter)
             if (changeResult.isLanguageChanged()) {
                 logger.info("Language changed - must regenerate cover letter completely");
             }
             logger.info("Generating anschreiben from scratch...");
             coverLetter = anschreibenGeneratorService.generateAnschreiben(
-                    jobRequirements, biography, request.getJobPosting(), request.getWishes(), language);
+                    jobRequirements, biography, req.getJobPosting(), req.getWishes(), language);
         }
-        
-        // Save to both output directory and data directory
-        fileOutputService.writeAnschreiben(coverLetter);
-        String dataAnschreibenPath = "data/anschreiben.txt";
-        fileOutputService.writeAnschreiben(coverLetter, dataAnschreibenPath);
-        
-        // Save path to state
-        changeDetectionService.saveAnschreibenPath(dataAnschreibenPath);
 
-        // Generate and save lebenslauf (CV)
+        String dataAnschreibenPath = "data/" + safeSessionId(sessionId) + "/anschreiben.txt";
+        fileOutputService.writeAnschreiben(sessionId, coverLetter);
+        fileOutputService.writeAnschreiben(sessionId, coverLetter, dataAnschreibenPath);
+        changeDetectionService.saveAnschreibenPath(sessionId, dataAnschreibenPath);
+
         try {
-            // Convert biography Map to JsonObject for lebenslauf generation
-            String biographyJsonStr = gson.toJson(request.getBiography());
+            String biographyJsonStr = gson.toJson(req.getBiography());
             JsonObject biographyJsonForLebenslauf = gson.fromJson(biographyJsonStr, JsonObject.class);
-            
             logger.info("Generating lebenslauf from biography data");
-            String lebenslaufHtml = lebenslaufTemplateService.generateLebenslauf(biographyJsonForLebenslauf);
-            fileOutputService.writeLebenslauf(lebenslaufHtml);
+            String lebenslaufHtml = lebenslaufTemplateService.generateLebenslauf(sessionId, biographyJsonForLebenslauf);
+            fileOutputService.writeLebenslauf(sessionId, lebenslaufHtml);
             logger.info("Lebenslauf generated and saved successfully");
         } catch (Exception e) {
             logger.error("Error generating lebenslauf, continuing without it", e);
-            // Не прерываем выполнение, если lebenslauf не удалось сгенерировать
         }
 
-        // Write notes
-        fileOutputService.writeNotes(changeResult.getDescription(), 
+        fileOutputService.writeNotes(sessionId, changeResult.getDescription(),
             changeResult.isVacancyChanged(), changeResult.isCvChanged());
-        
         logger.info("Cover letter generated and written to output files");
         return ResponseEntity.ok("Cover letter generated and written to output files");
     }
@@ -486,10 +413,12 @@ public class GenerateController {
 
     @PostMapping("/from-file")
     public ResponseEntity<GenerateResponseDto> generateFromFile(
+            HttpServletRequest request,
             @RequestParam("biographyFile") MultipartFile biographyFile,
             @RequestParam("jobPosting") String jobPosting,
             @RequestParam(value = "wishes", required = false) String wishes,
             @RequestParam(value = "language", required = false) String language) {
+        String sessionId = request.getSession(true).getId();
         logger.info("Received generate request from file");
         logger.info("Requested language parameter: {}", language != null ? language : "null");
         
@@ -537,25 +466,22 @@ public class GenerateController {
             logger.info("Data matches default samples for language '{}' and no wishes provided - using sample cover letter without AI processing", language);
             String sampleCoverLetter = fileOutputService.loadSampleCoverLetter(language);
             if (sampleCoverLetter != null && !sampleCoverLetter.trim().isEmpty()) {
-                // Save to output files
-                fileOutputService.writeAnschreiben(sampleCoverLetter);
-                String dataAnschreibenPath = "data/anschreiben.txt";
-                fileOutputService.writeAnschreiben(sampleCoverLetter, dataAnschreibenPath);
-                changeDetectionService.saveAnschreibenPath(dataAnschreibenPath);
-                
+                String dataAnschreibenPath = "data/" + safeSessionId(sessionId) + "/anschreiben.txt";
+                fileOutputService.writeAnschreiben(sessionId, sampleCoverLetter);
+                fileOutputService.writeAnschreiben(sessionId, sampleCoverLetter, dataAnschreibenPath);
+                changeDetectionService.saveAnschreibenPath(sessionId, dataAnschreibenPath);
                 logger.info("Sample cover letter loaded and saved to output files ({} chars, language: {})", sampleCoverLetter.length(), language);
                 GenerateResponseDto response = new GenerateResponseDto(sampleCoverLetter);
                 return ResponseEntity.ok(response);
             } else {
                 logger.warn("Sample cover letter not found for language '{}', falling back to AI generation", language);
             }
-        } else if (fileOutputService.isDefaultData(jobPosting, biographyText, language) 
+        } else if (fileOutputService.isDefaultData(jobPosting, biographyText, language)
                 && wishes != null && !wishes.trim().isEmpty()) {
             logger.info("Data matches default samples but wishes are provided - will use AI to generate cover letter with wishes");
         }
-        
-        // Check for changes (including wishes and language)
-        ChangeDetectionService.ChangeResult changeResult = changeDetectionService.checkAndSave(jobPosting, biographyText, wishes, language);
+
+        ChangeDetectionService.ChangeResult changeResult = changeDetectionService.checkAndSave(sessionId, jobPosting, biographyText, wishes, language);
         
         logger.info("Change detection result - hasChanges: {}, vacancyChanged: {}, cvChanged: {}, wishesChanged: {}, languageChanged: {}", 
             changeResult.hasChanges(), changeResult.isVacancyChanged(), changeResult.isCvChanged(), 
@@ -565,16 +491,16 @@ public class GenerateController {
         // IMPORTANT: If language changed, we must regenerate even if other data hasn't changed
         if (!changeResult.hasChanges() && !changeResult.isLanguageChanged()) {
             logger.info("No changes detected and language hasn't changed. Attempting to load saved Anschreiben...");
-            String savedAnschreibenPath = changeDetectionService.getSavedAnschreibenPath();
-            if (savedAnschreibenPath != null && !savedAnschreibenPath.isEmpty()) {
-                String savedAnschreiben = fileOutputService.readAnschreiben(savedAnschreibenPath);
-                if (savedAnschreiben != null && !savedAnschreiben.trim().isEmpty()) {
-                    logger.info("Successfully loaded saved Anschreiben from: {}", savedAnschreibenPath);
-                    // Also save to output directory for consistency
-                    fileOutputService.writeAnschreiben(savedAnschreiben);
+            String savedAnschreibenPath = changeDetectionService.getSavedAnschreibenPath(sessionId);
+            String savedAnschreiben = fileOutputService.readAnschreiben(sessionId);
+            if (savedAnschreiben == null && savedAnschreibenPath != null && !savedAnschreibenPath.isEmpty()) {
+                savedAnschreiben = fileOutputService.readAnschreiben(sessionId, savedAnschreibenPath);
+            }
+            if (savedAnschreiben != null && !savedAnschreiben.trim().isEmpty()) {
+                    logger.info("Successfully loaded saved Anschreiben from session");
+                    fileOutputService.writeAnschreiben(sessionId, savedAnschreiben);
                     GenerateResponseDto response = new GenerateResponseDto(savedAnschreiben);
                     return ResponseEntity.ok(response);
-                }
             }
             logger.info("No saved Anschreiben found. Will generate new one.");
         } else if (changeResult.isLanguageChanged()) {
@@ -618,35 +544,27 @@ public class GenerateController {
                         jobRequirements, biography, jobPosting, wishes, languageForGeneration);
             } else {
                 logger.info("Only wishes changed (no deletions, language unchanged) - attempting to apply corrections to existing anschreiben...");
-                
-                // Try to load existing anschreiben
-                String savedAnschreibenPath = changeDetectionService.getSavedAnschreibenPath();
-                String existingAnschreiben = null;
-                
-                if (savedAnschreibenPath != null && !savedAnschreibenPath.isEmpty()) {
-                    existingAnschreiben = fileOutputService.readAnschreiben(savedAnschreibenPath);
+                String savedAnschreibenPath = changeDetectionService.getSavedAnschreibenPath(sessionId);
+                String existingAnschreiben = fileOutputService.readAnschreiben(sessionId);
+                if (existingAnschreiben == null && savedAnschreibenPath != null && !savedAnschreibenPath.isEmpty()) {
+                    existingAnschreiben = fileOutputService.readAnschreiben(sessionId, savedAnschreibenPath);
                 }
-                
-                // Also try to read from default output location
                 if (existingAnschreiben == null || existingAnschreiben.trim().isEmpty()) {
-                    existingAnschreiben = fileOutputService.readAnschreiben("output/anschreiben.md");
+                    existingAnschreiben = fileOutputService.readAnschreiben(sessionId, "output/anschreiben.md");
                 }
-                
                 if (existingAnschreiben != null && !existingAnschreiben.trim().isEmpty()) {
                     logger.info("Found existing anschreiben (length: {} chars), applying corrections...", existingAnschreiben.length());
                     coverLetter = anschreibenGeneratorService.applyCorrectionsToAnschreiben(
-                            existingAnschreiben, wishes, languageForGeneration, 
+                            existingAnschreiben, wishes, languageForGeneration,
                             jobRequirements, biography, jobPosting);
                     logger.info("Corrections applied successfully (length: {} chars)", coverLetter.length());
                 } else {
                     logger.warn("No existing anschreiben found, falling back to full generation");
-                    // Fallback to full generation if no existing letter found
                     coverLetter = anschreibenGeneratorService.generateAnschreiben(
                             jobRequirements, biography, jobPosting, wishes, languageForGeneration);
                 }
             }
         } else {
-            // Full generation needed (vacancy, CV, or language changed, or wishes changed but no existing letter)
             if (changeResult.isLanguageChanged()) {
                 logger.info("Language changed - must regenerate cover letter completely");
             }
@@ -654,20 +572,16 @@ public class GenerateController {
             coverLetter = anschreibenGeneratorService.generateAnschreiben(
                     jobRequirements, biography, jobPosting, wishes, languageForGeneration);
         }
-        
-        // Save to both output directory and data directory
-        fileOutputService.writeAnschreiben(coverLetter);
-        String dataAnschreibenPath = "data/anschreiben.txt";
-        fileOutputService.writeAnschreiben(coverLetter, dataAnschreibenPath);
-        
-        // Save path to state
-        changeDetectionService.saveAnschreibenPath(dataAnschreibenPath);
 
-        // Generate and save lebenslauf (CV)
+        String dataAnschreibenPath = "data/" + safeSessionId(sessionId) + "/anschreiben.txt";
+        fileOutputService.writeAnschreiben(sessionId, coverLetter);
+        fileOutputService.writeAnschreiben(sessionId, coverLetter, dataAnschreibenPath);
+        changeDetectionService.saveAnschreibenPath(sessionId, dataAnschreibenPath);
+
         try {
             logger.info("Generating lebenslauf from Biography object");
-            String lebenslaufHtml = lebenslaufTemplateService.generateLebenslauf(biography);
-            fileOutputService.writeLebenslauf(lebenslaufHtml);
+            String lebenslaufHtml = lebenslaufTemplateService.generateLebenslauf(sessionId, biography);
+            fileOutputService.writeLebenslauf(sessionId, lebenslaufHtml);
             logger.info("Lebenslauf generated and saved successfully");
         } catch (Exception e) {
             logger.error("Error generating lebenslauf, continuing without it", e);
@@ -735,35 +649,50 @@ public class GenerateController {
     }
 
     @GetMapping("/lebenslauf/html")
-    public ResponseEntity<String> getLebenslaufHtml() {
-        Path htmlPath = Paths.get("output", "lebenslauf-filled.html").toAbsolutePath();
-        if (!Files.exists(htmlPath)) {
-            throw new RuntimeException("Lebenslauf HTML file not found: " + htmlPath);
+    public ResponseEntity<String> getLebenslaufHtml(HttpServletRequest request,
+            @RequestParam(name = "pdfToken", required = false) String pdfToken) {
+        String sessionId = pdfToken != null && !pdfToken.isBlank()
+                ? PDF_SESSION_TOKENS.remove(pdfToken)
+                : request.getSession(true).getId();
+        if (sessionId == null || sessionId.isBlank()) {
+            throw new RuntimeException("Invalid or expired PDF token. Please request the PDF again.");
         }
-
-        try {
-            String html = Files.readString(htmlPath, StandardCharsets.UTF_8);
-            html = embedPhotoAsDataUri(html);
-            return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_HTML_VALUE)
-                    .body(html);
-        } catch (IOException e) {
-            logger.error("Failed to read lebenslauf HTML from {}", htmlPath, e);
-            throw new RuntimeException("Failed to read lebenslauf HTML", e);
+        String html = fileOutputService.readLebenslauf(sessionId);
+        if (html == null || html.isBlank()) {
+            String cvText = fileOutputService.getCvText(sessionId);
+            if (cvText != null && !cvText.isBlank()) {
+                try {
+                    JsonObject biographyJson = gson.fromJson(cvText.trim(), JsonObject.class);
+                    if (biographyJson != null && (biographyJson.has("personalInformation") || biographyJson.has("name"))) {
+                        logger.info("Generating Lebenslauf HTML from stored CV for session (html requested)");
+                        html = lebenslaufTemplateService.generateLebenslauf(sessionId, biographyJson);
+                        fileOutputService.writeLebenslauf(sessionId, html);
+                    }
+                } catch (Exception e) {
+                    logger.debug("Could not generate Lebenslauf from stored CV: {}", e.getMessage());
+                }
+            }
+            if (html == null || html.isBlank()) {
+                throw new RuntimeException("Lebenslauf HTML not found for session. Please generate Lebenslauf first.");
+            }
         }
+        html = embedPhotoAsDataUri(html, sessionId);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_HTML_VALUE)
+                .body(html);
     }
 
     @GetMapping("/lebenslauf/default-html")
-    public ResponseEntity<String> getDefaultLebenslaufHtml() {
+    public ResponseEntity<String> getDefaultLebenslaufHtml(HttpServletRequest request) {
         try {
             ClassPathResource resource = new ClassPathResource("lebenslauf-filled.html");
             if (!resource.exists()) {
                 throw new RuntimeException("Default lebenslauf HTML template not found in resources");
             }
-
             String html = new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
             html = html.replace("src=\"static/", "src=\"/static/");
-            html = embedPhotoAsDataUri(html);
+            String sessionId = request.getSession(true).getId();
+            html = embedPhotoAsDataUri(html, sessionId);
 
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_HTML_VALUE)
@@ -781,11 +710,11 @@ public class GenerateController {
             @RequestParam(name = "force", defaultValue = "false") boolean forceRegenerate,
             @RequestParam(name = "useWkhtmltopdf", defaultValue = "false") boolean useWkhtmltopdf
     ) {
-        Path htmlPath = Paths.get("output", "lebenslauf-filled.html").toAbsolutePath();
-
+        String sessionId = request.getSession(true).getId();
         final String filename;
         final Path outputPdfPath;
         final String sourceUrl;
+        String sessionHtml = null;
 
         if (defaultData) {
             filename = "Musterman_Lebenslauf.PDF";
@@ -793,14 +722,33 @@ public class GenerateController {
             sourceUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
                     + "/api/generate/lebenslauf/default-html";
         } else {
-            if (!Files.exists(htmlPath)) {
-                throw new RuntimeException("Lebenslauf HTML file not found. Please generate Lebenslauf first.");
+            sessionHtml = fileOutputService.readLebenslauf(sessionId);
+            if (sessionHtml == null || sessionHtml.isBlank()) {
+                // Fallback: try to generate Lebenslauf HTML from stored CV (biography JSON) in this session
+                String cvText = fileOutputService.getCvText(sessionId);
+                if (cvText != null && !cvText.isBlank()) {
+                    try {
+                        JsonObject biographyJson = gson.fromJson(cvText.trim(), JsonObject.class);
+                        if (biographyJson != null && (biographyJson.has("personalInformation") || biographyJson.has("name"))) {
+                            logger.info("Generating Lebenslauf HTML from stored CV for session (PDF requested without prior generate)");
+                            sessionHtml = lebenslaufTemplateService.generateLebenslauf(sessionId, biographyJson);
+                            fileOutputService.writeLebenslauf(sessionId, sessionHtml);
+                        }
+                    } catch (Exception e) {
+                        logger.debug("Could not generate Lebenslauf from stored CV: {}", e.getMessage());
+                    }
+                }
+                if (sessionHtml == null || sessionHtml.isBlank()) {
+                    throw new RuntimeException("Lebenslauf HTML not found for session. Please generate Lebenslauf first.");
+                }
             }
-            String surname = extractSurnameFromLebenslaufHtml(htmlPath);
+            String surname = extractSurnameFromHtmlContent(sessionHtml);
             filename = surname + "_LebensLauf.PDF";
             outputPdfPath = Paths.get("output", filename).toAbsolutePath();
+            String pdfToken = UUID.randomUUID().toString();
+            PDF_SESSION_TOKENS.put(pdfToken, sessionId);
             sourceUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
-                    + "/api/generate/lebenslauf/html";
+                    + "/api/generate/lebenslauf/html?pdfToken=" + pdfToken;
         }
 
         // Check if PDF needs to be regenerated
@@ -814,18 +762,8 @@ public class GenerateController {
                 if (!Files.exists(outputPdfPath) || Files.size(outputPdfPath) == 0) {
                     needsRegeneration = true;
                     logger.debug("PDF file does not exist or is empty, will regenerate");
-                } else if (!defaultData && Files.exists(htmlPath)) {
-                    // Check if HTML file is newer than PDF
-                    long htmlLastModified = Files.getLastModifiedTime(htmlPath).toMillis();
-                    long pdfLastModified = Files.getLastModifiedTime(outputPdfPath).toMillis();
-                    if (htmlLastModified > pdfLastModified) {
-                        needsRegeneration = true;
-                        logger.info("HTML file is newer than PDF (HTML: {}, PDF: {}), will regenerate PDF", 
-                                new java.util.Date(htmlLastModified), new java.util.Date(pdfLastModified));
-                    } else {
-                        logger.debug("PDF file is up to date (HTML: {}, PDF: {})", 
-                                new java.util.Date(htmlLastModified), new java.util.Date(pdfLastModified));
-                    }
+                } else if (!defaultData) {
+                    needsRegeneration = true;
                 }
             } catch (IOException e) {
                 logger.warn("Error checking file timestamps, will regenerate PDF: {}", e.getMessage());
@@ -839,15 +777,15 @@ public class GenerateController {
             if (useWkhtmltopdfNow) {
                 logger.info("Using wkhtmltopdf (requested or server default)");
                 if (defaultData) {
-                    generated = generateLebenslaufPdfWithWkhtmltopdfDefault(outputPdfPath);
+                    generated = generateLebenslaufPdfWithWkhtmltopdfDefault(outputPdfPath, sessionId);
                 } else {
-                    generated = generateLebenslaufPdfWithWkhtmltopdf(htmlPath, outputPdfPath);
+                    generated = generateLebenslaufPdfWithWkhtmltopdf(sessionHtml, outputPdfPath, sessionId);
                 }
             } else {
                 generated = generateLebenslaufPdfWithChrome(sourceUrl, outputPdfPath);
-                if (!generated && !defaultData && Files.exists(htmlPath)) {
+                if (!generated && !defaultData && sessionHtml != null) {
                     logger.info("Chrome/Chromium not available, trying wkhtmltopdf (lightweight WebKit)");
-                    generated = generateLebenslaufPdfWithWkhtmltopdf(htmlPath, outputPdfPath);
+                    generated = generateLebenslaufPdfWithWkhtmltopdf(sessionHtml, outputPdfPath, sessionId);
                 }
             }
             if (!generated) {
@@ -886,6 +824,12 @@ public class GenerateController {
         }
 
         List<List<String>> commands = Arrays.asList(
+                Arrays.asList(
+                        "/usr/bin/google-chrome", "--headless", "--disable-gpu", "--no-sandbox",
+                        "--print-to-pdf-no-header",
+                        "--print-to-pdf=" + outputPdfPath.toString(),
+                        sourceUrl
+                ),
                 Arrays.asList(
                         "google-chrome", "--headless", "--disable-gpu", "--no-sandbox",
                         "--print-to-pdf-no-header",
@@ -937,25 +881,11 @@ public class GenerateController {
         return false;
     }
 
-    /**
-     * Generates Lebenslauf PDF using wkhtmltopdf (lightweight WebKit, no full browser).
-     * Embeds the same font from resources so no external URLs are needed.
-     */
-    private boolean generateLebenslaufPdfWithWkhtmltopdf(Path htmlPath, Path outputPdfPath) {
-        String html;
-        try {
-            html = Files.readString(htmlPath, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            logger.warn("Failed to read HTML for wkhtmltopdf: {}", e.getMessage());
-            return false;
-        }
-        return runWkhtmltopdf(html, outputPdfPath);
+    private boolean generateLebenslaufPdfWithWkhtmltopdf(String htmlContent, Path outputPdfPath, String sessionId) {
+        return runWkhtmltopdf(htmlContent, outputPdfPath, sessionId);
     }
 
-    /**
-     * Generates default (Mustermann) Lebenslauf PDF via wkhtmltopdf when useWkhtmltopdf=true and defaultData=true.
-     */
-    private boolean generateLebenslaufPdfWithWkhtmltopdfDefault(Path outputPdfPath) {
+    private boolean generateLebenslaufPdfWithWkhtmltopdfDefault(Path outputPdfPath, String sessionId) {
         try {
             ClassPathResource resource = new ClassPathResource("lebenslauf-filled.html");
             if (!resource.exists()) {
@@ -964,14 +894,14 @@ public class GenerateController {
             }
             String html = new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
             html = html.replace("src=\"static/", "src=\"/static/");
-            return runWkhtmltopdf(html, outputPdfPath);
+            return runWkhtmltopdf(html, outputPdfPath, sessionId);
         } catch (IOException e) {
             logger.warn("Failed to load default HTML for wkhtmltopdf: {}", e.getMessage());
             return false;
         }
     }
 
-    private boolean runWkhtmltopdf(String html, Path outputPdfPath) {
+    private boolean runWkhtmltopdf(String html, Path outputPdfPath, String sessionId) {
         try {
             Path parent = outputPdfPath.getParent();
             if (parent != null) {
@@ -993,7 +923,7 @@ public class GenerateController {
             logger.debug("Could not embed font for wkhtmltopdf: {}", e.getMessage());
         }
 
-        html = embedPhotoAsDataUriForWkhtmltopdf(html);
+        html = embedPhotoAsDataUriForWkhtmltopdf(html, sessionId);
         html = replaceCssVariablesForWkhtmltopdf(html);
         html = injectWkhtmltopdfLayoutFallback(html);
 
@@ -1044,8 +974,10 @@ public class GenerateController {
      * Embeds the CV photo as a data URI only when the user has uploaded one.
      * If no photo is uploaded, the image is removed so the PDF shows empty space (no broken image).
      */
-    private String embedPhotoAsDataUri(String html) {
-        String dataUri = tempPhotoStorageService.getCurrentPhotoDataUri().orElse("");
+    private String embedPhotoAsDataUri(String html, String sessionId) {
+        String dataUri = sessionId != null && !sessionId.isBlank()
+                ? tempPhotoStorageService.getCurrentPhotoDataUri(sessionId).orElse("")
+                : "";
         if (dataUri == null || dataUri.isEmpty()) {
             // No photo uploaded — remove img so we get empty place (no broken image)
             html = html.replaceFirst("\\s*<img\\s+[^>]*src=\"[^\"]*\"[^>]*/?>", " ");
@@ -1068,8 +1000,8 @@ public class GenerateController {
         return html;
     }
 
-    private String embedPhotoAsDataUriForWkhtmltopdf(String html) {
-        return embedPhotoAsDataUri(html);
+    private String embedPhotoAsDataUriForWkhtmltopdf(String html, String sessionId) {
+        return embedPhotoAsDataUri(html, sessionId);
     }
 
     /** Replace CSS variables with fixed values so old WebKit (wkhtmltopdf) doesn't ignore rules. */
@@ -1124,23 +1056,14 @@ public class GenerateController {
         return html.substring(0, startStyle + 7) + styleContent + css + html.substring(endStyle);
     }
 
-    private String extractSurnameFromLebenslaufHtml(Path htmlPath) {
-        try {
-            String html = Files.readString(htmlPath, StandardCharsets.UTF_8);
-            String fullName = extractFullName(html);
-
-            if (fullName == null || fullName.isBlank()) {
-                return "LEBENSLAUF";
-            }
-
-            String[] parts = fullName.trim().split("\\s+");
-            String rawSurname = parts[parts.length - 1];
-            String sanitized = sanitizeFilenamePart(rawSurname);
-            return sanitized.isBlank() ? "LEBENSLAUF" : sanitized.toUpperCase(Locale.ROOT);
-        } catch (IOException e) {
-            logger.warn("Failed to extract surname from lebenslauf HTML {}", htmlPath, e);
-            return "LEBENSLAUF";
-        }
+    private String extractSurnameFromHtmlContent(String html) {
+        if (html == null || html.isBlank()) return "LEBENSLAUF";
+        String fullName = extractFullName(html);
+        if (fullName == null || fullName.isBlank()) return "LEBENSLAUF";
+        String[] parts = fullName.trim().split("\\s+");
+        String rawSurname = parts[parts.length - 1];
+        String sanitized = sanitizeFilenamePart(rawSurname);
+        return sanitized.isBlank() ? "LEBENSLAUF" : sanitized.toUpperCase(Locale.ROOT);
     }
 
     private String extractFullName(String html) {

@@ -1,4 +1,23 @@
 {
-    "java.compile.nullAnalysis.mode": "automatic",
-    "java.configuration.updateBuildConfiguration": "interactive"
+  "java.compile.nullAnalysis.mode": "automatic",
+  "java.configuration.updateBuildConfiguration": "interactive",
+  "sqltools.useNodeRuntime": true,
+  "sqltools.connections": [
+    {
+      "name": "BewerbungDB_Connection",
+      "driver": "Oracle",
+      "connectionMethod": "Connection String",
+      "connectString": "bewrbungdb_high",
+      "username": "ADMIN",
+      "askForPassword": true,
+      "oracleOptions": {
+        "privilege": "Normal",
+        "thickMode": false,
+        "autoCommit": false,
+        "lowerCase": false,
+        "limitPrefetchRows": false
+      },
+      "previewLimit": 50
+    }
+  ]
 }

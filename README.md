@@ -1,4 +1,4 @@
-# Bewerbung AI
+# Bewerbung
 Share:
 https://bit.ly/4t7TusE   -  instagram 
 https://bit.ly/3MeXt6d   - youtube
@@ -12,7 +12,7 @@ https://bit.ly/3MeXt6d   - youtube
 
 ### Overview
 
-Bewerbung AI is a Spring Boot application that uses OpenAI's GPT models to automatically generate German job application documents (Bewerbung). The application analyzes job postings and candidate biographies to create personalized cover letters (Anschreiben) following German DIN 5008 standards.
+Bewerbung is a Spring Boot application that uses OpenAI's GPT models to automatically generate German job application documents (Bewerbung). The application analyzes job postings and candidate biographies to create personalized cover letters (Anschreiben) following German DIN 5008 standards.
 
 ### Features
 
@@ -120,7 +120,7 @@ The application uses HTTP API for email sending (no SMTP required!). Supported p
 EMAIL_API_PROVIDER=brevo
 EMAIL_API_KEY=your-brevo-api-key
 EMAIL_FROM_ADDRESS=your-email@example.com
-EMAIL_FROM_NAME=Bewerbung AI
+EMAIL_FROM_NAME=Bewerbung
 REVIEW_EMAIL_RECIPIENT=recipient@example.com
 REVIEW_EMAIL_ENABLED=true
 ```
@@ -148,6 +148,35 @@ REVIEW_EMAIL_RECIPIENT=recipient@example.com
 - ✅ Better logging and error handling
 - ✅ No authentication issues
 - ✅ Works in all production environments
+
+#### Oracle Always Free Autonomous Database (optional)
+
+To use Oracle Autonomous DB (e.g. on a VM or locally), activate the `oracle` profile and set environment variables.
+
+**On server (e.g. VM 130.162.224.203):**
+1. Unzip wallet to `/opt/oracle/wallet` and set permissions (see your setup notes).
+2. Set environment variables (or add to `variables.env`):
+```bash
+export TNS_ADMIN=/opt/oracle/wallet
+export ORACLE_JDBC_URL=jdbc:oracle:thin:@myfreeappdb_high
+export ORACLE_USER=your_schema_user
+export ORACLE_PASSWORD=your_password
+export SPRING_PROFILES_ACTIVE=oracle
+```
+3. Run the app; DB health: **GET** `/api/db/health`.
+
+**Locally:**
+1. Unzip the wallet (e.g. to `./wallet` or `~/Downloads/Wallet_MYFREEAPPDB`).
+2. Set in `variables.env` or in env:
+```bash
+TNS_ADMIN=/path/to/unzipped/wallet
+ORACLE_JDBC_URL=jdbc:oracle:thin:@myfreeappdb_high
+ORACLE_USER=your_user
+ORACLE_PASSWORD=your_password
+```
+3. Run with profile: `mvn spring-boot:run -Dspring.profiles.active=oracle` or set `SPRING_PROFILES_ACTIVE=oracle`.
+
+Use the TNS name from your wallet’s `tnsnames.ora` (e.g. `myfreeappdb_high`, `myfreeappdb_medium`, `myfreeappdb_low`). If Oracle is not configured, the app runs as before without a database.
 
 ### Project Structure
 
@@ -191,7 +220,7 @@ mvn test
 
 ### Обзор
 
-Bewerbung AI — это Spring Boot приложение, которое использует модели GPT от OpenAI для автоматической генерации немецких документов для трудоустройства (Bewerbung). Приложение анализирует вакансии и биографии кандидатов для создания персонализированных сопроводительных писем (Anschreiben) в соответствии с немецкими стандартами DIN 5008.
+Bewerbung — это Spring Boot приложение, которое использует модели GPT от OpenAI для автоматической генерации немецких документов для трудоустройства (Bewerbung). Приложение анализирует вакансии и биографии кандидатов для создания персонализированных сопроводительных писем (Anschreiben) в соответствии с немецкими стандартами DIN 5008.
 
 ### Возможности
 
@@ -299,7 +328,7 @@ mvn spring-boot:run
 EMAIL_API_PROVIDER=brevo
 EMAIL_API_KEY=ваш-brevo-api-ключ
 EMAIL_FROM_ADDRESS=ваш-email@example.com
-EMAIL_FROM_NAME=Bewerbung AI
+EMAIL_FROM_NAME=Bewerbung
 REVIEW_EMAIL_RECIPIENT=получатель@example.com
 REVIEW_EMAIL_ENABLED=true
 ```
@@ -327,6 +356,35 @@ REVIEW_EMAIL_RECIPIENT=получатель@example.com
 - ✅ Лучшее логирование и обработка ошибок
 - ✅ Нет проблем с аутентификацией
 - ✅ Работает во всех продакшен окружениях
+
+#### Oracle Always Free Autonomous Database (опционально)
+
+Чтобы использовать Oracle Autonomous DB (на VM или локально), активируйте профиль `oracle` и задайте переменные окружения.
+
+**На сервере (например VM 130.162.224.203):**
+1. Распакуйте wallet в `/opt/oracle/wallet` и настройте права.
+2. Задайте переменные (или в `variables.env`):
+```bash
+export TNS_ADMIN=/opt/oracle/wallet
+export ORACLE_JDBC_URL=jdbc:oracle:thin:@myfreeappdb_high
+export ORACLE_USER=ваш_пользователь
+export ORACLE_PASSWORD=ваш_пароль
+export SPRING_PROFILES_ACTIVE=oracle
+```
+3. Запустите приложение; проверка БД: **GET** `/api/db/health`.
+
+**Локально:**
+1. Распакуйте wallet (например в `./wallet`).
+2. В `variables.env` или в окружении:
+```bash
+TNS_ADMIN=/путь/к/wallet
+ORACLE_JDBC_URL=jdbc:oracle:thin:@myfreeappdb_high
+ORACLE_USER=ваш_user
+ORACLE_PASSWORD=ваш_пароль
+```
+3. Запуск с профилем: `mvn spring-boot:run -Dspring.profiles.active=oracle` или `SPRING_PROFILES_ACTIVE=oracle`.
+
+Имя TNS возьмите из `tnsnames.ora` в wallet (например `myfreeappdb_high`). Если Oracle не настроен, приложение работает как раньше без БД.
 
 ### Структура проекта
 

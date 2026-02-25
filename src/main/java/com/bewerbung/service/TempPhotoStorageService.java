@@ -6,9 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.Base64;
 import java.util.Locale;
 import java.util.Optional;
@@ -20,30 +17,23 @@ public class TempPhotoStorageService {
     private static final Logger logger = LoggerFactory.getLogger(TempPhotoStorageService.class);
     private static final long MAX_FILE_SIZE_BYTES = 5L * 1024 * 1024;
 
-    private final Path tempDir;
-    private volatile Path currentPhotoPath;
-    private volatile String currentPhotoMimeType;
+    private final SessionStorageService sessionStorage;
 
-    public TempPhotoStorageService() {
-        this.tempDir = Path.of(System.getProperty("java.io.tmpdir"), "bewerbung-ai", "photos");
+    public TempPhotoStorageService(SessionStorageService sessionStorage) {
+        this.sessionStorage = sessionStorage;
     }
 
-    public synchronized String saveTemporaryPhoto(MultipartFile photo) {
+    public String saveTemporaryPhoto(String sessionId, MultipartFile photo) {
         validatePhoto(photo);
-
+        if (sessionId == null || sessionId.isBlank()) {
+            throw new IllegalArgumentException("Session ID is required for photo upload");
+        }
         try {
-            Files.createDirectories(tempDir);
-            cleanupCurrentPhoto();
-
-            String extension = resolveExtension(photo.getOriginalFilename());
-            String fileName = "cv-photo-" + UUID.randomUUID() + extension;
-            Path targetPath = tempDir.resolve(fileName);
-
-            Files.copy(photo.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-            currentPhotoPath = targetPath;
-            currentPhotoMimeType = normalizeMimeType(photo.getContentType());
-
-            logger.info("Temporary CV photo uploaded: {}", targetPath);
+            byte[] bytes = photo.getInputStream().readAllBytes();
+            String mimeType = normalizeMimeType(photo.getContentType());
+            sessionStorage.setPhoto(sessionId, bytes, mimeType);
+            String fileName = "cv-photo-" + UUID.randomUUID() + resolveExtension(photo.getOriginalFilename());
+            logger.info("CV photo saved for session");
             return fileName;
         } catch (IOException e) {
             logger.error("Failed to store temporary CV photo", e);
@@ -51,31 +41,25 @@ public class TempPhotoStorageService {
         }
     }
 
-    public synchronized Optional<String> getCurrentPhotoDataUri() {
-        if (currentPhotoPath == null || !Files.exists(currentPhotoPath)) {
+    public Optional<String> getCurrentPhotoDataUri(String sessionId) {
+        if (sessionId == null || sessionId.isBlank()) {
             return Optional.empty();
         }
-
-        try {
-            byte[] bytes = Files.readAllBytes(currentPhotoPath);
-            String mimeType = currentPhotoMimeType != null ? currentPhotoMimeType : "image/jpeg";
-            String encoded = Base64.getEncoder().encodeToString(bytes);
-            return Optional.of("data:" + mimeType + ";base64," + encoded);
-        } catch (IOException e) {
-            logger.warn("Failed to read temporary CV photo from {}", currentPhotoPath, e);
-            return Optional.empty();
-        }
+        return sessionStorage.getPhoto(sessionId)
+                .map(photo -> {
+                    String encoded = Base64.getEncoder().encodeToString(photo.getBytes());
+                    String mime = photo.getMimeType() != null ? photo.getMimeType() : "image/jpeg";
+                    return "data:" + mime + ";base64," + encoded;
+                });
     }
 
     private void validatePhoto(MultipartFile photo) {
         if (photo == null || photo.isEmpty()) {
             throw new IllegalArgumentException("Photo file must not be empty");
         }
-
         if (photo.getSize() > MAX_FILE_SIZE_BYTES) {
             throw new IllegalArgumentException("Photo file is too large (max 5 MB)");
         }
-
         String contentType = normalizeMimeType(photo.getContentType());
         if (!contentType.startsWith("image/")) {
             throw new IllegalArgumentException("Only image files are allowed");
@@ -87,17 +71,6 @@ public class TempPhotoStorageService {
             return "image/jpeg";
         }
         return contentType.toLowerCase(Locale.ROOT);
-    }
-
-    private void cleanupCurrentPhoto() {
-        if (currentPhotoPath == null) {
-            return;
-        }
-        try {
-            Files.deleteIfExists(currentPhotoPath);
-        } catch (IOException e) {
-            logger.warn("Failed to delete previous temporary CV photo: {}", currentPhotoPath, e);
-        }
     }
 
     private String resolveExtension(String originalFilename) {

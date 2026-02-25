@@ -19,15 +19,13 @@ public class FileOutputService {
 
     private static final Logger logger = LoggerFactory.getLogger(FileOutputService.class);
     private static final String OUTPUT_DIR = "output";
-    private static final String ANALYSIS_FILE = "output/analysis.md";
-    private static final String ANSCHREIBEN_FILE = "output/anschreiben.md";
-    private static final String LEBENSLAUF_FILE = "output/lebenslauf-filled.html";
-    private static final String NOTES_FILE = "output/notes.json";
     
     private final Gson gson;
+    private final SessionStorageService sessionStorage;
 
-    public FileOutputService() {
+    public FileOutputService(SessionStorageService sessionStorage) {
         this.gson = new Gson();
+        this.sessionStorage = sessionStorage;
         ensureDirectoriesExist();
     }
 
@@ -39,7 +37,7 @@ public class FileOutputService {
         }
     }
 
-    public void writeAnalysis(JobRequirements requirements) {
+    public void writeAnalysis(String sessionId, JobRequirements requirements) {
         try {
             StringBuilder analysis = new StringBuilder();
             analysis.append("# Job Requirements Analysis\n\n");
@@ -48,141 +46,144 @@ public class FileOutputService {
             analysis.append("**Location:** ").append(requirements.getLocation()).append("\n\n");
             analysis.append("**Education:** ").append(requirements.getEducation()).append("\n\n");
             analysis.append("**Experience:** ").append(requirements.getExperience()).append("\n\n");
-            
             analysis.append("**Required Skills:**\n");
             for (String skill : requirements.getRequiredSkills()) {
                 analysis.append("- ").append(skill).append("\n");
             }
-            analysis.append("\n");
-            
-            analysis.append("**Preferred Skills:**\n");
+            analysis.append("\n**Preferred Skills:**\n");
             for (String skill : requirements.getPreferredSkills()) {
                 analysis.append("- ").append(skill).append("\n");
             }
-            analysis.append("\n");
-            
-            analysis.append("**Languages:**\n");
+            analysis.append("\n**Languages:**\n");
             for (String language : requirements.getLanguages()) {
                 analysis.append("- ").append(language).append("\n");
             }
-            
-            Files.write(Paths.get(ANALYSIS_FILE), analysis.toString().getBytes(StandardCharsets.UTF_8));
-            logger.info("Analysis written to: {}", ANALYSIS_FILE);
+            String content = analysis.toString();
+            if (sessionId != null && !sessionId.isBlank()) {
+                sessionStorage.setAnalysisMd(sessionId, content);
+            } else {
+                Files.write(Paths.get(OUTPUT_DIR, "analysis.md"), content.getBytes(StandardCharsets.UTF_8));
+            }
+            logger.info("Analysis written for session");
         } catch (IOException e) {
             logger.error("Failed to write analysis", e);
             throw new RuntimeException("Failed to write analysis", e);
         }
     }
 
-    public void writeAnschreiben(String anschreiben) {
-        writeAnschreiben(anschreiben, ANSCHREIBEN_FILE);
-    }
-    
-    public void writeAnschreiben(String anschreiben, String filePath) {
+    public void writeAnschreiben(String sessionId, String anschreiben) {
+        if (anschreiben == null || anschreiben.trim().isEmpty()) {
+            logger.warn("Anschreiben is null or empty, skipping write");
+            return;
+        }
+        if (sessionId != null && !sessionId.isBlank()) {
+            sessionStorage.setAnschreibenMd(sessionId, anschreiben);
+            logger.info("Anschreiben written to session storage ({} chars)", anschreiben.length());
+            return;
+        }
         try {
-            if (anschreiben == null || anschreiben.trim().isEmpty()) {
-                logger.warn("Anschreiben is null or empty, skipping write");
-                return;
-            }
-            
-            java.nio.file.Path path = Paths.get(filePath).toAbsolutePath();
-            logger.info("Writing anschreiben to: {} (length: {} chars)", path, anschreiben.length());
-            
-            // Ensure parent directory exists
-            Files.createDirectories(path.getParent());
-            
-            Files.write(path, anschreiben.getBytes(StandardCharsets.UTF_8));
-            
-            // Verify file was written
-            if (Files.exists(path)) {
-                long fileSize = Files.size(path);
-                logger.info("Anschreiben successfully written to: {} ({} bytes)", path, fileSize);
-            } else {
-                logger.error("File was not created: {}", path);
-                throw new RuntimeException("File was not created: " + path);
-            }
+            Files.createDirectories(Paths.get(OUTPUT_DIR));
+            Files.write(Paths.get(OUTPUT_DIR, "anschreiben.md"), anschreiben.getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
-            logger.error("Failed to write anschreiben to: {}", filePath, e);
             throw new RuntimeException("Failed to write anschreiben", e);
         }
     }
-    
-    public String readAnschreiben(String filePath) {
+
+    public void writeAnschreiben(String sessionId, String anschreiben, String filePath) {
+        if (anschreiben == null || anschreiben.trim().isEmpty()) {
+            logger.warn("Anschreiben is null or empty, skipping write");
+            return;
+        }
+        if (sessionId != null && !sessionId.isBlank()) {
+            sessionStorage.setAnschreibenMd(sessionId, anschreiben);
+            if (filePath != null && filePath.contains("data")) {
+                sessionStorage.setAnschreibenPath(sessionId, filePath);
+            }
+            logger.info("Anschreiben written to session storage ({} chars)", anschreiben.length());
+            return;
+        }
         try {
             java.nio.file.Path path = Paths.get(filePath).toAbsolutePath();
-            
-            if (!Files.exists(path)) {
-                logger.warn("Anschreiben file does not exist: {}", path);
-                return null;
-            }
-            
-            String content = Files.readString(path, StandardCharsets.UTF_8);
-            logger.info("Successfully read anschreiben from: {} ({} chars)", path, content.length());
-            return content;
+            Files.createDirectories(path.getParent());
+            Files.write(path, anschreiben.getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to write anschreiben", e);
+        }
+    }
+
+    public String readAnschreiben(String sessionId) {
+        if (sessionId != null && !sessionId.isBlank()) {
+            return sessionStorage.getAnschreibenMd(sessionId);
+        }
+        return null;
+    }
+
+    public String readAnschreiben(String sessionId, String filePath) {
+        if (sessionId != null && !sessionId.isBlank()) {
+            String fromStorage = sessionStorage.getAnschreibenMd(sessionId);
+            if (fromStorage != null) return fromStorage;
+        }
+        try {
+            java.nio.file.Path path = Paths.get(filePath).toAbsolutePath();
+            if (!Files.exists(path)) return null;
+            return Files.readString(path, StandardCharsets.UTF_8);
         } catch (IOException e) {
             logger.error("Failed to read anschreiben from: {}", filePath, e);
             return null;
         }
     }
-    
-    public void writeLebenslauf(String lebenslaufHtml) {
-        writeLebenslauf(lebenslaufHtml, LEBENSLAUF_FILE);
-    }
-    
-    public void writeLebenslauf(String lebenslaufHtml, String filePath) {
+
+    public void writeLebenslauf(String sessionId, String lebenslaufHtml) {
+        if (lebenslaufHtml == null || lebenslaufHtml.trim().isEmpty()) {
+            logger.warn("Lebenslauf HTML is null or empty, skipping write");
+            return;
+        }
+        if (sessionId != null && !sessionId.isBlank()) {
+            sessionStorage.setLebenslaufHtml(sessionId, lebenslaufHtml);
+            logger.info("Lebenslauf written to session storage ({} chars)", lebenslaufHtml.length());
+            return;
+        }
         try {
-            if (lebenslaufHtml == null || lebenslaufHtml.trim().isEmpty()) {
-                logger.warn("Lebenslauf HTML is null or empty, skipping write");
-                return;
-            }
-            
-            java.nio.file.Path path = Paths.get(filePath).toAbsolutePath();
-            logger.info("Writing lebenslauf to: {} (length: {} chars)", path, lebenslaufHtml.length());
-            
-            // Ensure parent directory exists
-            java.nio.file.Path parentDir = path.getParent();
-            if (parentDir != null) {
-                Files.createDirectories(parentDir);
-                logger.debug("Parent directory ensured: {}", parentDir);
-            }
-            
-            logger.debug("Writing {} bytes to file: {}", lebenslaufHtml.getBytes(StandardCharsets.UTF_8).length, path);
-            Files.write(path, lebenslaufHtml.getBytes(StandardCharsets.UTF_8));
-            logger.debug("File write operation completed");
-            
-            // Verify file was written
-            if (Files.exists(path)) {
-                long fileSize = Files.size(path);
-                logger.info("Lebenslauf successfully written to: {} ({} bytes)", path, fileSize);
-                
-                // Log first 200 chars for debugging
-                if (fileSize > 0 && lebenslaufHtml.length() > 0) {
-                    String preview = lebenslaufHtml.length() > 200 ? lebenslaufHtml.substring(0, 200) + "..." : lebenslaufHtml;
-                    logger.debug("File content preview: {}", preview.replace("\n", "\\n").replace("\r", ""));
-                }
-            } else {
-                logger.error("File was not created: {}", path);
-                throw new RuntimeException("File was not created: " + path);
-            }
+            Files.createDirectories(Paths.get(OUTPUT_DIR));
+            Files.write(Paths.get(OUTPUT_DIR, "lebenslauf-filled.html"), lebenslaufHtml.getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
-            logger.error("Failed to write lebenslauf to: {}", filePath, e);
-            throw new RuntimeException("Failed to write lebenslauf: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to write lebenslauf", e);
         }
     }
 
-    public void writeNotes(String changeDescription, boolean vacancyChanged, boolean cvChanged) {
+    /** Returns CV/biography text stored for the session (e.g. JSON), or null. */
+    public String getCvText(String sessionId) {
+        if (sessionId == null || sessionId.isBlank()) return null;
+        return sessionStorage.getCv(sessionId);
+    }
+
+    public String readLebenslauf(String sessionId) {
+        if (sessionId != null && !sessionId.isBlank()) {
+            return sessionStorage.getLebenslaufHtml(sessionId);
+        }
+        try {
+            java.nio.file.Path path = Paths.get(OUTPUT_DIR, "lebenslauf-filled.html");
+            if (!Files.exists(path)) return null;
+            return Files.readString(path, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    public void writeNotes(String sessionId, String changeDescription, boolean vacancyChanged, boolean cvChanged) {
         try {
             JsonObject notes = new JsonObject();
             notes.addProperty("lastProcessed", Instant.now().toString());
             notes.addProperty("changeDescription", changeDescription);
             notes.addProperty("vacancyChanged", vacancyChanged);
             notes.addProperty("cvChanged", cvChanged);
-            notes.addProperty("analysisFile", ANALYSIS_FILE);
-            notes.addProperty("anschreibenFile", ANSCHREIBEN_FILE);
-            
             String json = gson.toJson(notes);
-            Files.write(Paths.get(NOTES_FILE), json.getBytes(StandardCharsets.UTF_8));
-            logger.info("Notes written to: {}", NOTES_FILE);
+            if (sessionId != null && !sessionId.isBlank()) {
+                sessionStorage.setNotesJson(sessionId, json);
+            } else {
+                Files.write(Paths.get(OUTPUT_DIR, "notes.json"), json.getBytes(StandardCharsets.UTF_8));
+            }
+            logger.info("Notes written for session");
         } catch (IOException e) {
             logger.error("Failed to write notes", e);
             throw new RuntimeException("Failed to write notes", e);

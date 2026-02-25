@@ -10,7 +10,7 @@ public class BewerbungController {
 
     @GetMapping("/health")
     public String health() {
-        return "Bewerbung AI Service is running";
+        return "Bewerbung Service is running";
     }
 }
 

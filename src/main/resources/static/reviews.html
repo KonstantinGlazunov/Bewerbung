@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bewertungen - Bewerbung AI | Feedback & Reviews</title>
-    <meta name="description" content="Teilen Sie Ihre Erfahrungen mit Bewerbung AI. Ihr Feedback hilft uns, den Service zu verbessern. Bewertungen und Erfahrungsberichte von Nutzern.">
-    <meta name="keywords" content="Bewerbung AI Bewertungen, Feedback, Reviews, Erfahrungen, Nutzerbewertungen">
-    <meta name="author" content="Bewerbung AI">
+    <title>Bewertungen - Bewerbung | Feedback & Reviews</title>
+    <meta name="description" content="Teilen Sie Ihre Erfahrungen mit Bewerbung. Ihr Feedback hilft uns, den Service zu verbessern. Bewertungen und Erfahrungsberichte von Nutzern.">
+    <meta name="keywords" content="Bewerbung Bewertungen, Feedback, Reviews, Erfahrungen, Nutzerbewertungen">
+    <meta name="author" content="Bewerbung">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="http://130.162.224.203:8080/reviews.html">
     
@@ -41,13 +41,13 @@
     {
       "@context": "https://schema.org",
       "@type": "WebPage",
-      "name": "Bewertungen - Bewerbung AI",
-      "description": "Bewertungen und Feedback von Nutzern des Bewerbung AI Services",
+      "name": "Bewertungen - Bewerbung",
+      "description": "Bewertungen und Feedback von Nutzern des Bewerbung Services",
       "url": "http://130.162.224.203:8080/reviews.html",
       "inLanguage": ["de", "ru", "en"],
       "isPartOf": {
         "@type": "WebSite",
-        "name": "Bewerbung AI",
+        "name": "Bewerbung",
         "url": "http://130.162.224.203:8080/"
       }
     }
@@ -56,19 +56,19 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="http://130.162.224.203:8080/reviews.html">
-    <meta property="og:title" content="Bewertungen - Bewerbung AI | Feedback & Reviews">
-    <meta property="og:description" content="Teilen Sie Ihre Erfahrungen mit Bewerbung AI. Ihr Feedback hilft uns, den Service zu verbessern.">
+    <meta property="og:title" content="Bewertungen - Bewerbung | Feedback & Reviews">
+    <meta property="og:description" content="Teilen Sie Ihre Erfahrungen mit Bewerbung. Ihr Feedback hilft uns, den Service zu verbessern.">
     <meta property="og:image" content="http://130.162.224.203:8080/author-photo.jpg">
     <meta property="og:image:secure_url" content="http://130.162.224.203:8080/author-photo.jpg">
-    <meta property="og:site_name" content="Bewerbung AI">
+    <meta property="og:site_name" content="Bewerbung">
     <meta property="og:locale" content="de_DE">
     <meta property="og:locale:alternate" content="ru_RU">
     <meta property="og:locale:alternate" content="en_US">
     
     <!-- Twitter Cards -->
     <meta name="twitter:card" content="summary">
-    <meta name="twitter:title" content="Bewertungen - Bewerbung AI">
-    <meta name="twitter:description" content="Teilen Sie Ihre Erfahrungen mit Bewerbung AI. Ihr Feedback hilft uns, den Service zu verbessern.">
+    <meta name="twitter:title" content="Bewertungen - Bewerbung">
+    <meta name="twitter:description" content="Teilen Sie Ihre Erfahrungen mit Bewerbung. Ihr Feedback hilft uns, den Service zu verbessern.">
     <meta name="twitter:image" content="http://130.162.224.203:8080/author-photo.jpg">
     <script>
         window.tailwind = window.tailwind || {};
@@ -308,7 +308,7 @@
         <main>
         <div id="reviewSection" class="mt-6">
             <div class="flex items-center gap-4 mb-5">
-                <img id="authorPhoto" src="/author-photo.jpg" alt="Konstantin - Bewerbung AI Autor" class="w-16 h-16 rounded-full object-cover border-2 border-slate-200 dark:border-slate-700" onerror="this.style.display='none'">
+                <img id="authorPhoto" src="/author-photo.jpg" alt="Konstantin - Bewerbung Autor" class="w-16 h-16 rounded-full object-cover border-2 border-slate-200 dark:border-slate-700" onerror="this.style.display='none'">
                 <p class="text-sm text-slate-600 dark:text-slate-300" data-i18n="reviewPrompt">Друзья, черкните мне пару строк пожалуйста )))<br>Константин</p>
             </div>
 
@@ -318,6 +318,12 @@
                     <textarea id="reviewText" name="review" required class="min-h-[180px] w-full resize-y rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 dark:focus:border-blue-400 dark:focus:ring-blue-900"></textarea>
                     <p id="reviewError" class="hidden text-sm text-red-600 dark:text-red-300" data-i18n="reviewError">Bitte schreiben Sie eine Bewertung.</p>
                 </div>
+
+                <div id="consentFeedbackBlock" class="flex items-start gap-3 rounded-xl border border-slate-200 bg-slate-50/60 px-4 py-3 dark:border-slate-700 dark:bg-slate-900/40">
+                    <input type="checkbox" id="consentFeedbackCheckbox" name="consentFeedback" class="mt-1 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 dark:border-slate-600 dark:bg-slate-800 dark:checked:bg-blue-600" aria-describedby="consentFeedbackErrorMsg" />
+                    <label for="consentFeedbackCheckbox" class="text-sm text-slate-700 dark:text-slate-300 cursor-pointer leading-relaxed" id="consentFeedbackLabel" data-i18n="consentFeedbackLabel">Ich habe die <a href="/datenschutz.html" class="text-blue-600 dark:text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">Datenschutzerklärung</a> gelesen und stimme der Verarbeitung meiner Daten für dieses Feedback zu.</label>
+                </div>
+                <p id="consentFeedbackErrorMsg" class="hidden text-sm text-red-600 dark:text-red-300" data-i18n="consentFeedbackError">Bitte akzeptieren Sie die Verarbeitung Ihrer Daten für das Feedback.</p>
 
                 <button type="submit" class="w-full rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 dark:bg-blue-500 dark:hover:bg-blue-600" data-i18n="submitButton">Senden</button>
             </form>
@@ -332,7 +338,7 @@
 
         <div id="thankYouSection" class="hidden mt-6">
             <div class="flex items-center gap-4 mb-5">
-                <img id="authorPhotoThankYou" src="/author-photo.jpg" alt="Konstantin - Bewerbung AI Autor" class="w-16 h-16 rounded-full object-cover border-2 border-slate-200 dark:border-slate-700" onerror="this.style.display='none'">
+                <img id="authorPhotoThankYou" src="/author-photo.jpg" alt="Konstantin - Bewerbung Autor" class="w-16 h-16 rounded-full object-cover border-2 border-slate-200 dark:border-slate-700" onerror="this.style.display='none'">
                 <div class="text-left">
                     <p class="text-lg font-medium text-slate-900 dark:text-slate-100 mb-1" data-i18n="thankYouTitle">Спасибо!</p>
                     <p class="text-lg font-medium text-slate-900 dark:text-slate-100" data-i18n="thankYouMessage">Ваш отзыв был отправлен.</p>
@@ -381,7 +387,7 @@
                 <span class="hidden sm:inline">|</span>
                 <a href="/faq.html" class="text-blue-600 dark:text-blue-400 hover:underline" data-i18n="faqLink">Häufig gestellte Fragen (FAQ)</a>
             </div>
-            <p class="mt-4 text-xs text-slate-400 dark:text-slate-500">© 2024 Bewerbung AI. Alle Rechte vorbehalten.</p>
+            <p class="mt-4 text-xs text-slate-400 dark:text-slate-500">© 2024 Bewerbung. Alle Rechte vorbehalten.</p>
         </footer>
     </div>
 
@@ -460,6 +466,8 @@
                     impressumLink: 'Impressum',
                     faqLink: 'Häufig gestellte Fragen (FAQ)',
                     voluntaryDataNotice: 'Die Angabe personenbezogener Daten im Feedback erfolgt freiwillig.<br>Bitte teilen Sie nur solche Informationen mit, die Sie bewusst übermitteln möchten.',
+                    consentFeedbackLabel: 'Ich habe die <a href="/datenschutz.html" class="text-blue-600 dark:text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">Datenschutzerklärung</a> gelesen und stimme der Verarbeitung meiner Daten für dieses Feedback zu.',
+                    consentFeedbackError: 'Bitte akzeptieren Sie die Verarbeitung Ihrer Daten für das Feedback.',
                     whatsappShareTitle: 'In WhatsApp teilen',
                     facebookShareTitle: 'In Facebook teilen',
                     linkedinShareTitle: 'In LinkedIn teilen',
@@ -487,6 +495,8 @@
                     impressumLink: 'Выходные данные',
                     faqLink: 'Часто задаваемые вопросы (FAQ)',
                     voluntaryDataNotice: 'Указание персональных данных в отзыве является добровольным.<br>Пожалуйста, делитесь только той информацией, которую вы сознательно хотите передать.',
+                    consentFeedbackLabel: 'Я прочитал(а) <a href="/datenschutz.html" class="text-blue-600 dark:text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">Политику конфиденциальности</a> и согласен(на) с обработкой моих данных для этого отзыва.',
+                    consentFeedbackError: 'Пожалуйста, примите условия обработки данных для отправки отзыва.',
                     whatsappShareTitle: 'Поделиться в WhatsApp',
                     facebookShareTitle: 'Поделиться в Facebook',
                     linkedinShareTitle: 'Поделиться в LinkedIn',
@@ -514,6 +524,8 @@
                     impressumLink: 'Imprint',
                     faqLink: 'Frequently Asked Questions (FAQ)',
                     voluntaryDataNotice: 'The provision of personal data in feedback is voluntary.<br>Please only share information that you consciously wish to transmit.',
+                    consentFeedbackLabel: 'I have read the <a href="/datenschutz.html" class="text-blue-600 dark:text-blue-400 hover:underline" target="_blank" rel="noopener noreferrer">Privacy Policy</a> and agree to the processing of my data for this feedback.',
+                    consentFeedbackError: 'Please accept the data processing to submit feedback.',
                     whatsappShareTitle: 'Share on WhatsApp',
                     facebookShareTitle: 'Share on Facebook',
                     linkedinShareTitle: 'Share on LinkedIn',
@@ -568,7 +580,7 @@
                     const text = translate(key, lang);
                     if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
                         element.placeholder = text;
-                    } else if (key === 'reviewPrompt' || key === 'thankYouMessage' || key === 'sharePrompt' || key === 'voluntaryDataNotice') {
+                    } else if (key === 'reviewPrompt' || key === 'thankYouMessage' || key === 'sharePrompt' || key === 'voluntaryDataNotice' || key === 'consentFeedbackLabel') {
                         element.innerHTML = text;
                     } else {
                         element.textContent = text;
@@ -774,8 +786,22 @@
             }
         }
 
+        const consentFeedbackCheckbox = document.getElementById('consentFeedbackCheckbox');
+        const consentFeedbackErrorMsg = document.getElementById('consentFeedbackErrorMsg');
+        const consentFeedbackBlock = document.getElementById('consentFeedbackBlock');
+
         reviewForm.addEventListener('submit', async (event) => {
             event.preventDefault();
+            consentFeedbackErrorMsg.classList.add('hidden');
+            reviewError.classList.add('hidden');
+
+            if (!consentFeedbackCheckbox || !consentFeedbackCheckbox.checked) {
+                consentFeedbackErrorMsg.textContent = window.i18n ? window.i18n.translate('consentFeedbackError') : 'Bitte akzeptieren Sie die Verarbeitung Ihrer Daten für das Feedback.';
+                consentFeedbackErrorMsg.classList.remove('hidden');
+                if (consentFeedbackBlock) consentFeedbackBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
             const trimmedReview = reviewText.value.trim();
             if (!trimmedReview) {
                 reviewError.textContent = window.i18n ? window.i18n.translate('reviewError') : 'Bitte schreiben Sie eine Bewertung.';
@@ -783,8 +809,6 @@
                 reviewText.focus();
                 return;
             }
-
-            reviewError.classList.add('hidden');
 
             const source = getSource();
             const payload = {

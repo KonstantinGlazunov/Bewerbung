@@ -7,6 +7,9 @@ variables.env
 *.secret.env
 !variables.env.example
 
+# Oracle wallet (распакованный Wallet_*.zip)
+/wallet/
+
 # Logs and runtime files
 *.log
 *.pid
