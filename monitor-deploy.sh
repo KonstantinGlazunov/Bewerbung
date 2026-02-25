@@ -15,7 +15,7 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-echo -e "${BLUE}=== Bewerbung AI Deployment Monitor ===${NC}\n"
+echo -e "${BLUE}=== Bewerbung Deployment Monitor ===${NC}\n"
 
 # Check SSH key
 if [ ! -f "$SSH_KEY" ]; then

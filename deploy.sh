@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Deploy script for Bewerbung AI application
+# Deploy script for Bewerbung application
 # Stops the application before building/running to save memory (1GB server)
 
 set -e  # Exit on error

@@ -1,4 +1,4 @@
-# robots.txt for Bewerbung AI
+# robots.txt for Bewerbung
 User-agent: *
 Allow: /
 

@@ -1,4 +1,4 @@
-# Bewerbung AI
+# Bewerbung
 Share:
 https://bit.ly/4t7TusE   -  instagram 
 https://bit.ly/3MeXt6d   - youtube
@@ -12,7 +12,7 @@ https://bit.ly/3MeXt6d   - youtube
 
 ### Overview
 
-Bewerbung AI is a Spring Boot application that uses OpenAI's GPT models to automatically generate German job application documents (Bewerbung). The application analyzes job postings and candidate biographies to create personalized cover letters (Anschreiben) following German DIN 5008 standards.
+Bewerbung is a Spring Boot application that uses OpenAI's GPT models to automatically generate German job application documents (Bewerbung). The application analyzes job postings and candidate biographies to create personalized cover letters (Anschreiben) following German DIN 5008 standards.
 
 ### Features
 
@@ -120,7 +120,7 @@ The application uses HTTP API for email sending (no SMTP required!). Supported p
 EMAIL_API_PROVIDER=brevo
 EMAIL_API_KEY=your-brevo-api-key
 EMAIL_FROM_ADDRESS=your-email@example.com
-EMAIL_FROM_NAME=Bewerbung AI
+EMAIL_FROM_NAME=Bewerbung
 REVIEW_EMAIL_RECIPIENT=recipient@example.com
 REVIEW_EMAIL_ENABLED=true
 ```
@@ -220,7 +220,7 @@ mvn test
 
 ### Обзор
 
-Bewerbung AI — это Spring Boot приложение, которое использует модели GPT от OpenAI для автоматической генерации немецких документов для трудоустройства (Bewerbung). Приложение анализирует вакансии и биографии кандидатов для создания персонализированных сопроводительных писем (Anschreiben) в соответствии с немецкими стандартами DIN 5008.
+Bewerbung — это Spring Boot приложение, которое использует модели GPT от OpenAI для автоматической генерации немецких документов для трудоустройства (Bewerbung). Приложение анализирует вакансии и биографии кандидатов для создания персонализированных сопроводительных писем (Anschreiben) в соответствии с немецкими стандартами DIN 5008.
 
 ### Возможности
 
@@ -328,7 +328,7 @@ mvn spring-boot:run
 EMAIL_API_PROVIDER=brevo
 EMAIL_API_KEY=ваш-brevo-api-ключ
 EMAIL_FROM_ADDRESS=ваш-email@example.com
-EMAIL_FROM_NAME=Bewerbung AI
+EMAIL_FROM_NAME=Bewerbung
 REVIEW_EMAIL_RECIPIENT=получатель@example.com
 REVIEW_EMAIL_ENABLED=true
 ```

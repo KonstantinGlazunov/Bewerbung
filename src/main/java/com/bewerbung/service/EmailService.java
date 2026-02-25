@@ -28,7 +28,7 @@ public class EmailService {
     @Value("${email.from.address:100polok2018@gmail.com}")
     private String fromEmail;
     
-    @Value("${email.from.name:Bewerbung AI}")
+    @Value("${email.from.name:Bewerbung}")
     private String fromName;
     
     @Value("${review.email.recipient:kglaz@ya.ru}")
@@ -142,7 +142,7 @@ public class EmailService {
         requestBody.add("to", new com.google.gson.JsonArray());
         requestBody.getAsJsonArray("to").add(to);
         
-        requestBody.addProperty("subject", "Новый отзыв на Bewerbung AI");
+        requestBody.addProperty("subject", "Новый отзыв на Bewerbung");
         requestBody.addProperty("textContent", emailBody);
         
         String jsonBody = gson.toJson(requestBody);
@@ -179,7 +179,7 @@ public class EmailService {
         requestBody.add("to", new com.google.gson.JsonArray());
         requestBody.getAsJsonArray("to").add(to);
         
-        requestBody.addProperty("subject", "Новый отзыв на Bewerbung AI");
+        requestBody.addProperty("subject", "Новый отзыв на Bewerbung");
         requestBody.add("content", new com.google.gson.JsonArray());
         JsonObject content = new JsonObject();
         content.addProperty("type", "text/plain");
@@ -212,7 +212,7 @@ public class EmailService {
         String formData = String.format(
                 "from=%s <%s>&to=%s&subject=%s&text=%s",
                 fromName, fromEmail, recipientEmail,
-                "Новый отзыв на Bewerbung AI",
+                "Новый отзыв на Bewerbung",
                 emailBody.replace("\n", "%0A")
         );
         

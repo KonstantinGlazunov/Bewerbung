@@ -5,6 +5,7 @@ import com.bewerbung.entity.SessionReviewEntity;
 import com.bewerbung.model.ReviewEntry;
 import com.bewerbung.repository.SessionDataRepository;
 import com.bewerbung.repository.SessionReviewRepository;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +40,15 @@ public class SessionStorageService {
 
     public boolean isDatabaseStorage() {
         return sessionDataRepository != null;
+    }
+
+    @PostConstruct
+    public void logStorageMode() {
+        if (isDatabaseStorage()) {
+            logger.info("Session storage: database (Oracle). Data persists after session end.");
+        } else {
+            logger.warn("Session storage: files (data/, output/). To store data in database and persist after session end, set ORACLE_JDBC_URL, ORACLE_USER, ORACLE_PASSWORD, TNS_ADMIN; profile 'oracle' will be auto-activated.");
+        }
     }
 
     // --- vacancy ---

@@ -15,7 +15,7 @@
     <groupId>com.bewerbung</groupId>
     <artifactId>bewerbung-ai</artifactId>
     <version>1.0.0</version>
-    <name>Bewerbung AI</name>
+    <name>Bewerbung</name>
     <description>Spring Boot application for generating German Bewerbung documents</description>
 
     <properties>

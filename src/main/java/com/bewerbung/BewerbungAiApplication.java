@@ -51,6 +51,22 @@ public class BewerbungAiApplication {
             System.setProperty("spring.profiles.active", profiles);
         }
 
+        // Auto-activate Oracle profile when Oracle URL is set → session data will be stored in DB and persist after session end
+        String oracleUrl = System.getenv("ORACLE_JDBC_URL");
+        if (oracleUrl == null || oracleUrl.isEmpty()) {
+            oracleUrl = System.getProperty("ORACLE_JDBC_URL");
+        }
+        if (oracleUrl != null && !oracleUrl.isEmpty()) {
+            String active = System.getProperty("spring.profiles.active");
+            if (active == null || active.isEmpty()) {
+                System.setProperty("spring.profiles.active", "oracle");
+                logger.info("Oracle JDBC URL is set; activating profile 'oracle' so session data is stored in the database and persists after session end");
+            } else if (!active.contains("oracle")) {
+                System.setProperty("spring.profiles.active", active + ",oracle");
+                logger.info("Oracle JDBC URL is set; adding profile 'oracle' so session data is stored in the database and persists after session end");
+            }
+        }
+
         // Oracle Autonomous DB wallet: TNS_ADMIN must be set before any JDBC connection
         String tnsAdmin = System.getenv("TNS_ADMIN");
         if (tnsAdmin == null || tnsAdmin.isEmpty()) {
