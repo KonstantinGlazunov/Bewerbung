@@ -41,7 +41,29 @@ public class BewerbungAiApplication {
             logger.info("Could not load variables.env; falling back to OS environment variables. Reason: {}", e.getMessage());
             logger.debug("variables.env load failure details", e);
         }
-        
+
+        // Spring Boot reads "spring.profiles.active", not SPRING_PROFILES_ACTIVE from system properties
+        String profiles = System.getenv("SPRING_PROFILES_ACTIVE");
+        if (profiles == null || profiles.isEmpty()) {
+            profiles = System.getProperty("SPRING_PROFILES_ACTIVE");
+        }
+        if (profiles != null && !profiles.isEmpty()) {
+            System.setProperty("spring.profiles.active", profiles);
+        }
+
+        // Oracle Autonomous DB wallet: TNS_ADMIN must be set before any JDBC connection
+        String tnsAdmin = System.getenv("TNS_ADMIN");
+        if (tnsAdmin == null || tnsAdmin.isEmpty()) {
+            try {
+                Dotenv d = Dotenv.configure().filename("variables.env").load();
+                tnsAdmin = d.get("TNS_ADMIN");
+            } catch (Exception ignored) { }
+        }
+        if (tnsAdmin != null && !tnsAdmin.isEmpty()) {
+            System.setProperty("oracle.net.tns_admin", tnsAdmin);
+            logger.info("Oracle TNS_ADMIN set from env/variables.env: {}", tnsAdmin);
+        }
+
         SpringApplication.run(BewerbungAiApplication.class, args);
     }
 }

@@ -43,11 +43,13 @@ public class LebenslaufTemplateService {
      * @return заполненный HTML шаблон
      */
     public String generateLebenslauf(Biography biography) {
+        return generateLebenslauf(null, biography);
+    }
+
+    public String generateLebenslauf(String sessionId, Biography biography) {
         logger.info("Generating lebenslauf from Biography object");
-        
-        // Преобразуем Biography в JsonObject
         JsonObject biographyJson = convertBiographyToJson(biography);
-        return generateLebenslauf(biographyJson);
+        return generateLebenslauf(sessionId, biographyJson);
     }
 
     /**
@@ -56,21 +58,20 @@ public class LebenslaufTemplateService {
      * @return заполненный HTML шаблон
      */
     public String generateLebenslauf(JsonObject biographyJson) {
+        return generateLebenslauf(null, biographyJson);
+    }
+
+    public String generateLebenslauf(String sessionId, JsonObject biographyJson) {
         logger.info("Generating lebenslauf from biography data");
-        
         if (biographyJson == null) {
             throw new IllegalArgumentException("Biography JSON cannot be null");
         }
-        
         try {
-            // Загружаем шаблон
             logger.debug("Loading template from: {}", TEMPLATE_PATH);
             String template = loadTemplate();
             logger.debug("Template loaded successfully ({} chars)", template.length());
-            
-            // Преобразуем данные для шаблона
             logger.debug("Mapping biography data to template data structure");
-            Map<String, Object> templateData = mapBiographyToTemplateData(biographyJson);
+            Map<String, Object> templateData = mapBiographyToTemplateData(biographyJson, sessionId);
             logger.debug("Template data mapped successfully. Keys: {}", templateData.keySet());
             
             // Рендерим шаблон
@@ -120,15 +121,11 @@ public class LebenslaufTemplateService {
     /**
      * Преобразует данные биографии в структуру для Mustache шаблона
      */
-    private Map<String, Object> mapBiographyToTemplateData(JsonObject biographyJson) {
+    private Map<String, Object> mapBiographyToTemplateData(JsonObject biographyJson, String sessionId) {
         Map<String, Object> data = new HashMap<>();
-        
-        // Personal Information
         Map<String, Object> personalInfo = extractPersonalInformation(biographyJson);
         data.put("personalInformation", personalInfo);
-        
-        // Photo path (uploaded photo has priority over default)
-        data.put("photoPath", resolvePhotoPath());
+        data.put("photoPath", resolvePhotoPath(sessionId));
         
         // Profile text - оптимизируем для одной страницы
         String profileText = extractProfileText(biographyJson);
@@ -397,8 +394,11 @@ public class LebenslaufTemplateService {
         return null;
     }
 
-    private String resolvePhotoPath() {
-        return tempPhotoStorageService.getCurrentPhotoDataUri().orElse(PHOTO_PATH);
+    private String resolvePhotoPath(String sessionId) {
+        if (sessionId == null || sessionId.isBlank()) {
+            return PHOTO_PATH;
+        }
+        return tempPhotoStorageService.getCurrentPhotoDataUri(sessionId).orElse(PHOTO_PATH);
     }
 
     /**

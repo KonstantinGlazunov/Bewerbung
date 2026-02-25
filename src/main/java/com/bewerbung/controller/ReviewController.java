@@ -3,6 +3,7 @@ package com.bewerbung.controller;
 import com.bewerbung.dto.ReviewRequestDto;
 import com.bewerbung.model.ReviewEntry;
 import com.bewerbung.service.ReviewStorageService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,8 +21,9 @@ public class ReviewController {
     }
 
     @PostMapping
-    public ResponseEntity<ReviewEntry> createReview(@Valid @RequestBody ReviewRequestDto request) {
-        ReviewEntry saved = reviewStorageService.saveReview(request.getReview(), request.getUserInfo(), request.getSource());
+    public ResponseEntity<ReviewEntry> createReview(HttpServletRequest request, @Valid @RequestBody ReviewRequestDto dto) {
+        String sessionId = request.getSession(true).getId();
+        ReviewEntry saved = reviewStorageService.saveReview(sessionId, dto.getReview(), dto.getUserInfo(), dto.getSource());
         return ResponseEntity.ok(saved);
     }
 }

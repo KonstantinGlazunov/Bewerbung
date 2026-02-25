@@ -20,18 +20,14 @@ public class ChangeDetectionService {
 
     private static final Logger logger = LoggerFactory.getLogger(ChangeDetectionService.class);
     private static final String DATA_DIR = "data";
-    private static final String VACANCY_FILE = "data/vacancy.txt";
-    private static final String CV_FILE = "data/cv.txt";
-    private static final String STATE_FILE = "data/state.json";
-    private static final String ANSCHREIBEN_DATA_FILE = "data/anschreiben.txt";
-    
-    private final Gson gson;
 
-    public ChangeDetectionService() {
+    private final Gson gson;
+    private final SessionStorageService sessionStorage;
+
+    public ChangeDetectionService(SessionStorageService sessionStorage) {
         this.gson = new Gson();
-        logger.info("ChangeDetectionService initialized. Working directory: {}", 
-            System.getProperty("user.dir"));
-        logger.info("Data directory will be: {}", Paths.get(DATA_DIR).toAbsolutePath());
+        this.sessionStorage = sessionStorage;
+        logger.info("ChangeDetectionService initialized (session-scoped)");
         ensureDirectoriesExist();
     }
 
@@ -39,41 +35,20 @@ public class ChangeDetectionService {
         try {
             Files.createDirectories(Paths.get(DATA_DIR));
             Files.createDirectories(Paths.get("output"));
-            
-            // Initialize state.json if it doesn't exist
-            Path statePath = Paths.get(STATE_FILE);
-            if (!Files.exists(statePath)) {
-                State initialState = new State();
-                saveState(initialState);
-                logger.info("Initialized state.json file");
-            }
-            
-            // Create empty placeholder files if they don't exist
-            Path vacancyPath = Paths.get(VACANCY_FILE);
-            if (!Files.exists(vacancyPath)) {
-                Files.write(vacancyPath, "".getBytes(StandardCharsets.UTF_8));
-                logger.debug("Created placeholder vacancy.txt file");
-            }
-            
-            Path cvPath = Paths.get(CV_FILE);
-            if (!Files.exists(cvPath)) {
-                Files.write(cvPath, "".getBytes(StandardCharsets.UTF_8));
-                logger.debug("Created placeholder cv.txt file");
-            }
         } catch (IOException e) {
-            logger.error("Failed to create directories and files", e);
+            logger.error("Failed to create directories", e);
         }
     }
 
-    public ChangeResult checkAndSave(String vacancyText, String cvText) {
-        return checkAndSave(vacancyText, cvText, null, null);
+    public ChangeResult checkAndSave(String sessionId, String vacancyText, String cvText) {
+        return checkAndSave(sessionId, vacancyText, cvText, null, null);
     }
 
-    public ChangeResult checkAndSave(String vacancyText, String cvText, String wishesText) {
-        return checkAndSave(vacancyText, cvText, wishesText, null);
+    public ChangeResult checkAndSave(String sessionId, String vacancyText, String cvText, String wishesText) {
+        return checkAndSave(sessionId, vacancyText, cvText, wishesText, null);
     }
 
-    public ChangeResult checkAndSave(String vacancyText, String cvText, String wishesText, String language) {
+    public ChangeResult checkAndSave(String sessionId, String vacancyText, String cvText, String wishesText, String language) {
         try {
             // Handle null inputs
             if (vacancyText == null) {
@@ -108,8 +83,8 @@ public class ChangeDetectionService {
                 wishesHash.substring(0, Math.min(8, wishesHash.length())),
                 language);
 
-            // Load existing state
-            State state = loadState();
+            // Load existing state for this session
+            State state = loadState(sessionId);
             
             // Normalize state language (default to "de" if empty)
             String stateLanguage = state.getLanguage();
@@ -152,15 +127,14 @@ public class ChangeDetectionService {
                     logger.info("Saving files with available data");
                 }
                 
-                // Save files if we have data
+                // Save to session storage if we have data
                 if (vacancyText != null && !vacancyText.trim().isEmpty()) {
-                    saveTextToFile(VACANCY_FILE, vacancyText);
+                    sessionStorage.setVacancy(sessionId, vacancyText);
                 } else {
                     logger.warn("Vacancy text is empty, skipping save");
                 }
-                
                 if (cvText != null && !cvText.trim().isEmpty()) {
-                    saveTextToFile(CV_FILE, cvText);
+                    sessionStorage.setCv(sessionId, cvText);
                 } else {
                     logger.warn("CV text is empty, skipping save");
                 }
@@ -179,7 +153,7 @@ public class ChangeDetectionService {
             state.setLanguage(language);
             state.setVacancyLastProcessed(vacancyChanged ? Instant.now().toString() : state.getVacancyLastProcessed());
             state.setCvLastProcessed(cvChanged ? Instant.now().toString() : state.getCvLastProcessed());
-            saveState(state);
+            saveState(sessionId, state);
             
             logger.info("State updated with new hashes and language: {}", language);
 
@@ -225,39 +199,6 @@ public class ChangeDetectionService {
         return desc.toString();
     }
 
-    private void saveTextToFile(String filePath, String content) throws IOException {
-        if (content == null) {
-            logger.warn("Content is null for file: {}, skipping save", filePath);
-            return;
-        }
-        
-        if (content.trim().isEmpty()) {
-            logger.warn("Content is empty for file: {}, skipping save", filePath);
-            return;
-        }
-        
-        Path path = Paths.get(filePath).toAbsolutePath();
-        logger.info("Saving {} bytes to: {}", content.length(), path);
-        
-        Files.write(path, content.getBytes(StandardCharsets.UTF_8));
-        logger.info("Successfully saved {} bytes to: {}", content.length(), path);
-        
-        // Verify file was written
-        if (Files.exists(path)) {
-            long fileSize = Files.size(path);
-            logger.info("Verified file exists: {} ({} bytes)", path, fileSize);
-            
-            // Log first 100 chars for debugging
-            if (fileSize > 0) {
-                String preview = content.length() > 100 ? content.substring(0, 100) + "..." : content;
-                logger.debug("File content preview: {}", preview.replace("\n", "\\n"));
-            }
-        } else {
-            logger.error("File was not created: {}", path);
-            throw new IOException("File was not created: " + path);
-        }
-    }
-
     private String calculateHash(String text) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -277,55 +218,32 @@ public class ChangeDetectionService {
         }
     }
 
-    private State loadState() {
+    private State loadState(String sessionId) {
         try {
-            Path statePath = Paths.get(STATE_FILE).toAbsolutePath();
-            logger.debug("Loading state from: {}", statePath);
-            
-            if (!Files.exists(statePath)) {
-                logger.info("State file does not exist, using empty state");
+            String json = sessionStorage.getStateJson(sessionId);
+            if (json == null || json.isBlank()) {
+                logger.debug("No state for session, using empty state");
                 return new State();
             }
-            
-            String json = Files.readString(statePath, StandardCharsets.UTF_8);
-            logger.debug("Loaded state JSON: {} bytes", json.length());
-            
+            logger.debug("Loaded state JSON: {} bytes for session", json.length());
             JsonObject jsonObject = gson.fromJson(json, JsonObject.class);
-            
+            if (jsonObject == null) return new State();
             State state = new State();
-            if (jsonObject.has("vacancyHash")) {
-                state.setVacancyHash(jsonObject.get("vacancyHash").getAsString());
-            }
-            if (jsonObject.has("cvHash")) {
-                state.setCvHash(jsonObject.get("cvHash").getAsString());
-            }
-            if (jsonObject.has("vacancyLastProcessed")) {
-                state.setVacancyLastProcessed(jsonObject.get("vacancyLastProcessed").getAsString());
-            }
-            if (jsonObject.has("cvLastProcessed")) {
-                state.setCvLastProcessed(jsonObject.get("cvLastProcessed").getAsString());
-            }
-            if (jsonObject.has("wishesHash")) {
-                state.setWishesHash(jsonObject.get("wishesHash").getAsString());
-            }
-            if (jsonObject.has("language")) {
-                state.setLanguage(jsonObject.get("language").getAsString());
-            }
-            if (jsonObject.has("anschreibenFile")) {
-                state.setAnschreibenFile(jsonObject.get("anschreibenFile").getAsString());
-            }
-            
-            logger.debug("Loaded state - Vacancy hash length: {}, CV hash length: {}, Wishes hash length: {}", 
-                state.getVacancyHash().length(), state.getCvHash().length(), state.getWishesHash().length());
-            
+            if (jsonObject.has("vacancyHash")) state.setVacancyHash(jsonObject.get("vacancyHash").getAsString());
+            if (jsonObject.has("cvHash")) state.setCvHash(jsonObject.get("cvHash").getAsString());
+            if (jsonObject.has("vacancyLastProcessed")) state.setVacancyLastProcessed(jsonObject.get("vacancyLastProcessed").getAsString());
+            if (jsonObject.has("cvLastProcessed")) state.setCvLastProcessed(jsonObject.get("cvLastProcessed").getAsString());
+            if (jsonObject.has("wishesHash")) state.setWishesHash(jsonObject.get("wishesHash").getAsString());
+            if (jsonObject.has("language")) state.setLanguage(jsonObject.get("language").getAsString());
+            if (jsonObject.has("anschreibenFile")) state.setAnschreibenFile(jsonObject.get("anschreibenFile").getAsString());
             return state;
         } catch (Exception e) {
-            logger.warn("Failed to load state, using empty state", e);
+            logger.warn("Failed to load state for session, using empty state", e);
             return new State();
         }
     }
 
-    private void saveState(State state) {
+    private void saveState(String sessionId, State state) {
         try {
             JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("vacancyHash", state.getVacancyHash());
@@ -335,11 +253,9 @@ public class ChangeDetectionService {
             jsonObject.addProperty("vacancyLastProcessed", state.getVacancyLastProcessed());
             jsonObject.addProperty("cvLastProcessed", state.getCvLastProcessed());
             jsonObject.addProperty("anschreibenFile", state.getAnschreibenFile());
-            
             String json = gson.toJson(jsonObject);
-            Path statePath = Paths.get(STATE_FILE).toAbsolutePath();
-            Files.write(statePath, json.getBytes(StandardCharsets.UTF_8));
-            logger.info("State saved to: {} ({} bytes)", statePath, json.length());
+            sessionStorage.setStateJson(sessionId, json);
+            logger.debug("State saved for session ({} bytes)", json.length());
         } catch (Exception e) {
             logger.error("Failed to save state", e);
         }
@@ -463,15 +379,12 @@ public class ChangeDetectionService {
         }
     }
     
-    public String getSavedAnschreibenPath() {
-        State state = loadState();
-        return state.getAnschreibenFile();
+    public String getSavedAnschreibenPath(String sessionId) {
+        return sessionStorage.getAnschreibenPath(sessionId);
     }
-    
-    public void saveAnschreibenPath(String filePath) {
-        State state = loadState();
-        state.setAnschreibenFile(filePath);
-        saveState(state);
+
+    public void saveAnschreibenPath(String sessionId, String filePath) {
+        sessionStorage.setAnschreibenPath(sessionId, filePath);
     }
 }
 
