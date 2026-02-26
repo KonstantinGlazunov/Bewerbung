@@ -2,43 +2,43 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <url>
-        <loc>http://130.162.224.203:8080/</loc>
+        <loc>https://bewerbungprofi.de/</loc>
         <lastmod>2026-01-29</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
-        <xhtml:link rel="alternate" hreflang="de" href="http://130.162.224.203:8080/"/>
-        <xhtml:link rel="alternate" hreflang="ru" href="http://130.162.224.203:8080/"/>
-        <xhtml:link rel="alternate" hreflang="en" href="http://130.162.224.203:8080/"/>
+        <xhtml:link rel="alternate" hreflang="de" href="https://bewerbungprofi.de/"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://bewerbungprofi.de/"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bewerbungprofi.de/"/>
     </url>
     <url>
-        <loc>http://130.162.224.203:8080/reviews.html</loc>
+        <loc>https://bewerbungprofi.de/reviews.html</loc>
         <lastmod>2026-01-29</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
-        <xhtml:link rel="alternate" hreflang="de" href="http://130.162.224.203:8080/reviews.html"/>
-        <xhtml:link rel="alternate" hreflang="ru" href="http://130.162.224.203:8080/reviews.html"/>
-        <xhtml:link rel="alternate" hreflang="en" href="http://130.162.224.203:8080/reviews.html"/>
+        <xhtml:link rel="alternate" hreflang="de" href="https://bewerbungprofi.de/reviews.html"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://bewerbungprofi.de/reviews.html"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bewerbungprofi.de/reviews.html"/>
     </url>
     <url>
-        <loc>http://130.162.224.203:8080/datenschutz.html</loc>
+        <loc>https://bewerbungprofi.de/datenschutz.html</loc>
         <lastmod>2026-01-29</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.3</priority>
     </url>
     <url>
-        <loc>http://130.162.224.203:8080/impressum.html</loc>
+        <loc>https://bewerbungprofi.de/impressum.html</loc>
         <lastmod>2026-01-29</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.3</priority>
     </url>
     <url>
-        <loc>http://130.162.224.203:8080/faq.html</loc>
+        <loc>https://bewerbungprofi.de/faq.html</loc>
         <lastmod>2026-01-29</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
-        <xhtml:link rel="alternate" hreflang="de" href="http://130.162.224.203:8080/faq.html"/>
-        <xhtml:link rel="alternate" hreflang="ru" href="http://130.162.224.203:8080/faq.html"/>
-        <xhtml:link rel="alternate" hreflang="en" href="http://130.162.224.203:8080/faq.html"/>
+        <xhtml:link rel="alternate" hreflang="de" href="https://bewerbungprofi.de/faq.html"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://bewerbungprofi.de/faq.html"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bewerbungprofi.de/faq.html"/>
     </url>
 </urlset>
 
