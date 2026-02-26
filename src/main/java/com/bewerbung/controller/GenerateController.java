@@ -720,7 +720,7 @@ public class GenerateController {
 
         if (defaultData) {
             filename = "Musterman_Lebenslauf.PDF";
-            outputPdfPath = Paths.get("output", filename).toAbsolutePath();
+            outputPdfPath = Paths.get("output", safeSessionId(sessionId), filename).toAbsolutePath();
             sourceUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
                     + "/api/generate/lebenslauf/default-html";
         } else {
@@ -746,7 +746,7 @@ public class GenerateController {
             }
             String surname = extractSurnameFromHtmlContent(sessionHtml);
             filename = surname + "_LebensLauf.PDF";
-            outputPdfPath = Paths.get("output", filename).toAbsolutePath();
+            outputPdfPath = Paths.get("output", safeSessionId(sessionId), filename).toAbsolutePath();
             String pdfToken = UUID.randomUUID().toString();
             PDF_SESSION_TOKENS.put(pdfToken, sessionId);
             sourceUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
@@ -756,7 +756,7 @@ public class GenerateController {
         // Keep a lightweight content signature next to the PDF to skip expensive re-rendering
         // when the source HTML has not changed between requests.
         String contentSignature = defaultData
-                ? "default-template-v1"
+                ? calculateSha256(loadDefaultLebenslaufHtmlForSession(sessionId))
                 : calculateSha256(sessionHtml != null ? sessionHtml : "");
         Path signaturePath = getPdfSignaturePath(outputPdfPath);
 
@@ -854,6 +854,21 @@ public class GenerateController {
             return sb.toString();
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("SHA-256 not available", e);
+        }
+    }
+
+    private String loadDefaultLebenslaufHtmlForSession(String sessionId) {
+        try {
+            ClassPathResource resource = new ClassPathResource("lebenslauf-filled.html");
+            if (!resource.exists()) {
+                return "default-template-missing";
+            }
+            String html = new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+            html = html.replace("src=\"static/", "src=\"/static/");
+            return embedPhotoAsDataUri(html, sessionId);
+        } catch (IOException e) {
+            logger.warn("Failed to build default Lebenslauf HTML signature for session {}: {}", sessionId, e.getMessage());
+            return "default-template-error";
         }
     }
 
