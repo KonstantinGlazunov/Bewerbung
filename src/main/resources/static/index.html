@@ -855,6 +855,7 @@
                     progressCreatingLetter: 'Erstelle Anschreiben',
                     progressGenerating: 'Generiere Inhalt...',
                     progressFinalizing: 'Finalisiere Dokument',
+                    progressDownloadingPdf: 'Bereite PDF-Download vor...',
                     progressComplete: 'Abgeschlossen',
                     errorTitle: 'Error',
                     coverLetterTitle: 'Cover Letter (Anschreiben)',
@@ -925,6 +926,7 @@
                     progressCreatingLetter: 'Создание письма',
                     progressGenerating: 'Генерация содержимого...',
                     progressFinalizing: 'Завершение документа',
+                    progressDownloadingPdf: 'Подготовка PDF к скачиванию...',
                     progressComplete: 'Завершено',
                     errorTitle: 'Ошибка',
                     coverLetterTitle: 'Cover Letter (Anschreiben)',
@@ -995,6 +997,7 @@
                     progressCreatingLetter: 'Creating Cover Letter',
                     progressGenerating: 'Generating Content...',
                     progressFinalizing: 'Finalizing Document',
+                    progressDownloadingPdf: 'Preparing PDF download...',
                     progressComplete: 'Complete',
                     errorTitle: 'Error',
                     coverLetterTitle: 'Cover Letter (Anschreiben)',
@@ -1273,6 +1276,45 @@
 
         // Initialize progress bar
         const progressBar = new ProgressBar();
+        const loadingIndicator = document.getElementById('loading');
+        let downloadProgressInterval = null;
+
+        function startDownloadProgress() {
+            loadingIndicator.classList.remove('hidden');
+            progressBar.start();
+            progressBar.update(50);
+            const label = document.getElementById('progressLabel');
+            label.textContent = window.i18n ? window.i18n.translate('progressDownloadingPdf') : 'Preparing PDF download...';
+            label.classList.add('active');
+
+            let simulatedProgress = 50;
+            downloadProgressInterval = setInterval(() => {
+                if (simulatedProgress < 95) {
+                    simulatedProgress = Math.min(95, simulatedProgress + 1.2);
+                    progressBar.update(simulatedProgress);
+                    const progressLabel = document.getElementById('progressLabel');
+                    progressLabel.textContent = window.i18n ? window.i18n.translate('progressDownloadingPdf') : 'Preparing PDF download...';
+                }
+            }, 250);
+        }
+
+        async function finishDownloadProgress() {
+            if (downloadProgressInterval) {
+                clearInterval(downloadProgressInterval);
+                downloadProgressInterval = null;
+            }
+            progressBar.complete();
+            await new Promise(resolve => setTimeout(resolve, 400));
+            loadingIndicator.classList.add('hidden');
+        }
+
+        function failDownloadProgress() {
+            if (downloadProgressInterval) {
+                clearInterval(downloadProgressInterval);
+                downloadProgressInterval = null;
+            }
+            loadingIndicator.classList.add('hidden');
+        }
 
         // Store loaded sample data for comparison
         let loadedSampleData = {
@@ -1763,6 +1805,7 @@
             
             downloadAnschreibenButton.disabled = true;
             downloadAnschreibenButton.textContent = window.i18n ? window.i18n.translate('downloadAnschreibenButtonGenerating') : 'Anschreiben-PDF wird generiert...';
+            startDownloadProgress();
             
             try {
                 const response = await fetch('/api/generate/pdf', {
@@ -1786,8 +1829,10 @@
                 a.click();
                 window.URL.revokeObjectURL(url);
                 document.body.removeChild(a);
+                await finishDownloadProgress();
                 
             } catch (error) {
+                failDownloadProgress();
                 console.error('Error downloading PDF:', error);
                 const errorMsg = window.i18n ? window.i18n.translate('errorPdfError') : 'Fehler beim Generieren des PDFs: ';
                 alert(errorMsg + error.message);
@@ -1802,6 +1847,7 @@
             const downloadLebenslaufButton = document.getElementById('downloadLebenslaufButton');
             downloadLebenslaufButton.disabled = true;
             downloadLebenslaufButton.textContent = window.i18n ? window.i18n.translate('downloadLebenslaufButtonGenerating') : 'Lebenslauf-PDF wird generiert...';
+            startDownloadProgress();
 
             try {
                 const useDefaultPdf = !hasSignificantChanges();
@@ -1823,7 +1869,9 @@
                 a.click();
                 window.URL.revokeObjectURL(url);
                 document.body.removeChild(a);
+                await finishDownloadProgress();
             } catch (error) {
+                failDownloadProgress();
                 console.error('Error downloading resume PDF:', error);
                 const errorMsg = window.i18n ? window.i18n.translate('errorPdfError') : 'Fehler beim Generieren des PDFs: ';
                 alert(errorMsg + error.message);
@@ -2004,4 +2052,3 @@
     </script>
 </body>
 </html>
-

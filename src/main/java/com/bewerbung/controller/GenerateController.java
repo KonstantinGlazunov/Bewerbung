@@ -52,6 +52,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.io.InputStream;
 import java.util.Base64;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 @RestController
 @RequestMapping("/api/generate")
@@ -751,8 +753,18 @@ public class GenerateController {
                     + "/api/generate/lebenslauf/html?pdfToken=" + pdfToken;
         }
 
+        // Keep a lightweight content signature next to the PDF to skip expensive re-rendering
+        // when the source HTML has not changed between requests.
+        String contentSignature = defaultData
+                ? "default-template-v1"
+                : calculateSha256(sessionHtml != null ? sessionHtml : "");
+        Path signaturePath = getPdfSignaturePath(outputPdfPath);
+
         // Check if PDF needs to be regenerated
-        // Regenerate if: force flag is set, PDF doesn't exist, or HTML file is newer than PDF
+        // Regenerate if:
+        // 1) force flag is set
+        // 2) PDF file does not exist / empty
+        // 3) Source content signature differs from previously generated signature
         boolean needsRegeneration = false;
         if (forceRegenerate) {
             needsRegeneration = true;
@@ -762,11 +774,19 @@ public class GenerateController {
                 if (!Files.exists(outputPdfPath) || Files.size(outputPdfPath) == 0) {
                     needsRegeneration = true;
                     logger.debug("PDF file does not exist or is empty, will regenerate");
-                } else if (!defaultData) {
-                    needsRegeneration = true;
+                } else {
+                    String existingSignature = Files.exists(signaturePath)
+                            ? Files.readString(signaturePath, StandardCharsets.UTF_8).trim()
+                            : "";
+                    if (!contentSignature.equals(existingSignature)) {
+                        needsRegeneration = true;
+                        logger.info("Lebenslauf content changed (or signature missing), will regenerate PDF");
+                    } else {
+                        logger.info("Lebenslauf content unchanged, using cached PDF");
+                    }
                 }
             } catch (IOException e) {
-                logger.warn("Error checking file timestamps, will regenerate PDF: {}", e.getMessage());
+                logger.warn("Error checking PDF/signature, will regenerate PDF: {}", e.getMessage());
                 needsRegeneration = true;
             }
         }
@@ -791,6 +811,11 @@ public class GenerateController {
             if (!generated) {
                 throw new RuntimeException("Failed to generate Lebenslauf PDF. Install google-chrome/chromium or wkhtmltopdf.");
             }
+            try {
+                Files.writeString(signaturePath, contentSignature, StandardCharsets.UTF_8);
+            } catch (IOException e) {
+                logger.warn("Failed to write PDF signature file {}: {}", signaturePath, e.getMessage());
+            }
         } else {
             logger.info("PDF file is up to date, using existing file: {}", outputPdfPath);
         }
@@ -809,6 +834,26 @@ public class GenerateController {
         } catch (IOException e) {
             logger.error("Failed to read generated lebenslauf PDF from {}", outputPdfPath, e);
             throw new RuntimeException("Failed to read generated lebenslauf PDF", e);
+        }
+    }
+
+    private Path getPdfSignaturePath(Path outputPdfPath) {
+        return Paths.get(outputPdfPath.toString() + ".sha256");
+    }
+
+    private String calculateSha256(String content) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(content.getBytes(StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) sb.append('0');
+                sb.append(hex);
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("SHA-256 not available", e);
         }
     }
 
@@ -1092,4 +1137,3 @@ public class GenerateController {
         return gson.toJson(biography);
     }
 }
-
