@@ -96,6 +96,10 @@ The application will start on port 8080 by default (configurable via `PORT` envi
     - `biographyFile`: Multipart file containing biography
     - `jobPosting`: Job posting text
 
+- **POST** `/api/generate/upload-photo` — upload CV photo (multipart `photo`) for Lebenslauf
+- **GET** `/api/db/health` — Oracle DB health check (when profile `oracle` is active)
+- **POST** `/api/reviews` — submit review feedback (triggers optional email notification when configured)
+
 ### Configuration
 
 The application can be configured via `application.properties`:
@@ -151,14 +155,14 @@ REVIEW_EMAIL_RECIPIENT=recipient@example.com
 
 #### Oracle Always Free Autonomous Database (optional)
 
-To use Oracle Autonomous DB (e.g. on a VM or locally), activate the `oracle` profile and set environment variables.
+To use Oracle Autonomous DB (e.g. BewrbungDB on a VM or locally), activate the `oracle` profile and set environment variables. Session data (CV, vacancy, generated documents) is then stored in the DB and persists after the HTTP session ends.
 
 **On server (e.g. VM 130.162.224.203):**
-1. Unzip wallet to `/opt/oracle/wallet` and set permissions (see your setup notes).
+1. Copy `Wallet_*.zip` to the project and unzip to `./wallet` in the project root (or to `/opt/oracle/wallet` and set `TNS_ADMIN` accordingly).
 2. Set environment variables (or add to `variables.env`):
 ```bash
-export TNS_ADMIN=/opt/oracle/wallet
-export ORACLE_JDBC_URL=jdbc:oracle:thin:@myfreeappdb_high
+export TNS_ADMIN=./wallet
+export ORACLE_JDBC_URL=jdbc:oracle:thin:@bewrbungdb_high
 export ORACLE_USER=your_schema_user
 export ORACLE_PASSWORD=your_password
 export SPRING_PROFILES_ACTIVE=oracle
@@ -166,36 +170,40 @@ export SPRING_PROFILES_ACTIVE=oracle
 3. Run the app; DB health: **GET** `/api/db/health`.
 
 **Locally:**
-1. Unzip the wallet (e.g. to `./wallet` or `~/Downloads/Wallet_MYFREEAPPDB`).
+1. Unzip the wallet (e.g. `Wallet_BewrbungDB.zip`) to `./wallet` in the project root.
 2. Set in `variables.env` or in env:
 ```bash
-TNS_ADMIN=/path/to/unzipped/wallet
-ORACLE_JDBC_URL=jdbc:oracle:thin:@myfreeappdb_high
+TNS_ADMIN=./wallet
+ORACLE_JDBC_URL=jdbc:oracle:thin:@bewrbungdb_high
 ORACLE_USER=your_user
 ORACLE_PASSWORD=your_password
+SPRING_PROFILES_ACTIVE=local,oracle
 ```
 3. Run with profile: `mvn spring-boot:run -Dspring.profiles.active=oracle` or set `SPRING_PROFILES_ACTIVE=oracle`.
 
-Use the TNS name from your wallet’s `tnsnames.ora` (e.g. `myfreeappdb_high`, `myfreeappdb_medium`, `myfreeappdb_low`). If Oracle is not configured, the app runs as before without a database.
+Use the TNS name from your wallet’s `tnsnames.ora` (e.g. `bewrbungdb_high`, `bewrbungdb_medium`, `bewrbungdb_low`). If Oracle is not configured, the app runs as before without a database.
 
 ### Project Structure
 
 ```
 src/main/java/com/bewerbung/
 ├── controller/          # REST controllers
-├── service/            # Business logic services
-├── model/              # Data models
-├── dto/                # Data transfer objects
-├── exception/          # Exception handling
-└── runner/             # Application runners
+├── service/             # Business logic services
+├── model/               # Data models
+├── dto/                 # Data transfer objects
+├── config/              # Configuration (env, Oracle wallet, async)
+├── entity/              # JPA entities (session data, reviews)
+├── repository/          # JPA repositories
+└── exception/           # Exception handling
 ```
 
 ### Output
 
-Generated documents are saved to the `output/` directory:
-- `analysis.txt`: Job requirements analysis
-- `anschreiben.txt`: Generated cover letter
-- `notes.txt`: Processing notes and change detection information
+Generated documents are saved to the `output/` directory (or per-session under `output/{sessionId}/` when using Oracle):
+- `analysis.md`: Job requirements analysis
+- `anschreiben.md`: Generated cover letter (Markdown)
+- `notes.json`: Processing notes and change detection information
+- PDF files (e.g. Anschreiben.pdf, Lebenslauf) are generated on demand and can be downloaded via the API
 
 ### Development
 
@@ -304,6 +312,10 @@ mvn spring-boot:run
     - `biographyFile`: Multipart файл с биографией
     - `jobPosting`: Текст вакансии
 
+- **POST** `/api/generate/upload-photo` — загрузка фото для Lebenslauf (multipart `photo`)
+- **GET** `/api/db/health` — проверка Oracle БД (при активном профиле `oracle`)
+- **POST** `/api/reviews` — отправка отзыва (при настроенной почте — уведомление по email)
+
 ### Конфигурация
 
 Приложение можно настроить через `application.properties`:
@@ -359,14 +371,14 @@ REVIEW_EMAIL_RECIPIENT=получатель@example.com
 
 #### Oracle Always Free Autonomous Database (опционально)
 
-Чтобы использовать Oracle Autonomous DB (на VM или локально), активируйте профиль `oracle` и задайте переменные окружения.
+Чтобы использовать Oracle Autonomous DB (например BewrbungDB на VM или локально), активируйте профиль `oracle` и задайте переменные окружения. Данные сессии (резюме, вакансия, сгенерированные документы) сохраняются в БД и не теряются после окончания HTTP-сессии.
 
 **На сервере (например VM 130.162.224.203):**
-1. Распакуйте wallet в `/opt/oracle/wallet` и настройте права.
+1. Скопируйте `Wallet_*.zip` в проект и распакуйте в `./wallet` в корне проекта (или в `/opt/oracle/wallet` и задайте `TNS_ADMIN`).
 2. Задайте переменные (или в `variables.env`):
 ```bash
-export TNS_ADMIN=/opt/oracle/wallet
-export ORACLE_JDBC_URL=jdbc:oracle:thin:@myfreeappdb_high
+export TNS_ADMIN=./wallet
+export ORACLE_JDBC_URL=jdbc:oracle:thin:@bewrbungdb_high
 export ORACLE_USER=ваш_пользователь
 export ORACLE_PASSWORD=ваш_пароль
 export SPRING_PROFILES_ACTIVE=oracle
@@ -374,36 +386,40 @@ export SPRING_PROFILES_ACTIVE=oracle
 3. Запустите приложение; проверка БД: **GET** `/api/db/health`.
 
 **Локально:**
-1. Распакуйте wallet (например в `./wallet`).
+1. Распакуйте wallet (например `Wallet_BewrbungDB.zip`) в `./wallet` в корне проекта.
 2. В `variables.env` или в окружении:
 ```bash
-TNS_ADMIN=/путь/к/wallet
-ORACLE_JDBC_URL=jdbc:oracle:thin:@myfreeappdb_high
+TNS_ADMIN=./wallet
+ORACLE_JDBC_URL=jdbc:oracle:thin:@bewrbungdb_high
 ORACLE_USER=ваш_user
 ORACLE_PASSWORD=ваш_пароль
+SPRING_PROFILES_ACTIVE=local,oracle
 ```
 3. Запуск с профилем: `mvn spring-boot:run -Dspring.profiles.active=oracle` или `SPRING_PROFILES_ACTIVE=oracle`.
 
-Имя TNS возьмите из `tnsnames.ora` в wallet (например `myfreeappdb_high`). Если Oracle не настроен, приложение работает как раньше без БД.
+Имя TNS возьмите из `tnsnames.ora` в wallet (например `bewrbungdb_high`). Если Oracle не настроен, приложение работает как раньше без БД.
 
 ### Структура проекта
 
 ```
 src/main/java/com/bewerbung/
 ├── controller/          # REST контроллеры
-├── service/            # Сервисы бизнес-логики
-├── model/              # Модели данных
-├── dto/                # Объекты передачи данных
-├── exception/          # Обработка исключений
-└── runner/             # Запускающие классы приложения
+├── service/             # Сервисы бизнес-логики
+├── model/               # Модели данных
+├── dto/                 # Объекты передачи данных
+├── config/              # Конфигурация (env, Oracle wallet, async)
+├── entity/              # JPA-сущности (сессия, отзывы)
+├── repository/         # JPA-репозитории
+└── exception/           # Обработка исключений
 ```
 
 ### Вывод
 
-Сгенерированные документы сохраняются в директорию `output/`:
-- `analysis.txt`: Анализ требований вакансии
-- `anschreiben.txt`: Сгенерированное сопроводительное письмо
-- `notes.txt`: Заметки обработки и информация об обнаружении изменений
+Сгенерированные документы сохраняются в директорию `output/` (или в `output/{sessionId}/` при использовании Oracle):
+- `analysis.md`: Анализ требований вакансии
+- `anschreiben.md`: Сгенерированное сопроводительное письмо (Markdown)
+- `notes.json`: Заметки обработки и информация об обнаружении изменений
+- PDF (Anschreiben.pdf, Lebenslauf) создаются по запросу и доступны для скачивания через API
 
 ### Разработка
 

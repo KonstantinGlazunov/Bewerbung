@@ -9,6 +9,11 @@ variables.env
 
 # Oracle wallet (распакованный Wallet_*.zip)
 /wallet/
+# Oracle wallet archive (не коммитить)
+Wallet*.zip
+
+# Сгенерированные PDF и файлы в output/
+/output/
 
 # Logs and runtime files
 *.log
