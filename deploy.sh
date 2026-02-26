@@ -96,6 +96,16 @@ start_app() {
     # Set up Java environment
     export PATH=/home/opc/jdk-21.0.2/bin:$PATH
     
+    # Load variables.env so app uses Oracle DB (ORACLE_*, SPRING_PROFILES_ACTIVE); TNS_ADMIN must be absolute for JDBC
+    if [ -f "$APP_DIR/variables.env" ]; then
+        set -a
+        # shellcheck source=/dev/null
+        source "$APP_DIR/variables.env" 2>/dev/null || true
+        set +a
+        export TNS_ADMIN="$APP_DIR/wallet"
+        echo_info "Using Oracle: TNS_ADMIN=$TNS_ADMIN, SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-oracle}"
+    fi
+    
     # Start application in background
     nohup java -Xmx512m -Xms256m \
         -Dorg.apache.pdfbox.fontcache.disabled=true \
