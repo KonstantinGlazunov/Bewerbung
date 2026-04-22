@@ -3,42 +3,52 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
     <url>
         <loc>https://bewerbungprofi.de/</loc>
-        <lastmod>2026-01-29</lastmod>
+        <lastmod>2026-04-22</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
         <xhtml:link rel="alternate" hreflang="de" href="https://bewerbungprofi.de/"/>
         <xhtml:link rel="alternate" hreflang="ru" href="https://bewerbungprofi.de/"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://bewerbungprofi.de/"/>
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://bewerbungprofi.de/"/>
     </url>
     <url>
         <loc>https://bewerbungprofi.de/reviews.html</loc>
-        <lastmod>2026-01-29</lastmod>
+        <lastmod>2026-04-22</lastmod>
         <changefreq>weekly</changefreq>
         <priority>0.8</priority>
         <xhtml:link rel="alternate" hreflang="de" href="https://bewerbungprofi.de/reviews.html"/>
         <xhtml:link rel="alternate" hreflang="ru" href="https://bewerbungprofi.de/reviews.html"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://bewerbungprofi.de/reviews.html"/>
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://bewerbungprofi.de/reviews.html"/>
     </url>
     <url>
         <loc>https://bewerbungprofi.de/datenschutz.html</loc>
-        <lastmod>2026-01-29</lastmod>
+        <lastmod>2026-04-22</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.3</priority>
+        <xhtml:link rel="alternate" hreflang="de" href="https://bewerbungprofi.de/datenschutz.html"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://bewerbungprofi.de/datenschutz.html"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bewerbungprofi.de/datenschutz.html"/>
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://bewerbungprofi.de/datenschutz.html"/>
     </url>
     <url>
         <loc>https://bewerbungprofi.de/impressum.html</loc>
-        <lastmod>2026-01-29</lastmod>
+        <lastmod>2026-04-22</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.3</priority>
+        <xhtml:link rel="alternate" hreflang="de" href="https://bewerbungprofi.de/impressum.html"/>
+        <xhtml:link rel="alternate" hreflang="ru" href="https://bewerbungprofi.de/impressum.html"/>
+        <xhtml:link rel="alternate" hreflang="en" href="https://bewerbungprofi.de/impressum.html"/>
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://bewerbungprofi.de/impressum.html"/>
     </url>
     <url>
         <loc>https://bewerbungprofi.de/faq.html</loc>
-        <lastmod>2026-01-29</lastmod>
+        <lastmod>2026-04-22</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
         <xhtml:link rel="alternate" hreflang="de" href="https://bewerbungprofi.de/faq.html"/>
         <xhtml:link rel="alternate" hreflang="ru" href="https://bewerbungprofi.de/faq.html"/>
         <xhtml:link rel="alternate" hreflang="en" href="https://bewerbungprofi.de/faq.html"/>
+        <xhtml:link rel="alternate" hreflang="x-default" href="https://bewerbungprofi.de/faq.html"/>
     </url>
 </urlset>
-

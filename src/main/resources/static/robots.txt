@@ -2,20 +2,8 @@
 User-agent: *
 Allow: /
 
-# Sitemap location
-Sitemap: https://bewerbungprofi.de/sitemap.xml
-
 # Disallow API endpoints from being indexed
 Disallow: /api/
 
-# Allow static resources
-Allow: /static/
-Allow: /*.css
-Allow: /*.js
-Allow: /*.png
-Allow: /*.jpg
-Allow: /*.svg
-
-# Crawl-delay (optional, helps prevent server overload)
-Crawl-delay: 1
-
+# Sitemap location
+Sitemap: https://bewerbungprofi.de/sitemap.xml
